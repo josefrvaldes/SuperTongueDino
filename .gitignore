@@ -54,3 +54,4 @@ printer.txt
 *.binamsdos
 *.binamsdos.log
 cpctelera/tools/sdcc-3.5.0/share
+*.sna

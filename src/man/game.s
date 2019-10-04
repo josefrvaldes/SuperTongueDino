@@ -24,7 +24,7 @@ bool_mostrar_menu: .db #0
 
 ;; Manager Variables
 ent1: DefineCmp_Entity 50,    40,    0,    0, 4,  8, _hero_sp_1, e_ai_st_noAI
-;ent2: DefineCmp_Entity 70,  40, 0xFF, 0xFE, 4,  8, _hero_sp_0, e_ai_st_stand_by
+ent2: DefineCmp_Entity 70,  0, 0xFF, 0xFE, 4,  8, _hero_sp_0, e_ai_st_stand_by
 ;ent3: DefineCmp_Entity 40, 120,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
 ;ent4: DefineCmp_Entity 50,  20,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
 
@@ -78,8 +78,8 @@ man_game_init::
 	;; Init 3 entities
 	ld hl, #ent1
 	call man_entity_create
-	;ld hl, #ent2
-	;call man_entity_create
+	ld hl, #ent2
+	call man_entity_create
 	;ld hl, #ent3
 	;call man_entity_create
 	;ld hl, #ent4
@@ -147,8 +147,10 @@ man_game_render::
 	dec a
 	jr z, #render_menuIngame
 
+	cpctm_setBorder_asm HW_RED
 	call man_entity_getArray
 	call sys_eren_update
+	cpctm_setBorder_asm HW_WHITE
 
 	ret
 render_menuIngame:

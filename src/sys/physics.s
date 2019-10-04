@@ -23,11 +23,11 @@ screen_height = 200
 V_jumpControlVY_gravity:	.db #-1 ;; -1 GRAVITY // 0 JUMP CONTROL
 V_jumpControlVX_keyboardO: 	.db #1 ;; -1 GRAVITY // 0 JUMP CONTROL
 V_jumpControlVX_keyboardP:	.db #1 ;; -1 GRAVITY // 0 JUMP CONTROL
-hero_jump: 			.db #-1         	;; -1 NO SALTANDO
-hero_jump_left:		.db #-1
-hero_jump_right:		.db #-1
-hero_gravity: 		.db #0
-press_now_W:		.db #-1	;; variable que nos indica si estamos saltando justo en ese momento
+hero_jump: 				.db #-1         	;; -1 NO SALTANDO
+hero_jump_left:			.db #-1
+hero_jump_right:			.db #-1
+hero_gravity: 			.db #0
+press_now_W:			.db #-1	;; variable que nos indica si estamos saltando justo en ese momento
 ;;
 ;;TABLAS DE SALTO Y GRAVEDAD
 ;;
@@ -43,10 +43,10 @@ gravity_table:
 	.db #7 
     	.db #0x80
 jump_table_right:  		;; POSITIVO: RIGHT
-	.db #2, #2, #1, #1, #1
+	.db #2, #2, #1, #1, #1, #00
 	.db #0x80
 jump_table_left:  
-	.db #-2, #-2, #-1, #-1, #-1	;; NEGATIVO: LEFT
+	.db #-2, #-2, #-1, #-1, #-1,#00	;; NEGATIVO: LEFT
 	.db #0x80
 ;;
 ;; METODO QUE DEVUELVE SI ESTAMOS UTILIZANDO LA TABLA DE SALTO O NO
@@ -75,43 +75,56 @@ sys_physics_init::
 sys_physics_update::
 	ld	(_ent_counter), a
 
-;; CONTROLAMOS SI ESTAMOS SALTANDO O ESTAMOS CAYENDO CON GRAVEDAD
-	ld	a, (V_jumpControlVY_gravity)
-	cp	#-1
+	;; commprobamos si somos el HEROE o un ENEMIGO para pocesar el salto
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_noAI
+	jr	nz, _update_loop
 
-	jr	z, aplicate_gravity	;; SI EL VALOR ERA -1 APLICAMOS GRAVEDAD
-		call jump_control
+		;; CONTROLAMOS SI ESTAMOS SALTANDO O ESTAMOS CAYENDO CON GRAVEDAD
+		ld	a, (V_jumpControlVY_gravity)
+		cp	#-1
+		jr	z, aplicate_gravity	;; SI EL VALOR ERA -1 APLICAMOS GRAVEDAD
+			call jump_control
 		jr	no_gravity
 aplicate_gravity:
-	call	gravedad_hero
+		call	gravedad_hero
 no_gravity:
 
-;; CONTROLAMOS SI ESTAMOS SALTANDO LATERALMENTE POR LA DERECHA
-	ld	a, (V_jumpControlVX_keyboardO)
-	cp	#-1
-	jr	z, not_aplicate_jump_table_right 	;; SI EL VALOR ERA -1 NO TABLA DE SALTO DERECHA
-		call jump_control_right
+		;; CONTROLAMOS SI ESTAMOS SALTANDO LATERALMENTE POR LA DERECHA
+		ld	a, (V_jumpControlVX_keyboardO)
+		cp	#-1
+		jr	z, not_aplicate_jump_table_right 	;; SI EL VALOR ERA -1 NO TABLA DE SALTO DERECHA
+			call jump_control_right
 not_aplicate_jump_table_right:
 
-;; CONTROLAMOS SI ESTAMOS SALTANDO LATERALMENTE POR LA IZQUIERDA
-	ld	a, (V_jumpControlVX_keyboardP)
-	cp	#-1
-	jr	z, not_aplicate_jump_table_left	;; SI EL VALOR ERA -1 NO TABLA DE SALTO IZQUIERDA
-		call jump_control_left
+		;; CONTROLAMOS SI ESTAMOS SALTANDO LATERALMENTE POR LA IZQUIERDA
+		ld	a, (V_jumpControlVX_keyboardP)
+		cp	#-1
+		jr	z, not_aplicate_jump_table_left	;; SI EL VALOR ERA -1 NO TABLA DE SALTO IZQUIERDA
+			call jump_control_left
 not_aplicate_jump_table_left:
 
 
 ;; BUCLE QUE RECORRE TODAS LAS ENTIDADES CON FISICAS 
 _update_loop:
 
+
 ;; COLISIONES CON LOS OBJETOS
 	call sys_check_collision
 	;; tenemos en D = VX en E = VY
 	;; si colisionamos por arriba, salto normal
-
 	ld	a, d
 	add	e
-	jr	z,	no_jump	;Si !=0 uno de nuestros saltos seguro la jum_table normal 
+	jr	nz,	equals	;Si !=0 uno de nuestros saltos seguro la jum_table normal 
+
+		ld	a, #0
+		add	d
+		jr	z, only_collision_corner   ;; si la D es 0, es que la E tambien lo es y hay que comprobar los corner
+
+equals:	;; si no son iguales HA HABIDO COLISION SEGURO
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_noAI
+	jr	nz, no_mas_saltos
 
     		ld  a, e_y(ix)
     		add e_vy(ix)
@@ -120,11 +133,10 @@ _update_loop:
     		sub c
     		jr	z, no_mas_saltos
     		jr  nc, parar_salto_vetical  ;; velocidad positiva
-
     			;; vamos a ver si justo ahora esta pulsada la tecla W
     			ld	a, (press_now_W)
     			cp	#-1
-    			jr 	z, no_jump  ;; ya no saltamos ni para arriba ni lateralmente
+    			jr 	z, no_mas_saltos  ;; ya no saltamos ni para arriba ni lateralmente
 			call activar_salto_normal
 
 			;; en la D tengo la variabilidad de la velocidad
@@ -133,45 +145,50 @@ _update_loop:
     			ld	a, #0
     			add	d      ;; VX corregida
 
-    			jr z, no_jump		;; 0, SIN VELOCIDIAD
+    			jr z, no_mas_saltos		;; 0, SIN VELOCIDIAD
 
 	    			ld  a, e_x(ix)
 	    			add e_vx(ix)
 	    			ld  c, a
 	    			ld  a, e_vx(ix)
 	    			sub c
-	    			jr  z, no_jump    
+	    			jr  z, no_mas_saltos    
 	    			jr  c, jump_left  ;; velocidad positiva
 	        		;;velocidad negativa
 	        			call active_jump_right ;; activamos la jump table right
-	        		jr no_jump
+	        		jr no_mas_saltos
 
 jump_left:				;; velocidad positiva
 	        			call active_jump_left  ;; activamos la jump table left
-;======================================================================
-		;jr	no_mas_saltos
 
-no_jump:
+	jr	no_mas_saltos
+
+
+only_collision_corner:
 ;; COLISIONES CON LAS ESQUINAS DE LOS OBJETOS
 	call sys_check_collision_corner
+		jr no_mas_saltos
 
-	jr no_parar_salto_vertical
 ;; DEBEMOS PARAR EL SALTO VERTICAL
 parar_salto_vetical:
 	call	end_of_jump
-no_parar_salto_vertical:
-;; COLISIONES CON LOS BORDES DE LA PANTALLA
+
 no_mas_saltos:
+	;; COLISIONES CON LOS BORDES DE LA PANTALLA
 	call sys_check_borderScreem
 
+
 	_ent_counter = . + 1
-	ld	b, #0
-	dec 	b
+	ld	a, #0
+	dec 	a
 	ret	z
 
+	ld	(_ent_counter), a
 	ld	de, #sizeof_e
 	add 	ix, de
 	jr	_update_loop
+
+
 
 
 ;======================================================================================

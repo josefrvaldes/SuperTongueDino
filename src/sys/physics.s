@@ -38,9 +38,9 @@ jump_table:
     	.db #0x80
 gravity_table:
     	.db #00, #00, #00
-    	.db #1, #1, #1, #1
-    	.db #2, #2, #2, #3
-	.db #5, #7 
+    	.db #1, #1, #1, #2
+    	.db #2, #2, #3, #5
+	.db #7 
     	.db #0x80
 jump_table_right:  		;; POSITIVO: RIGHT
 	.db #2, #2, #1, #1, #1
@@ -315,7 +315,7 @@ gravedad_hero:
 	ret
 	;; se reinicia el satlo
 max_gravity:
-		ld	a, #7			;; gravedad maxima = 7
+		ld	a, #11			;; gravedad maxima = 7
 
 		ld	(hero_gravity), a
 	ret

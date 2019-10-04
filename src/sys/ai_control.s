@@ -1,5 +1,5 @@
 ;;
-;; ENTITY AI CONTROL SYSTEM
+;;  ENTITY AI CONTROL SYSTEM
 ;;
 .include "cpctelera.h.s"
 .include "cmp/entity.h.s"

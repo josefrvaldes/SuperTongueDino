@@ -24,7 +24,7 @@
 ############################################################################
 
 ## Set the name of your main game file in the CDT here
-$(eval $(call CDTMAN, SET_FILENAME, SuperRetroboy))
+$(eval $(call CDTMAN, SET_FILENAME, SuperTongueBoy))
 
 ###############################################################################
 ##                    CASSETE FILE MANAGER HELP INDEX                        ##

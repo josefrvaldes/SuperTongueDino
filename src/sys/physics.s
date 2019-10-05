@@ -4,19 +4,14 @@
 .include "cpctelera.h.s"
 .include "cmp/entity.h.s"
 .include "man/entity.h.s"
-;.include "sys/colisions.h.s"
 .include "sys/collisions.h.s"
-
 
 
 .module sys_entity_physics
 
-;; //////////////////
 ;; Physics system constants
 screen_width  = 80
 screen_height = 200
-
-
 ;;
 ;; VARIABLES CONTROL DEL SALTO Y REBOTES
 ;;
@@ -27,7 +22,8 @@ hero_jump: 				.db #-1         	;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
 hero_jump_left:			.db #-1		;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
 hero_jump_right:			.db #-1		;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
 hero_gravity: 			.db #0		;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
-press_now_W:			.db #-1	;; variable que nos indica si estamos saltando justo en ese momento
+press_now_W:			.db #-1		;; variable que nos indica si estamos saltando justo en ese momento
+;spittle:				.db #6      	;; el numero de saliva es lo que le restamos a la gravedad 
 ;;
 ;;TABLAS DE SALTO Y GRAVEDAD
 ;;
@@ -80,7 +76,68 @@ sys_physics_update::
 	ld	a, e_ai_st(ix)
 	cp	#e_ai_st_noAI	;; comparamos si no tiene IA
 	jr	nz, _update_loop
-	;; SOMOS EL HEROE
+		;; SOMOS EL HEROE
+		call check_jump_tables_init
+
+;; BUCLE QUE RECORRE TODAS LAS ENTIDADES CON FISICAS 
+_update_loop:
+	;; COLISIONES CON LOS OBJETOS
+	call sys_check_collision
+
+	;; tenemos en D = VX en E = VY
+	ld	a, d
+	add	e										;; sumo variacion en D y variacion en E
+	jr	nz,	equals								;Si !=0 es que NO HAY COLISION EN LAS ESQUINAS
+
+		ld	a, #0
+		add	d
+		jr	z, only_collision_corner   					;; SI UNA DE LAS DOS ES 0, LAS DOS LO ERAN (D y E) y por tanto comprobar colisiones en las esquinas
+equals:	;; si no son iguales HA HABIDO COLISION SEGURO
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_noAI
+	jr	nz, no_mas_saltos
+
+    		ld  a, e_y(ix)
+    		add e_vy(ix)
+    		ld  c, a
+    		ld  a, e_vy(ix)
+    		sub c
+    		jr	z, no_mas_saltos
+    		jr  nc, parar_salto_vetical  						;; velocidad positiva
+
+		call check_jump_table_update
+
+	jr	no_mas_saltos
+
+
+only_collision_corner:
+	;; COLISIONES CON LAS ESQUINAS DE LOS OBJETOS
+	call sys_check_collision_corner
+		jr no_mas_saltos
+parar_salto_vetical:
+	call	end_of_jump
+no_mas_saltos:
+	;; COLISIONES CON LOS BORDES DE LA PANTALLA
+	call sys_check_borderScreem
+
+	_ent_counter = . + 1
+	ld	a, #0
+	dec 	a
+	ret	z
+
+	ld	(_ent_counter), a
+	ld	de, #sizeof_e
+	add 	ix, de
+	jr	_update_loop
+;; FIN  -- sys_physics_update --
+;; ---------------------------------------------------------------------------------------------------------------------------------------------------- ;;
+
+
+
+;;
+;; METODO QUE COMPRUEBA LAS VARIABLES DE SALTO
+;;
+check_jump_tables_init:
 		;; CONTROLAMOS SI ESTAMOS SALTANDO O ESTAMOS CAYENDO CON GRAVEDAD
 		ld	a, (V_jumpControlVY_gravity)
 		cp	#-1
@@ -104,97 +161,41 @@ not_aplicate_jump_table_right:
 		jr	z, not_aplicate_jump_table_left	;; SI EL VALOR ERA -1 NO TABLA DE SALTO IZQUIERDA
 			call jump_control_left
 not_aplicate_jump_table_left:
+	ret
+;;
+;; METODO QUE COMPRUEBA LAS VARIABLES DE SALTO
+;;
+check_jump_table_update:
 
+    	;; vamos a ver si justo ahora esta pulsada la tecla W
+    	ld	a, (press_now_W)
+    	cp	#-1
+    	ret 	z  					;; ya no saltamos ni para arriba ni lateralmente
+	call activar_salto_normal
 
-;; BUCLE QUE RECORRE TODAS LAS ENTIDADES CON FISICAS 
-_update_loop:
+	;; en la D tengo la variabilidad de la velocidad
+	;; si es positiva, llevamos velocidad NEGATIVA = nos movemos con O = right
+	;; si es negativa, llevamos velocidad POSITIVA = nos movemos con P = left
+    	ld	a, #0
+    	add	d      ;; VX corregida
 
+    	ret z						;; 0, SIN VELOCIDIAD
 
-;; COLISIONES CON LOS OBJETOS
-;==========================================================================================================================================
-	call sys_check_collision
-;==========================================================================================================================================
-	;; tenemos en D = VX en E = VY
-	;; si colisionamos por arriba, salto normal
-	ld	a, d
-	add	e										;; sumo variacion en D y variacion en E
-	jr	nz,	equals								;Si !=0 es que NO HAY COLISION EN LAS ESQUINAS
-
-		ld	a, #0
-		add	d
-		jr	z, only_collision_corner   					;; SI UNA DE LAS DOS ES 0, LAS DOS LO ERAN (D y E) y por tanto comprobar colisiones en las esquinas
-
-equals:	;; si no son iguales HA HABIDO COLISION SEGURO
-	ld	a, e_ai_st(ix)
-	cp	#e_ai_st_noAI
-	jr	nz, no_mas_saltos
-
-    		ld  a, e_y(ix)
-    		add e_vy(ix)
-    		ld  c, a
-    		ld  a, e_vy(ix)
-    		sub c
-    		jr	z, no_mas_saltos
-    		jr  nc, parar_salto_vetical  						;; velocidad positiva
-    			;; vamos a ver si justo ahora esta pulsada la tecla W
-    			ld	a, (press_now_W)
-    			cp	#-1
-    			jr 	z, no_mas_saltos  					;; ya no saltamos ni para arriba ni lateralmente
-			call activar_salto_normal
-
-			;; en la D tengo la variabilidad de la velocidad
-			;; si es positiva, llevamos velocidad NEGATIVA = nos movemos con O = right
-			;; si es negativa, llevamos velocidad POSITIVA = nos movemos con P = left
-    			ld	a, #0
-    			add	d      ;; VX corregida
-
-    			jr z, no_mas_saltos						;; 0, SIN VELOCIDIAD
-
-	    			ld  a, e_x(ix)
-	    			add e_vx(ix)
-	    			ld  c, a
-	    			ld  a, e_vx(ix)
-	    			sub c
-	    			jr  z, no_mas_saltos    
-	    			jr  c, jump_left  ;; velocidad positiva
-	        		;;velocidad negativa
-	        			call active_jump_right 				;; activamos la jump table right
-	        		jr no_mas_saltos
+	    	ld  a, e_x(ix)
+	    	add e_vx(ix)
+	    	ld  c, a
+	    	ld  a, e_vx(ix)
+	    	sub c
+	    	ret  z    
+	    	jr  c, jump_left  ;; velocidad positiva
+	        ;;velocidad negativa
+	        	call active_jump_right 				;; activamos la jump table right
+	        ret
 
 jump_left:				;; velocidad positiva
-	        			call active_jump_left  				;; activamos la jump table left
+	        	call active_jump_left  				;; activamos la jump table left
 
-	jr	no_mas_saltos
-
-
-only_collision_corner:
-;; COLISIONES CON LAS ESQUINAS DE LOS OBJETOS
-;====================================================================================================================================================
-	call sys_check_collision_corner
-;=====================================================================================================================================================
-		jr no_mas_saltos
-
-;; DEBEMOS PARAR EL SALTO VERTICAL
-parar_salto_vetical:
-	call	end_of_jump
-
-no_mas_saltos:
-	;; COLISIONES CON LOS BORDES DE LA PANTALLA
-	call sys_check_borderScreem
-
-
-	_ent_counter = . + 1
-	ld	a, #0
-	dec 	a
-	ret	z
-
-	ld	(_ent_counter), a
-	ld	de, #sizeof_e
-	add 	ix, de
-	jr	_update_loop
-;; FIN  -- sys_physics_update --
-;; ---------------------------------------------------------------------------------------------------------------------------------------------------- ;;
-
+	ret
 
 ;;
 ;; METODO QUE NOS CALCULA LOS LIMITES DE PANTALLA Y APLICA VARIABLES VX y vy

@@ -9,35 +9,34 @@
 check_collisions::
 	ld	(_obs_counter), a
 
-	ld	d, #0             ;; si A = 0 NO modifico
-    ld  e, #0             ;; si A = 0 NO modifico
+	ld	d, #0                                           ;; si D = 0 NO modifico VX = no colision VX
+    ld  e, #0                                           ;; si E = 0 NO modifico VY = no colision VT
 _update_loop:
 
-
-
-    ld  a, e_x(ix)
-    add e_vx(ix)
-    ld  c, a
-    ld  a, e_vx(ix)
-    sub c
-    jr  z, no_collision_VX    
-    jr  c, check_collision_left  ;; velocidad positiva
+    ;; COLISIONES EJE X
+    ld  a, e_x(ix)                                      ;; A = E_X
+    add e_vx(ix)                                            
+    ld  c, a                                            ;; Guardamos en C el valor de E_X + E_VX
+    ld  a, e_vx(ix)             
+    sub c                                               ;; E_VX - (E_X + E_VX)
+    jr  z, no_collision_VX                              ;; SI 0 = NO COLLISION 
+    jr  c, check_collision_left                         ;; SI MAYOR 0 = COLLISION LEFT
         ;;velocidad negativa
-        call sys_colision_right
+        call sys_colision_right                         ;; CALL COLLISION RIGHT
         jr no_collision_VX
 
-check_collision_left:
-        call sys_colision_left
+check_collision_left:                                   ;; SI MENOR 0 = COLLISION RIGHT
+        call sys_colision_left                          ;; CALL COLLISION LEFT
 
 no_collision_VX:
-
+    ;; COLISIONES EJE Y
     ld  a, e_y(ix)
     add e_vy(ix)
     ld  c, a
     ld  a, e_vy(ix)
-    sub c
+    sub c                                               ;; E_VY- (E_Y + E_VY)
     jr  z, no_collision_VY  
-    jr  c, check_collision_top  ;; velocidad positiva
+    jr  c, check_collision_top                          ;; velocidad positiva
         ;;velocidad negativa
         call sys_colision_bottom
         jr no_collision_VY
@@ -49,17 +48,6 @@ no_collision_VY:
 
 
 
-	;call sys_collision_Top
-	 ;  jr	z, no_puede_haber_collision_bottom
-
-	;call sys_colision_bottom
-;no_puede_haber_collision_bottom:
-
-;	call sys_colision_left
- ;       jr  z, no_puede_haber_collision_right
-
-;	call sys_colision_right
-;no_puede_haber_collision_right:
 
 	_obs_counter = . + 1
 		ld	a, #0  ;; 1
@@ -83,7 +71,7 @@ ret
 check_collisions_corner::
     ld  (_obs_counter_corner), a
 
-    ld  d, #0             ;; si A = 0 NO modifico
+    ld  d, #0                                           ;; si A = 0 NO modifico
 _update_loop_corner:
 
     call sys_colision_left

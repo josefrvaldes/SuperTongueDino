@@ -20,34 +20,35 @@ screen_height = 200
 ;;
 ;; VARIABLES CONTROL DEL SALTO Y REBOTES
 ;;
-V_jumpControlVY_gravity:	.db #-1 ;; -1 GRAVITY // 0 JUMP CONTROL
-V_jumpControlVX_keyboardO: 	.db #1 ;; -1 GRAVITY // 0 JUMP CONTROL
-V_jumpControlVX_keyboardP:	.db #1 ;; -1 GRAVITY // 0 JUMP CONTROL
-hero_jump: 				.db #-1         	;; -1 NO SALTANDO
-hero_jump_left:			.db #-1
-hero_jump_right:			.db #-1
-hero_gravity: 			.db #0
+V_jumpControlVY_gravity:	.db #-1 		;; -1 GRAVITY     // 0 JUMP CONTROL
+V_jumpControlVX_keyboardO: 	.db #1 		;; -1 KEYBOARD    // 0 JUMP CONTROL           // 1 PRIMER SALTO
+V_jumpControlVX_keyboardP:	.db #1 		;; -1 KEYBOARD    // 0 JUMP CONTROL          // 1 PRIMER SALTO
+hero_jump: 				.db #-1         	;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
+hero_jump_left:			.db #-1		;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
+hero_jump_right:			.db #-1		;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
+hero_gravity: 			.db #0		;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
 press_now_W:			.db #-1	;; variable que nos indica si estamos saltando justo en ese momento
 ;;
 ;;TABLAS DE SALTO Y GRAVEDAD
 ;;
-jump_table:
+jump_table:						;; Tabla de salto normal (hacia arriba)
 	.db #-7, #-5, #-4, #-3
     	.db #-2, #-2, #-2, #-1
     	.db #-1, #-1, #-1
-    	.db #0x80
-gravity_table:
+    	.db #0x80					;; Ultima posicion de la tabla, para saber que he terminado (nunca tendre una velocidad tan alta)
+gravity_table:					;; Tabla de salto que simula la gravedad
     	.db #00, #00, #00
     	.db #1, #1, #1, #2
     	.db #2, #2, #3, #5
 	.db #7 
     	.db #0x80
-jump_table_right:  		;; POSITIVO: RIGHT
+jump_table_right:  				;; Tabla hacia la IZQUIERDA cuando colisionamos por la DERECHA
 	.db #2, #2, #1, #1, #1, #00
 	.db #0x80
-jump_table_left:  
-	.db #-2, #-2, #-1, #-1, #-1,#00	;; NEGATIVO: LEFT
+jump_table_left:  				;; Tabla hacia la DERECHA cuando colisionamos por la IZQUIERDA
+	.db #-2, #-2, #-1, #-1, #-1,#00	
 	.db #0x80
+
 ;;
 ;; METODO QUE DEVUELVE SI ESTAMOS UTILIZANDO LA TABLA DE SALTO O NO
 ;; 	RETURN: A - valor de salto lateral
@@ -70,16 +71,16 @@ sys_physics_init::
 ;;
 ;; SYS_PHYSICS UPDATE
 ;; Input: IX -> puntero al array de entidades,    A -> numero de elementos en el array 
-;; Destroy: AF, BC, DE, IX
+;; Destroy: AF, BC, DE, IX, IY, HL -- TODOS
 ;; Stack Use: 2 bytes
 sys_physics_update::
 	ld	(_ent_counter), a
 
 	;; commprobamos si somos el HEROE o un ENEMIGO para pocesar el salto
 	ld	a, e_ai_st(ix)
-	cp	#e_ai_st_noAI
+	cp	#e_ai_st_noAI	;; comparamos si no tiene IA
 	jr	nz, _update_loop
-
+	;; SOMOS EL HEROE
 		;; CONTROLAMOS SI ESTAMOS SALTANDO O ESTAMOS CAYENDO CON GRAVEDAD
 		ld	a, (V_jumpControlVY_gravity)
 		cp	#-1
@@ -110,16 +111,18 @@ _update_loop:
 
 
 ;; COLISIONES CON LOS OBJETOS
+;==========================================================================================================================================
 	call sys_check_collision
+;==========================================================================================================================================
 	;; tenemos en D = VX en E = VY
 	;; si colisionamos por arriba, salto normal
 	ld	a, d
-	add	e
-	jr	nz,	equals	;Si !=0 uno de nuestros saltos seguro la jum_table normal 
+	add	e										;; sumo variacion en D y variacion en E
+	jr	nz,	equals								;Si !=0 es que NO HAY COLISION EN LAS ESQUINAS
 
 		ld	a, #0
 		add	d
-		jr	z, only_collision_corner   ;; si la D es 0, es que la E tambien lo es y hay que comprobar los corner
+		jr	z, only_collision_corner   					;; SI UNA DE LAS DOS ES 0, LAS DOS LO ERAN (D y E) y por tanto comprobar colisiones en las esquinas
 
 equals:	;; si no son iguales HA HABIDO COLISION SEGURO
 	ld	a, e_ai_st(ix)
@@ -132,11 +135,11 @@ equals:	;; si no son iguales HA HABIDO COLISION SEGURO
     		ld  a, e_vy(ix)
     		sub c
     		jr	z, no_mas_saltos
-    		jr  nc, parar_salto_vetical  ;; velocidad positiva
+    		jr  nc, parar_salto_vetical  						;; velocidad positiva
     			;; vamos a ver si justo ahora esta pulsada la tecla W
     			ld	a, (press_now_W)
     			cp	#-1
-    			jr 	z, no_mas_saltos  ;; ya no saltamos ni para arriba ni lateralmente
+    			jr 	z, no_mas_saltos  					;; ya no saltamos ni para arriba ni lateralmente
 			call activar_salto_normal
 
 			;; en la D tengo la variabilidad de la velocidad
@@ -145,7 +148,7 @@ equals:	;; si no son iguales HA HABIDO COLISION SEGURO
     			ld	a, #0
     			add	d      ;; VX corregida
 
-    			jr z, no_mas_saltos		;; 0, SIN VELOCIDIAD
+    			jr z, no_mas_saltos						;; 0, SIN VELOCIDIAD
 
 	    			ld  a, e_x(ix)
 	    			add e_vx(ix)
@@ -155,18 +158,20 @@ equals:	;; si no son iguales HA HABIDO COLISION SEGURO
 	    			jr  z, no_mas_saltos    
 	    			jr  c, jump_left  ;; velocidad positiva
 	        		;;velocidad negativa
-	        			call active_jump_right ;; activamos la jump table right
+	        			call active_jump_right 				;; activamos la jump table right
 	        		jr no_mas_saltos
 
 jump_left:				;; velocidad positiva
-	        			call active_jump_left  ;; activamos la jump table left
+	        			call active_jump_left  				;; activamos la jump table left
 
 	jr	no_mas_saltos
 
 
 only_collision_corner:
 ;; COLISIONES CON LAS ESQUINAS DE LOS OBJETOS
+;====================================================================================================================================================
 	call sys_check_collision_corner
+;=====================================================================================================================================================
 		jr no_mas_saltos
 
 ;; DEBEMOS PARAR EL SALTO VERTICAL
@@ -187,11 +192,15 @@ no_mas_saltos:
 	ld	de, #sizeof_e
 	add 	ix, de
 	jr	_update_loop
+;; FIN  -- sys_physics_update --
+;; ---------------------------------------------------------------------------------------------------------------------------------------------------- ;;
 
 
-
-
-;======================================================================================
+;;
+;; METODO QUE NOS CALCULA LOS LIMITES DE PANTALLA Y APLICA VARIABLES VX y vy
+;; IMPUT   :  IX: entidad actual
+;; DESTROY :  AF, BC
+;;
 sys_check_borderScreem:
 ;; CHOQUES CON LOS BORDES DE LA PANTALLA
 	;; UPDATE X
@@ -233,119 +242,123 @@ endif_y:
 
 	ret
 
-;======================================================================================
+;;
+;; METODO QUE NOS CALCULA LAS COLISIONES EN LOS 4 EJES
+;; IMPUT   :  IX: entidad actual
+;; DESTROY :  AF, DA
+;; AL SALIR: D y E siguen teniendo el valor que hay que modifcar, lo que nos servira para calcular los saltos en el caso de ser el HEROE
+;;
 sys_check_collision:
-	;; RETURN: - IY puntero a obstaculos
-	;;	     - A numero de obstaculos
-	call man_obstacle_getArray
-	;; RETURN: - D modificacion en e_x
-	;;         - E modificacion en e_y
-	call check_collisions
 
-	ld	a, d
-	add	#0     ;; si no hat colision se debe de quedar en 0
+	call man_obstacle_getArray				;; RETURN: - IY puntero a obstaculos
+									;;	     - A numero de obstaculos
+	call check_collisions					;; RETURN: - D modificacion en e_x
+									;;         - E modificacion en e_y
+
+	ld	a, d   						;;tenemos la variacion en el eje X
+	add	#0     						;; si no hat colision se debe de quedar en 0
 	jr z, no_colision_X
 		;; COLISION EN X:
             ld    a, e_x(ix)
-            sub    d
-            ld    e_x(ix), a   
+            sub    d						;; al tener colision:
+            ld    e_x(ix), a   				;; anyadimos esa modicion para que se quede en el borde
 no_colision_X:
 
-	ld	a, e
-	add	#0	;; si no hay colision se debe de quedar en 0 ( -1 + 1 = 0)
+	ld	a, e							;; tenemos la variacion en el EJE Y
+	add	#0							;; si no hay colision se debe de quedar en 0 ( -1 + 1 = 0)
 
 	jr z, no_colision_Y
 		;; COLISION EN Y
             ld    a, e_y(ix)
-            sub    e
-            ld    e_y(ix), a   
+            sub    e						;; al tener colision:
+            ld    e_y(ix), a   				;; anyadimos esa modificacion para que se quede en el borde
 no_colision_Y:
 	ret
 
-;==========================================================================================
+;;
+;; METODO QUE NOS CALCULA LAS COLISIONES EN LAS 4 ESQUINAS
+;; IMPUT   :  IX: entidad actual
+;; DESTROY :  AF, BC
+;;
 sys_check_collision_corner:
-	;; Si no nos da colisiones por ningun lado puede ser que las tengamos en las diagonales
-	ld	a, d
-	add	e
-
-	jr	nz,	no_collision_corner
-	;; si PUEDE collision
+	;; si "PUEDE" collision
 	;; HAGO EL SUPUESTO DE SUMAR LA VELOCIAD EN Y
-	ld	a, e_y(ix)
-	add	e_vy(ix)
-	ld	e_y(ix), a
+	ld	a, e_y(ix)						;; guardo en A la posicion Y de la entidad
+	add	e_vy(ix)						;; le sumo la VY
+	ld	e_y(ix), a                                ;; se lo aplico a la variable/dato posicion Y de la entidad
 
-	call man_obstacle_getArray
-	;; RETURN: - D modificacion en e_x
-	call check_collisions_corner
+	call man_obstacle_getArray				;; Apunto al primer obstaculo
+	call check_collisions_corner				;; y al igual que en la colision normal los recorro con: UN EJE YA SUMADO, en este caso el Y
 
-	ld	a, d
-	add	#0		     ;; si no hat colision se debe de quedar en 0
-	jr z, no_colision_X_corner
+	ld	a, d							;; como la colision por las esquinas las DOS  se modifican (D y E) cojo una y compruebo si es 0 o no
+	add	#0		     					;; le anyado 0 para activar el FLAG Z
+	jr z, no_colision_X_corner				;; COLLISION = 0 // NO COLLISION != 0
 		;; COLISION EN X:
             ld    a, e_x(ix)
             sub    d
-            ld    e_x(ix), a   
-no_colision_X_corner:
-	;; haya o no colision, vuelvo a dejar la VY como estaba ya que se modifica despues
-	ld	a, e_y(ix)
+            ld    e_x(ix), a   				;; Al aplicarselo en X siempre que entremos por UNA ESQUINA, nos dejara por debajo la cantidad de pixles que hemos entrado simulando la caida dela gravedad
+no_colision_X_corner:					
+	ld	a, e_y(ix)						;; haya o no colision, vuelvo a dejar la VY como estaba ya que se modifica despues en sys_check_borderScreem
 	sub	e_vy(ix)
 	ld	e_y(ix), a
-no_collision_corner:
+
 	ret
 
 
 
 
-;====================================================================0
+;=====================================================================
 ;   			¡¡¡¡¡¡¡¡¡  SALTO !!!!!!!!!!
 ;=====================================================================
 
 ;; destruye A
+;; Recorremos la tabla de GRAVEDAD
 gravedad_hero:
 
-	ld	a, (hero_gravity)
+	ld	a, (hero_gravity)					;; guardamos en A la variable gravedad
 	cp	#-1
-	ret	z	;; el valor era -1 y po lo tanto no se esta saltando
+	ret	z							;; si A = -1 NO SALTAR // si A != -1 SI SALTAR/SALTANDO
 
 	;; Get jump value
-	ld	hl, #gravity_table  ;; hl primer valor de jump_table
+	ld	hl, #gravity_table  				;; hl primer valor de jump_table
 	ld	e, a
 	ld 	d, #0
-	add	hl, de
+	add	hl, de						;; Se le suma al primer valor de la tabla (HL) el indice actual (A
 
 	;; Comprobar final del salto
-	ld	a, (hl)
-	cp	#0x80
-	jr	z, max_gravity
+	ld	a, (hl)					
+	cp	#0x80							;; Comprobamos el indice actual con el ultimo (SIEMPRE ES 0x80 ya que es el maximo numero negativo)
+	jr	z, max_gravity					;; si A = 0x80 ESTAMOS EN GRAVEDAD MAXIMA // si A != 0x80 SEGUIMOS RECORRIENDO
 
 	;; Cambia la velocidad segun la tabla
 	ld	d, a
 	ld	a, e_vy(ix)
-	add	d
-	ld	e_vy(ix), a
+	add	d							;; SUMAMOS EN D el indice actual+ VY
+	ld	e_vy(ix), a						;; APLICAMOS LA GRAVEDAD ACTUAL A NUESTRA VARIABLE VY (es decir, en el eje Y)
 
 	;; Cambia el indice actual en la tabla
-	ld	a, (hero_gravity)
-	inc	a
-	ld	(hero_gravity), a
-	ret
+	ld	a, (hero_gravity)					;; COGEMOS EL INDICE ACTUAL
+	inc	a							;; LO AUMENTAMOS EN 1
+	ld	(hero_gravity), a					;; Y SE LO APLICAMOS 
+	ret								;; SALIMOS
 	;; se reinicia el satlo
 max_gravity:
-		ld	a, #11			;; gravedad maxima = 7
+		;; MALA PROGRAMACION -- VALOR PUESTO A PELO
+		ld	a, #11					;; GUARDAMOS EN A EL INDICE ULTIMO DE NUESTRA TABLA = GRAVEDAD MAXIMA
 
 		ld	(hero_gravity), a
 	ret
 
 ;; destruye A
+;; Recorremos la tabla de salto DERECHA
 jump_control_right:
 
 	ld	a, (hero_jump_right)
 	cp	#-1
-	ret	z	;; el valor era -1 y po lo tanto no se esta saltando
+	ret	z	
 
 	;; Get jump value
-	ld	hl, #jump_table_right  ;; hl primer valor de jump_table
+	ld	hl, #jump_table_right 
 	ld	e, a
 	ld 	d, #0
 	add	hl, de
@@ -368,20 +381,20 @@ jump_control_right:
 	ret
 	;; se reinicia el satlo
 end_of_jump_right:
-		ld	a, #-1			;; gravedad maxima = 7
+		ld	a, #-1		
 
 		ld	(hero_jump_right), a
 		ld	(V_jumpControlVX_keyboardO), a
 	ret
-
+;; Recorremos la tabla de salto ZIQUIERDA
 jump_control_left:
 
 	ld	a, (hero_jump_left)
 	cp	#-1
-	ret	z	;; el valor era -1 y po lo tanto no se esta saltando
+	ret	z	
 
 	;; Get jump value
-	ld	hl, #jump_table_left  ;; hl primer valor de jump_table
+	ld	hl, #jump_table_left 
 	ld	e, a
 	ld 	d, #0
 	add	hl, de
@@ -404,20 +417,20 @@ jump_control_left:
 	ret
 	;; se reinicia el satlo
 end_of_jump_left:
-		ld	a, #-1			;; gravedad maxima = 7
+		ld	a, #-1			
 
 		ld	(hero_jump_left), a
 		ld	(V_jumpControlVX_keyboardP), a
 	ret
 
-
+;; Recorremos la tabla de salto normal
 jump_control:
 	ld	a, (hero_jump)
 	cp	#-1
-	ret	z	;; el valor era -1 y po lo tanto no se esta saltando
+	ret	z	
 
 	;; Get jump value
-	ld	hl, #jump_table  ;; hl primer valor de jump_table
+	ld	hl, #jump_table 
 	ld	e, a
 	ld 	d, #0
 	add	hl, de
@@ -454,28 +467,30 @@ end_of_jump:
 	ret
 
 ;; Modifica A
+; Loc contrario a NOT_JUMP, empezamos a saltar
 start_jump::
 
 	ld	a, (press_now_W)
 	cp	#-1
-	jr	nz,  continue_start_jump	;; ya se habia pulsado el salto, me voy
+	jr	nz,  continue_start_jump				;; ya se habia pulsado el salto, me voy
 
 		ld	a, #0
 		ld (press_now_W), a
-
+; Limpiar la variable hero_jump ya que si pulsamos en el aire y NO estamos colisionando se queda activa
 continue_start_jump:
 
 	ld	a, (hero_jump)
 	cp	#-1
-	ret	nz	;; ya se habia pulsado el salto, me voy
+	ret	nz								;; ya se habia pulsado el salto, me voy
 	ld	a, #0
 	ld	(hero_jump), a
 
 	ret
+;; inmediatamente después de pulsar la tecla de salto, reseteamos y nps ponemos en estado "NOT PRESS" = -1
 not_jump::
 	ld	a, (press_now_W)
 	cp	#0
-	ret	nz	;; ya se habia pulsado el salto, me voy
+	ret	nz								;; ya se habia pulsado el salto, me voy
 
 		ld	a, #-1
 		ld (press_now_W), a
@@ -501,35 +516,35 @@ activar_salto_normal:
 		;; LE DAMOS EL CONTROL AL JUMP COMTRL
 		ld (V_jumpControlVY_gravity), a
 	ret
-
+; Saltamos y colisionamos con velocidad POSITIVA
 active_jump_left:
 	ld	a, (V_jumpControlVY_gravity)
 	cp	#-1
-	ret	z	;; el valor era -1 y po lo tanto no se esta saltando
+	ret	z								;; el valor era -1 y po lo tanto no se esta saltando
 
 	ld	a, (V_jumpControlVX_keyboardP)
 	cp	#-1
-	ret	z	;; el valor era -1 y po lo tanto no se esta saltando
+	ret	z								;; el valor era -1 y po lo tanto no se esta saltando
 		ld	a, #0
 		;; el control deja de estar en el usuario y se le pasa a la jump table
-		ld	(hero_jump_left), a    ;; a 0 es que esta ACTIVO
-		ld	(V_jumpControlVX_keyboardP), a    ;; a 0 es que esta ACTIVO
+		ld	(hero_jump_left), a    				;; a 0 es que esta ACTIVO
+		ld	(V_jumpControlVX_keyboardP), a    		;; a 0 es que esta ACTIVO
 	ret
-
+;  Saltamos y colisionamos con velocidad NEGATIVA
 active_jump_right:
 	ld	a, (V_jumpControlVY_gravity)
 	cp	#-1
-	ret	z	;; el valor era -1 y po lo tanto estamos en gravedad
+	ret	z								;; el valor era -1 y po lo tanto estamos en gravedad
 	;; ERROR, NO NOS COGE LA GRAVEDAD EN ESE INSTANTE... .SE ACTUALIZARA DESPUES?
 
 	ld	a, (V_jumpControlVX_keyboardO)
 	cp	#-1
-	ret	z	;; el valor era -1 y po lo tanto no se esta saltando
+	ret	z								;; el valor era -1 y po lo tanto no se esta saltando
 
 		ld	a, #0
 		;; el control deja de estar en el usuario y se le pasa a la jump table
-		ld	(hero_jump_right), a    ;; a 0 es que esta ACTIVO
-		ld	(V_jumpControlVX_keyboardO), a    ;; a 0 es que esta ACTIVO
+		ld	(hero_jump_right), a    			;; a 0 es que esta ACTIVO
+		ld	(V_jumpControlVX_keyboardO), a    		;; a 0 es que esta ACTIVO
 	ret
 
 

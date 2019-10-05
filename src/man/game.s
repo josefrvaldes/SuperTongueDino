@@ -26,8 +26,8 @@ bool_mostrar_menu: .db #0
 ;; Manager Variables
 ent1: DefineCmp_Entity 50,    40,    0,    0, 4,  8, _hero_sp_1, e_ai_st_noAI
 ent2: DefineCmp_Entity 70,  0, 0xFF, 0xFE, 4,  8, _hero_sp_2, e_ai_st_stand_by
-;ent3: DefineCmp_Entity 40, 120,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
-;ent4: DefineCmp_Entity 50,  20,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
+;ent3: DefineCmp_Entity 40, 0,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
+;ent4: DefineCmp_Entity 50,  0,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
 
 obst1: DefineCmp_Obstacle  0, 121,    12, 8, 0x0F
 obst2: DefineCmp_Obstacle 40, 70,    4, 80, 0x0F

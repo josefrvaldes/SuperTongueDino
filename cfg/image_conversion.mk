@@ -43,7 +43,7 @@
 PALETTE= 26 0 1 2 3 6 9 11 12 13 15 16 18 20 24 25
 $(eval $(call IMG2SP, SET_FOLDER, src/assets/sprites/ ))
 $(eval $(call IMG2SP, SET_PALETTE_FW  , $(PALETTE) ))
-$(eval $(call IMG2SP, CONVERT, img/hero.png , 8, 8, hero_sp, hero_pal ))
+$(eval $(call IMG2SP, CONVERT, img/tongueBoy.png , 8, 8, hero_sp, hero_pal ))
 
 
 

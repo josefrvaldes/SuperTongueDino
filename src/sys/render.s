@@ -18,6 +18,13 @@
 screen_start = 0xC000
 
 
+decompress_buffer     = 0x040
+level_max_size        = 0x362
+decompress_buffer_end = decompress_buffer + level_max_size - 1
+tilemap_ptr 	    = decompress_buffer + 0
+tileset_ptr 	    = decompress_buffer + 98
+
+
 
 
 ;; //////////////////
@@ -31,6 +38,25 @@ sys_eren_init::
 	ld	de, #16
 	call cpct_setPalette_asm
 	cpctm_setBorder_asm HW_WHITE
+	call sys_eren_load_tilemap
+	ret
+
+
+sys_eren_load_tilemap::
+
+	ld hl, #_level0_pack_end
+	ld de, #decompress_buffer_end
+	call cpct_zx7b_decrunch_s_asm
+
+	ld bc, #0x070E
+	ld de, #_castillo_W
+	ld hl, #tileset_ptr
+	call cpct_etm_setDrawTilemap4x8_ag_asm
+
+
+	ld hl, #0xC000
+	ld de, #tilemap_ptr
+	call cpct_etm_drawTilemap4x8_ag_asm
 	ret
 
 

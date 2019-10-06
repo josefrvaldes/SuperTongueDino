@@ -48,6 +48,15 @@ $(eval $(call IMG2SP, CONVERT, img/tongueBoy.png , 8, 8, hero_sp, hero_pal ))
 
 
 
+$(eval $(call IMG2SP, SET_FOLDER, src/tilesets/ ))
+$(eval $(call IMG2SP, SET_OUTPUT, bin))
+$(eval $(call IMG2SP, SET_IMG_FORMAT, zgtiles))
+$(eval $(call IMG2SP, CONVERT_PALETTE , $(PALETTE), tilemap_pal ))
+$(eval $(call IMG2SP, CONVERT, img/TilesCastillo.png, 8, 8, tiles, ))
+
+
+
+
 ##
 ## OLD MACROS (For compatibility)
 ##

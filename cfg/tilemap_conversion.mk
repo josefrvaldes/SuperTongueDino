@@ -38,6 +38,12 @@
 # Conversion 
 #$(eval $(call TMX2DATA, CONVERT, tmxfile, array )) 
 
+# imagen del tilemap
+#$(eval $(call TMX2DATA, SET_BITSPERITEM , 8))
+
+$(eval $(call TMX2DATA, SET_FOLDER, src/tilesets/ )) 
+$(eval $(call TMX2DATA, SET_OUTPUTS, hs bin))
+$(eval $(call TMX2DATA, CONVERT, img/castillo.tmx, castillo ))
 
 ##
 ## OLD MACROS (For compatibility)

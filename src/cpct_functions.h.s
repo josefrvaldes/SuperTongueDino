@@ -15,3 +15,4 @@
 .globl cpct_memset_f64_asm
 .globl cpct_setDrawCharM0_asm
 .globl cpct_drawStringM0_asm
+.globl cpct_zx7b_decrunch_s_asm

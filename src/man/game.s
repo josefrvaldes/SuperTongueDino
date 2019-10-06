@@ -79,8 +79,8 @@ man_game_init::
 	;; Init 3 entities
 	ld hl, #ent1
 	call man_entity_create
-	ld hl, #ent2
-	call man_entity_create
+	;ld hl, #ent2
+	;call man_entity_create
 	;ld hl, #ent3
 	;call man_entity_create
 	;ld hl, #ent4

@@ -18,6 +18,7 @@
 .area _CODE
 
 
+
 ;;
 ;; MAIN function. This is the entry point of the application.
 ;;    _main:: global symbol is required for correctly compiling and linking

@@ -1,9 +1,9 @@
 ;; File 'src/tilesets/level0_pack.h.s' generated using cpct_pack
 ;; Compresor used:   zx7b
 ;; Files compressed: [ 'src/tilesets/castillo.bin' 'src/tilesets/TilesCastillo.bin' ]
-;; Uncompressed:     866 bytes
-;; Compressed:       196 bytes
-;; Space saved:      670 bytes
+;; Uncompressed:     1268 bytes
+;; Compressed:       180 bytes
+;; Space saved:      1088 bytes
 ;;
 
 ;; Declaration of the compressed array and
@@ -12,11 +12,11 @@
 .globl _level0_pack_end
 
 ;; Compressed and uncompressed sizes
-_level0_pack_size_z == 196
-_level0_pack_size   == 866
+_level0_pack_size_z == 180
+_level0_pack_size   == 1268
 
 
 ;; Define constants for starting offsets of files in the uncompressed array
 _level0_pack_OFF_000 ==      0   ;; Starting offset for src/tilesets/castillo.bin
-_level0_pack_OFF_001 ==     98   ;; Starting offset for src/tilesets/TilesCastillo.bin
+_level0_pack_OFF_001 ==    500   ;; Starting offset for src/tilesets/TilesCastillo.bin
 

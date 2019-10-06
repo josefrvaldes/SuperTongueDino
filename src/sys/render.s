@@ -19,10 +19,10 @@ screen_start = 0xC000
 
 
 decompress_buffer     = 0x040
-level_max_size        = 0x362
+level_max_size        = 0x4F4
 decompress_buffer_end = decompress_buffer + level_max_size - 1
 tilemap_ptr 	    = decompress_buffer + 0
-tileset_ptr 	    = decompress_buffer + 98
+tileset_ptr 	    = decompress_buffer + 500
 
 
 
@@ -48,7 +48,7 @@ sys_eren_load_tilemap::
 	ld de, #decompress_buffer_end
 	call cpct_zx7b_decrunch_s_asm
 
-	ld bc, #0x070E
+	ld bc, #0x1914
 	ld de, #_castillo_W
 	ld hl, #tileset_ptr
 	call cpct_etm_setDrawTilemap4x8_ag_asm

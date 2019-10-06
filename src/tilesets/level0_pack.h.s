@@ -2,8 +2,8 @@
 ;; Compresor used:   zx7b
 ;; Files compressed: [ 'src/tilesets/castillo.bin' 'src/tilesets/TilesCastillo.bin' ]
 ;; Uncompressed:     1268 bytes
-;; Compressed:       180 bytes
-;; Space saved:      1088 bytes
+;; Compressed:       190 bytes
+;; Space saved:      1078 bytes
 ;;
 
 ;; Declaration of the compressed array and
@@ -12,7 +12,7 @@
 .globl _level0_pack_end
 
 ;; Compressed and uncompressed sizes
-_level0_pack_size_z == 180
+_level0_pack_size_z == 190
 _level0_pack_size   == 1268
 
 

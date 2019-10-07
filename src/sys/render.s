@@ -13,12 +13,15 @@
 
 .globl _hero_pal
 
+.globl _level0_pack_end
+.globl _castillo_W
+
 ;; //////////////////
 ;; Square Render System Constants
 screen_start = 0xC000
 
 
-decompress_buffer     = 0x040
+decompress_buffer     = 0x4000
 level_max_size        = 0x4F4
 decompress_buffer_end = decompress_buffer + level_max_size - 1
 tilemap_ptr 	    = decompress_buffer + 0

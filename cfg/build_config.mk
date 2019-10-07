@@ -49,7 +49,7 @@
 # Name of the project (without spaces, as it will be used as filename)
 #   and Z80 memory location where code will start in the generated binary
 PROJNAME   := SuperTongueBoy
-Z80CODELOC := 0x534 # empezamos en esta posición para reservar tamaño para el tilemap descomprimido
+Z80CODELOC := 0x44F4 # empezamos en esta posición para reservar tamaño para el tilemap descomprimido
 
 ##
 ## Folders 
@@ -124,7 +124,7 @@ include $(CPCT_PATH)/cfg/global_paths.mk
 ##   fine for most of the projects, but you may change them for special uses.
 #####
 Z80CCFLAGS    :=
-Z80ASMFLAGS   := -l -o -s -g
+Z80ASMFLAGS   := -l -o -s
 Z80CCINCLUDE  := -I$(CPCT_SRC) -I$(SRCDIR)
 Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
                  --code-loc $(Z80CODELOC) \

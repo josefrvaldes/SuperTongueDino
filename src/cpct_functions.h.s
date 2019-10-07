@@ -16,3 +16,5 @@
 .globl cpct_setDrawCharM0_asm
 .globl cpct_drawStringM0_asm
 .globl cpct_zx7b_decrunch_s_asm
+.globl cpct_etm_setDrawTilemap4x8_ag_asm
+.globl cpct_etm_drawTilemap4x8_ag_asm

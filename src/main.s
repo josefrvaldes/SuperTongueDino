@@ -2,7 +2,7 @@
 ;; Include all CPCtelera constant definitions, macros and variables
 .include "cpctelera.h.s"
 .include "cpct_functions.h.s"
-.include "man/game.h.s"
+.include "man/state.h.s"
 
 ;;
 ;; Start of _DATA area 
@@ -18,7 +18,6 @@
 .area _CODE
 
 
-
 ;;
 ;; MAIN function. This is the entry point of the application.
 ;;    _main:: global symbol is required for correctly compiling and linking
@@ -27,12 +26,12 @@ _main::
    ;; Disable firmware to prevent it from interfering with string drawing
    call cpct_disableFirmware_asm
 
-   call man_game_init
+   call man_state_init
 
    ;; Loop forever
 loop:
-   call man_game_update
+   call man_state_update
 
    call cpct_waitVSYNC_asm
-   call man_game_render
+   call man_state_render
    jr    loop

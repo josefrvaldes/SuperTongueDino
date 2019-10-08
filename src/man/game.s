@@ -11,7 +11,7 @@
 .include "man/entity.h.s"
 .include "man/man_obstacle.h.s"
 .include "sys/ai_control.h.s"
-.include "sys/menuIngame.h.s"
+.include "man/menuIngame.h.s"
 
 .module game_manager
 
@@ -29,11 +29,11 @@ ent2: DefineCmp_Entity 70,  0, 0xFF, 0xFE, 4,  8, _hero_sp_2, e_ai_st_stand_by
 ;ent3: DefineCmp_Entity 40, 0,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
 ;ent4: DefineCmp_Entity 50,  0,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
 
-obst1: DefineCmp_Obstacle  0, 121,    12, 8, 0x0F
-obst2: DefineCmp_Obstacle 40, 70,    4, 80, 0x0F
+obst1: DefineCmp_Obstacle  0, 120,    12, 8, 0x0F
+obst2: DefineCmp_Obstacle 40, 72,    4, 80, 0x0F
 obst3: DefineCmp_Obstacle 60, 101,    20, 8, 0x0F
-obst4: DefineCmp_Obstacle  0, 150,   40, 8, 0x0F
-obst5: DefineCmp_Obstacle  40, 150,   40, 8, 0x0F
+obst4: DefineCmp_Obstacle  0, 152,   40, 8, 0x0F
+obst5: DefineCmp_Obstacle  40, 152,   40, 8, 0x0F
 obst6: DefineCmp_Obstacle  0, 40,    24, 8, 0x0F
 ;; //////////////////
 ;; Manager Game Init
@@ -167,21 +167,26 @@ render_menuIngame:
 abrir_cerrar_menuIngame::
 	ld a, (#bool_mostrar_menu) ;; comprobacion menu ingame abierto
 	dec a
-	jr z, #cerrar_menuIngame
+	jr z, #salir_menuIngame
 	abrir_menuIngame:
 	ld a, #1
 	ld (#bool_mostrar_menu), a
 	call menuIngame_init
 	ret
 	
-	cerrar_menuIngame:
+	salir_menuIngame:
 	ld a, #0
 	ld (#bool_mostrar_menu), a
 	call sys_eren_clearScreen
 
-	;; nos da el puntero al array de obstaculos
-	call man_obstacle_getArray
-	;; TEMPORANEO!!! Para comprobar coliones, despues no se renderizara
-	call sys_eren_update_obstacle
 
+	;; TEMPORANEO !!! Para dibujar el tileset pero descomprime y todo
+	call sys_eren_init
+
+	ret
+
+
+man_game_cerrarMenuIngame::
+	ld a, #0
+	ld (#bool_mostrar_menu), a
 	ret

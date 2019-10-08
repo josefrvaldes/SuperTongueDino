@@ -2,7 +2,8 @@
 ;;  ENTITY AI CONTROL SYSTEM
 ;;
 .include "cpctelera.h.s"
-.include "cmp/entity.h.s"
+.include "ent/entity.h.s"
+.include "ent/ent_obstacle.h.s"
 .include "man/entity.h.s"
 
 

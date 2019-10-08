@@ -3,7 +3,8 @@
 ;;
 .include "cpctelera.h.s"
 .include "man/entity.h.s"
-.include "cmp/entity.h.s"
+.include "ent/entity.h.s"
+.include "ent/ent_obstacle.h.s"
 .include "cpct_functions.h.s"
 ;.include "sys/colisions.h.s"
 .include "physics.h.s"

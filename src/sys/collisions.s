@@ -1,5 +1,6 @@
 .include "cpctelera.h.s"
-.include "cmp/entity.h.s"
+.include "ent/entity.h.s"
+.include "ent/ent_obstacle.h.s"
 .include "sys/collisions.h.s"
 
 ;;

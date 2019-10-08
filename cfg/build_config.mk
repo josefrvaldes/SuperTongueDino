@@ -124,7 +124,7 @@ include $(CPCT_PATH)/cfg/global_paths.mk
 ##   fine for most of the projects, but you may change them for special uses.
 #####
 Z80CCFLAGS    :=
-Z80ASMFLAGS   := -l -o -s -g
+Z80ASMFLAGS   := -l -o -s
 Z80CCINCLUDE  := -I$(CPCT_SRC) -I$(SRCDIR)
 Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
                  --code-loc $(Z80CODELOC) \

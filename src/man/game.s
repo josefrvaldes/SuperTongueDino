@@ -1,20 +1,20 @@
 ;;
 ;;  GAME MANAGER
 ;;
-
 .include "cpctelera.h.s"
 .include "sys/render.h.s"
-.include "cmp/entity.h.s"
+.include "ent/entity.h.s"
+.include "ent/ent_obstacle.h.s"
 .include "sys/physics.h.s"
 .include "sys/render.h.s"
 .include "sys/input.h.s"
 .include "man/entity.h.s"
+.include "man/man_obstacle.h.s"
 .include "sys/ai_control.h.s"
 .include "sys/menuIngame.h.s"
-;.include "sys/colisions.h.s"
-
 
 .module game_manager
+
 
 bool_mostrar_menu: .db #0
 
@@ -40,9 +40,10 @@ obst6: DefineCmp_Obstacle  0, 40,    24, 8, 0x0F
 ;; Input: -
 ;; Destroy: AF, BC, DE, HL, IX
 man_game_init::
+
+	;; TODO: valdés: esto luego cambiará, se generarán según el nivel. Esto habrá que cambiarlo
 	;; Obstacle manager
 	call man_obstacle_init
-
 	ld hl, #obst1
 	call man_obstacle_create
 	ld hl, #obst2

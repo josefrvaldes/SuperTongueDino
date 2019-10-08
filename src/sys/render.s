@@ -1,10 +1,13 @@
 ;;
 ;; SQUARE RENDER SYSTEM
 ;;
-.include "cmp/entity.h.s"
-.include "man/entity.h.s"
 .include "cpctelera.h.s"
+.include "tilesets/cabeceras_tilesets.h.s"
+.include "man/entity.h.s"
 .include "cpct_functions.h.s"
+.include "ent/entity.h.s"
+.include "ent/ent_obstacle.h.s"
+.include "man/man_obstacle.h.s"
 
 
 

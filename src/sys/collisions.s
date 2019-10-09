@@ -4,10 +4,8 @@
 .include "sys/collisions.h.s"
 
 
-hay_colision_top: .db #0
-hay_colision_bottom: .db #0
-hay_colision_right: .db #0
-hay_colision_left: .db #0
+col_hay_colision_top:: .db #0
+col_hay_colision_left:: .db #0
 
 
 
@@ -21,10 +19,8 @@ check_collisions::
 	ld	d, #0                                           ;; si D = 0 NO modifico VX = no colision VX
     ld  e, #0                                           ;; si E = 0 NO modifico VY = no colision VT
     ld  a, #0
-    ld  (#hay_colision_top), a
-    ld  (#hay_colision_bottom), a
-    ld  (#hay_colision_right), a
-    ld  (#hay_colision_left), a
+    ld  (#col_hay_colision_top), a
+    ld  (#col_hay_colision_left), a
 _update_loop:
 
     ;; COLISIONES EJE X
@@ -118,10 +114,6 @@ sys_collision_Top:
     ret	c            ;; Si es negativo NO HAY COLISION
     ret	z            ;; Si es 0, NO HAY COLISION
     cp	obs_h(iy)
-
-    ;ld  a, #1
-    ;ld  (#hay_colision_top), a
-
     ret	nc	
     ;; HAY COLISION EN EJE  Y
     call sys_collision_Y    ;; comprobamos si hay colision en eje x tambien
@@ -198,6 +190,9 @@ sys_collision_Y:
         jr    z, no_collision_EX
 
             ;; SI COLISION RIGHT
+            ld  a, #1
+            ld  (#col_hay_colision_left), a
+
             ex af, af'
             ld  e, a
 
@@ -220,6 +215,9 @@ no_collision_EX:
           ;; Si es menor o igual a 0 NO hay colision, ESTA POR LA DERECHA
         jr    nc, no_collision_EX_EW
             ;; SI COLISION RIGHT
+            ld  a, #1
+            ld  (#col_hay_colision_left), a
+
             ex af, af'
             ld e, a
 
@@ -246,6 +244,9 @@ sys_collision_X:
         jr    z, no_collision_EY
 
             ;; SI COLISION RIGHT
+            ld  a, #1
+            ld  (#col_hay_colision_top), a
+
             ex af, af'
             ld    d, a
 
@@ -268,6 +269,9 @@ no_collision_EY:
           ;; Si es menor o igual a 0 NO hay colision, ESTA POR  abajo
         jr    nc, no_collision_EY_EW
             ;; SI COLISION RIGHT
+            ld  a, #1
+            ld  (#col_hay_colision_top), a
+
             ex af, af'
             ld    d, a
 

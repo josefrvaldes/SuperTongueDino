@@ -47,6 +47,8 @@ jump_table_left:  				;; Tabla hacia la DERECHA cuando colisionamos por la IZQUI
 	.db #-2, #-2, #-1, #-1, #-1,#00	
 	.db #0x80
 
+
+
 ;;
 ;; METODO QUE DEVUELVE SI ESTAMOS UTILIZANDO LA TABLA DE SALTO O NO
 ;; 	RETURN: A - valor de salto lateral
@@ -97,8 +99,35 @@ _update_loop:
 equals:	;; si no son iguales HA HABIDO COLISION SEGURO
 	ld	a, e_ai_st(ix)
 	cp	#e_ai_st_noAI
-	jr	nz, no_mas_saltos
+	jr	z, continuar_saltando
 
+
+
+
+	;; colisiones enemigo ///////////////////////////////////////////////////////////
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_rebotar
+	jr	nz, no_mas_saltos  ;; se comprueba si el enemigo rebota
+	ld a, d
+	or a
+	jr z, comprobar_vel_Y   ;; se comprueba si colisiona en X, en caso afirmativo se le niega la vx
+	ld  a, e_vx(ix)
+	neg
+	ld  e_vx(ix), a
+	comprobar_vel_Y:
+	ld a, c
+	or a
+	jr z, no_mas_saltos	;; se comprueba si colisiona en Y, en caso afirmativo se le niega la vy
+	ld  a, e_vy(ix)
+	neg
+	ld  e_vy(ix), a
+	jr no_mas_saltos
+	; /////////////////////////////////////////////////////////////////////////
+
+
+
+
+continuar_saltando:
     		ld  a, e_y(ix)
     		add e_vy(ix)
     		ld  c, a

@@ -3,6 +3,14 @@
 .include "ent/ent_obstacle.h.s"
 .include "sys/collisions.h.s"
 
+
+hay_colision_top: .db #0
+hay_colision_bottom: .db #0
+hay_colision_right: .db #0
+hay_colision_left: .db #0
+
+
+
 ;;
 ;; IMPUT:   IY: puntero a los obstaculos
 ;;           A: total de obstaculos
@@ -12,6 +20,11 @@ check_collisions::
 
 	ld	d, #0                                           ;; si D = 0 NO modifico VX = no colision VX
     ld  e, #0                                           ;; si E = 0 NO modifico VY = no colision VT
+    ld  a, #0
+    ld  (#hay_colision_top), a
+    ld  (#hay_colision_bottom), a
+    ld  (#hay_colision_right), a
+    ld  (#hay_colision_left), a
 _update_loop:
 
     ;; COLISIONES EJE X
@@ -104,8 +117,11 @@ sys_collision_Top:
 
     ret	c            ;; Si es negativo NO HAY COLISION
     ret	z            ;; Si es 0, NO HAY COLISION
-
     cp	obs_h(iy)
+
+    ;ld  a, #1
+    ;ld  (#hay_colision_top), a
+
     ret	nc	
     ;; HAY COLISION EN EJE  Y
     call sys_collision_Y    ;; comprobamos si hay colision en eje x tambien

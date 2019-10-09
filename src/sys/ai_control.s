@@ -11,6 +11,9 @@
 .module sys_ai_control
 
 
+aplicar_velocidad_rebote: .db #1
+enemigoRebote_anterior_vx: .db #0
+enemigoRebote_anterior_vy: .db #0
 
 ;; //////////////////
 ;; Inits AI system
@@ -26,7 +29,7 @@ sys_ai_control_init::
 
 ;; //////////////////
 ;; SAI Stand by
-sys_ai_stand_by::
+sys_ai_stand_by:
 _ent_array_ptr_temp_standby = . + 2
 	ld	iy, #0x0000
 
@@ -48,7 +51,7 @@ _ent_array_ptr_temp_standby = . + 2
 
 ;; //////////////////
 ;; Ai Move to
-sys_ai_move_to::
+sys_ai_move_to:
 	ld	e_vy(ix), #0
 	ld	e_vx(ix), #0 ;; IMPORTANTE !!! esto no lo pone en su video pero creo que se debe poner por la linea anterior que si pone
 
@@ -111,6 +114,8 @@ _AI_ent:
 	call	z, sys_ai_stand_by
 	cp 	#e_ai_st_move_to
 	call	z, sys_ai_move_to
+	cp 	#e_ai_st_rebotar
+	call	z, sys_ai_rebotar
 _no_AI_ent:
 
 _ent_counter = . + 1
@@ -125,3 +130,9 @@ _ent_counter = . + 1
 	add	ix, de
 
 	jr	_loop
+
+
+
+sys_ai_rebotar:
+
+	ret

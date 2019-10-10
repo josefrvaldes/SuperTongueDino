@@ -11,16 +11,14 @@
 .module sys_ai_control
 
 
-aplicar_velocidad_rebote: .db #1
-enemigoRebote_anterior_vx: .db #0
-enemigoRebote_anterior_vy: .db #0
-
+ai_rangoDetectar_rebote_X = 10
+ai_rangoDetectar_rebote_Y = ai_rangoDetectar_rebote_X + ai_rangoDetectar_rebote_X
 ;; //////////////////
 ;; Inits AI system
 ;; Input: IX -> puntero al array de entidades
 sys_ai_control_init::
 	ld 	(_ent_array_ptr_temp_standby), ix  ;; temporal
-
+	ld 	(_ent_array_ptr_temp_rebotar), ix  ;; temporal
 	ld 	(_ent_array_ptr), ix
 	ret
 
@@ -133,6 +131,59 @@ _ent_counter = . + 1
 
 
 
+; Entrada: IX -> al enemigo
 sys_ai_rebotar:
+	_ent_array_ptr_temp_rebotar = . + 2
+	ld	iy, #0x0000					;; se almacena el jugador
 
+	call sys_ai_detectarRebote
+
+
+	ret
+
+
+;; Entrada: IX -> al enemigo, IY -> al jugador
+sys_ai_detectarRebote:	; colision basica luego añadir distancia ESTO ESTA EN PRUEBAS
+	
+	ld    	a, e_x(iy)	
+	add    	e_w(iy)
+	add    	e_vx(iy)
+	sub    	e_x(ix)
+	sub		e_vx(ix)
+	;sub		(#ai_rangoDetectar_rebote_X)
+	jr c, rebote_noDetecta	;; se queda a la izquierda el jugador
+	jr z, rebote_noDetecta
+
+
+	ld    	a, e_x(iy)
+	add    	e_vx(iy)
+	sub    	e_x(ix)
+	sub    	e_w(ix)
+	sub		e_vx(ix)
+	;sub		(#ai_rangoDetectar_rebote_X)
+	jr nc, rebote_noDetecta  ;; se queda a la derecha el jugador
+	jr z, rebote_noDetecta
+
+
+	ld    	a, e_y(iy)
+	add    	e_h(iy)
+	add    	e_vy(iy)
+	sub    	e_y(ix)
+	sub		e_vy(ix)
+	;sub		(#ai_rangoDetectar_rebote_Y)
+	jr c, rebote_noDetecta  ;; se queda arriba el jugador
+	jr z, rebote_noDetecta
+
+
+	ld    	a, e_y(iy)
+	add    	e_vy(iy)
+	sub    	e_y(ix)
+	sub    	e_h(ix)
+	sub		e_vy(ix)
+	;sub		(#ai_rangoDetectar_rebote_Y)
+	jr nc, rebote_noDetecta  ;; se queda arriba el jugador
+	jr z, rebote_noDetecta
+
+
+	rebote_noDetecta:
 	ret

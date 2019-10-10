@@ -68,9 +68,15 @@ sys_physics_init::
    ret
 
 
+; Recibe una x y una y del mapa (en bytes) y devuelve la posición de memoria
+; donde se encuentra ese tile en el tilemap en memoria.
+; Por ahora solo funciona para 1 solo tilemap. Para hacer que funcione con más,
+; habrá que pasar próximamente otra variable con el número de nivel en el que nos encontramos
 ; Input 
-;     D: x
-;     E: y
+;     E: x
+;     D: y
+; Output
+;    HL: la pos de memoria mapeada de la x e y que le hemos pasado
 get_pos_tile_memoria::
    ; la posición del tile en memoria es:
    ; pos_ini_tilemap + x + ancho_tilemap * y ---- 4000 + x + 20y
@@ -78,9 +84,10 @@ get_pos_tile_memoria::
    ; así que: pos_ini_tilemap = 4000
    ; sabemos que el ancho del tilemap es de 20: ancho_tilemap = 20
    
+   push de ; guardamos en la pila el valor de x, porque lo vamos a perder en las siguientes llamadas
+
+   ; aquí d ya contiene la pos y en bytes
    ; hay que dividir entre 8 la posición y, porque cada tile son 8 bytes en altura
-   ld a, e_y(ix) ; cargamos en d la pos y
-   ld d, a
    call dividir_d_entre_8
    ; ahora en d ya no tenemos la y original, sino la y/8, que es la que necesitamos
 
@@ -90,8 +97,9 @@ get_pos_tile_memoria::
    call multiplicar_d_c_16bits ; ya tenemos 20y que nos hace falta para la operación
    ; ahora en HL tenemos el resultado de la operación 20y
 
-   ld   a, e_x(ix) ; cargamos en d la pos x
-   ld   d, a
+   ; recuperamos el valor de x, que lo teníamos en la pila
+   pop  de
+   ld   d, e ; y lo guardamos en d, que es donde tiene que estar para llamar a esta función
    call dividir_d_entre_4 ; dividimos entre 4 porque en ancho, cada tile son 4 bytes
    ; ahora en d ya no tenemos la y original, sino la y/4, que es la que necesitamos
 
@@ -106,11 +114,56 @@ get_pos_tile_memoria::
    ret
    
 
+; Input
+;     hl: pos en memoria del obstáculo
+crear_obstaculo::
+   
+   ret
+
+
+; Input: 
+;     HL, pos de memoria de la entidad origen
+analizar_obstaculos_vy_positiva::
+   ; para obtener el tiled de abajo, sumo 20 a la pos de memoria
+   ; para obtener el diagonal abajo izq, sumo 19, y para el diagonal abajo dch, sumo 21
+   push hl
+   ld   bc, #19
+   add  hl, bc
+   ld a, (hl)
+   or a
+   jr nz, colision_vertical
+   
+   inc hl
+   ld a, (hl)
+   or a
+   jr nz, colision_vertical
+   
+   inc hl
+   ld a, (hl)
+   or a
+   jr nz, colision_vertical
+   cpctm_setBorder_asm HW_WHITE
+   ret
+
+   
+   colision_vertical:
+   cpctm_setBorder_asm HW_RED
+   ret
+
+
 
 ;; Función que re-rellena el array de obstáculos en base a la posición y velocidad de la entidad recibida en iy
 ;; Input: IX - Puntero a la entidad a revisar
 re_rellenar_array_obstacles::
    ;call man_obstacle_init ; vaciamos el array de obstacles
+
+   ; la velocidad es positiva, es decir, vamos hacia abajo, por lo tanto hay que
+   ; comprobar con los 3 tiles de abajo, /|\, para ello, necesitamos su posición en el tilemap
+   ld   a, e_x(ix)
+   ld   e, a
+   ld   a, e_y(ix) ; para probar lo vamos a hacer con un solo tile en vertical debajo del monigote
+   ld   d, a
+   call get_pos_tile_memoria
 
    ; comprobamos si la vy es positiva, es decir, si va hacia abajo
    ld a, e_vy(ix)
@@ -125,9 +178,9 @@ re_rellenar_array_obstacles::
    vy_negativa:
 
    vy_positiva:
-      ; la velocidad es positiva, es decir, vamos hacia abajo, por lo tanto hay que
-      ; comprobar con los 3 tiles de abajo, /|\, para ello, necesitamos su posición en el tilemap
-      call get_pos_tile_memoria
+   call analizar_obstaculos_vy_positiva
+      
+
 
    vy_cero:
 

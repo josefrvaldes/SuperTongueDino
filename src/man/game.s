@@ -31,7 +31,7 @@ ent2: DefineCmp_Entity 70,  0, 0xFF, 0xFE, 4,  8, _hero_sp_2, e_ai_st_stand_by
 
 obst1: DefineCmp_Obstacle  0, 120,    12, 8, 0x0F
 obst2: DefineCmp_Obstacle 40, 72,    4, 80, 0x0F
-obst3: DefineCmp_Obstacle 60, 101,    20, 8, 0x0F
+obst3: DefineCmp_Obstacle 60, 104,    20, 8, 0x0F
 obst4: DefineCmp_Obstacle  0, 152,   40, 8, 0x0F
 obst5: DefineCmp_Obstacle  40, 152,   40, 8, 0x0F
 obst6: DefineCmp_Obstacle  0, 40,    24, 8, 0x0F

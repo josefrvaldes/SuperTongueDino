@@ -5,6 +5,7 @@
 .include "ent/entity.h.s"
 .include "ent/ent_obstacle.h.s"
 .include "man/entity.h.s"
+.include "cpct_functions.h.s"
 
 
 
@@ -144,46 +145,92 @@ sys_ai_rebotar:
 
 ;; Entrada: IX -> al enemigo, IY -> al jugador
 sys_ai_detectarRebote:	; colision basica luego añadir distancia ESTO ESTA EN PRUEBAS
-	
-	ld    	a, e_x(iy)	
-	add    	e_w(iy)
-	add    	e_vx(iy)
-	sub    	e_x(ix)
-	sub		e_vx(ix)
-	;sub		(#ai_rangoDetectar_rebote_X)
-	jr c, rebote_noDetecta	;; se queda a la izquierda el jugador
-	jr z, rebote_noDetecta
 
 
-	ld    	a, e_x(iy)
-	add    	e_vx(iy)
-	sub    	e_x(ix)
-	sub    	e_w(ix)
-	sub		e_vx(ix)
-	;sub		(#ai_rangoDetectar_rebote_X)
-	jr nc, rebote_noDetecta  ;; se queda a la derecha el jugador
-	jr z, rebote_noDetecta
+
+;=======================================================================
+	;; X con rango	
+	ld	a, #ai_rangoDetectar_rebote_X  
+	neg
+	add	e_x(ix)
+	neg
+	neg
+	jr	nc, out_screem_LEFT 
+		ld	a, #0
+out_screem_LEFT:
+	ld	b, a						;; en B tengo la verdade X
+	;; ANCHO con rango
+	ld	a, #ai_rangoDetectar_rebote_X 
+	add	e_x(ix)
+	add	e_w(ix)
+	cp	#79
+	jr	c, out_screem_RIGHT
+		ld	a, #79
+out_screem_RIGHT:	
+	ld	c, a						;; en C tengo el verdadero ancho
+;===============================================================================
+	ld	a, c
+	sub	e_x(iy)
+	jr	c, __no_collision
+
+	ld	a, e_x(iy)
+	add	e_w(iy)
+	sub	b
+	jr	c, __no_collision
+
+;============================================================================
+	;; Y con rango	
+	ld	a, #ai_rangoDetectar_rebote_Y  
+	neg
+	add	e_y(ix)					;; en B tengo la verdade Y
+	neg
+	neg
+	jr	nc, out_screem_UP 
+		ld	a, #0
+out_screem_UP:
+	ld	b, a	
+
+	;; ALTO con rango
+	ld	a, #ai_rangoDetectar_rebote_Y  
+	add	e_y(ix)
+	add	e_h(ix)
+	cp	#199
+	jr	c, out_screem_DOWN
+		ld	a, #199
+out_screem_DOWN:	
+	ld	c, a						;; en C tengo el verdadero alto
+;====================================================================================
+
+	ld	a, c
+	sub	e_y(iy)
+	jr	c, __no_collision
+
+	ld	a, e_y(iy)
+	add	e_h(iy)
+	sub	b
+	jr	c, __no_collision
+
+		;;DETECTAMOS
+		;(2B DE) memory	Video memory pointer to the upper left box corner byte
+		;(1B A ) colour_pattern	1-byte colour pattern (in screen pixel format) to fill the box with
+		;(1B C ) width	Box width in bytes [1-64] (Beware!  not in pixels!)
+		;(1B B ) height	Box height in bytes (>0)
+
+		ld	de, 	#0xC000
+		ld	a, 	#0xFF
+		ld	c,    #0x04
+		ld	b,    #0x08
+    		call cpct_drawSolidBox_asm
+ret
+
+__no_collision:
 
 
-	ld    	a, e_y(iy)
-	add    	e_h(iy)
-	add    	e_vy(iy)
-	sub    	e_y(ix)
-	sub		e_vy(ix)
-	;sub		(#ai_rangoDetectar_rebote_Y)
-	jr c, rebote_noDetecta  ;; se queda arriba el jugador
-	jr z, rebote_noDetecta
+		ld	de, 	#0xC000
+		ld	a, 	#0x00
+		ld	c,    #0x04
+		ld	b,    #0x08
+    		call cpct_drawSolidBox_asm
 
-
-	ld    	a, e_y(iy)
-	add    	e_vy(iy)
-	sub    	e_y(ix)
-	sub    	e_h(ix)
-	sub		e_vy(ix)
-	;sub		(#ai_rangoDetectar_rebote_Y)
-	jr nc, rebote_noDetecta  ;; se queda arriba el jugador
-	jr z, rebote_noDetecta
-
-
-	rebote_noDetecta:
 	ret
+

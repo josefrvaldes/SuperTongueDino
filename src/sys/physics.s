@@ -37,8 +37,7 @@ jump_table:						;; Tabla de salto normal (hacia arriba)
 gravity_table:					;; Tabla de salto que simula la gravedad
     	.db #00, #00, #00
     	.db #1, #1, #1, #2
-    	.db #2, #2, #3, #5
-	.db #7 
+    	.db #2, #3, #4
     	.db #0x80
 jump_table_right:  				;; Tabla hacia la IZQUIERDA cuando colisionamos por la DERECHA
 	.db #2, #2, #1, #1, #1, #00
@@ -382,8 +381,11 @@ gravedad_hero:
 	ret								;; SALIMOS
 	;; se reinicia el satlo
 max_gravity:
+
+		ld	a, #4						;; SUMAMOS EN D el indice actual+ VY
+		ld	e_vy(ix), a	
 		;; MALA PROGRAMACION -- VALOR PUESTO A PELO
-		ld	a, #11					;; GUARDAMOS EN A EL INDICE ULTIMO DE NUESTRA TABLA = GRAVEDAD MAXIMA
+		ld	a, #9					;; GUARDAMOS EN A EL INDICE ULTIMO DE NUESTRA TABLA = GRAVEDAD MAXIMA
 
 		ld	(hero_gravity), a
 	ret

@@ -14,12 +14,33 @@
 
 ai_rangoDetectar_rebote_X = 10
 ai_rangoDetectar_rebote_Y = ai_rangoDetectar_rebote_X + ai_rangoDetectar_rebote_X
+reducir_velocidad: .db #0      ;; 1 NORMAL   //  -1 NO ENTRAR
+actualizar_direccion: .db #0      ;; 1 NORMAL   //  -1 NO ENTRAR
+
+
+rebote_control_direcction: 	.db #0
+control_direction_X:						;; Tabla de salto normal (hacia arriba)
+	.db #1,  #1,  #0, #-1
+    	.db #-1, #-1, #0, #1
+    	.db #0x80					;; Ultima posicion de la tabla, para saber que he terminado (nunca tendre una velocidad tan alta)
+control_direction_Y:					;; Tabla de salto que simula la gravedad
+    	.db #0, #-1, #-2, #-1
+    	.db #0, #1,  #2,  #1
+    	.db #0x80
+
+
+
+
+
+
+
 ;; //////////////////
 ;; Inits AI system
 ;; Input: IX -> puntero al array de entidades
 sys_ai_control_init::
 	ld 	(_ent_array_ptr_temp_standby), ix  ;; temporal
 	ld 	(_ent_array_ptr_temp_rebotar), ix  ;; temporal
+	ld 	(_ent_array_ptr_temp_perseguir), ix  ;; temporal
 	ld 	(_ent_array_ptr), ix
 	ret
 
@@ -115,6 +136,8 @@ _AI_ent:
 	call	z, sys_ai_move_to
 	cp 	#e_ai_st_rebotar
 	call	z, sys_ai_rebotar
+	cp 	#e_ai_st_perseguir
+	call	z, sys_ai_perseguir
 _no_AI_ent:
 
 _ent_counter = . + 1
@@ -134,13 +157,51 @@ _ent_counter = . + 1
 
 ; Entrada: IX -> al enemigo
 sys_ai_rebotar:
+
+	;; para simular una velocidad de 0,5 entraremos en el metodo la mitad de veces
+	ld	a, (reducir_velocidad)
+	cp	#0
+	jr	nz, espera_movimiento
+
 	_ent_array_ptr_temp_rebotar = . + 2
 	ld	iy, #0x0000					;; se almacena el jugador
 
+
+	;; METODO MOVIMIENTO ALEATORIO
+	call movimiento_aleatorio
+
+	;; Devuelve: A 
 	call sys_ai_detectarJugador
+	dec a
+	jr nz, rebote_seguirEjecutando
+	ld	a, #e_ai_st_perseguir		;; cambia a la IA de persecucion
+	ld	e_ai_st(ix), a
+	ld 	a, #0
+	ld	e_vx(ix), a
+	ld	e_vy(ix), a
+	rebote_seguirEjecutando:
 
 
-	ret
+	ld	a, #2
+	ld	(reducir_velocidad), a
+ ret
+espera_movimiento:
+	;; cotraposicion de la velocidad
+	ld	a, e_vx(ix)
+	neg
+	add	e_x(ix)
+	ld	e_x(ix), a
+
+	ld	a, e_vy(ix)
+	neg
+	add	e_y(ix)
+	ld	e_y(ix), a
+
+
+	ld	a, (reducir_velocidad)
+	dec   a
+	ld	(reducir_velocidad), a
+ ret
 
 
 
@@ -202,6 +263,9 @@ out_screem_UP:
     ld  c,    #0x04
     ld  b,    #0x08
         call cpct_drawSolidBox_asm
+
+
+    ld	a, #1
 ret
 
 __no_collision:
@@ -213,4 +277,114 @@ __no_collision:
     ld  b,    #0x08
         call cpct_drawSolidBox_asm
 
+    ld	a, #0
+
   ret
+
+
+
+
+
+
+
+movimiento_aleatorio:
+
+
+	ld	a, (actualizar_direccion)
+	cp	#0
+	jr	nz, espera_actualizar_velocidad
+
+	;; SOLO AQUI ACTUALIZAMOS VELOCIDAD
+	call rebote_tabla_direcciones
+
+	ld	a, #60
+	ld	(actualizar_direccion), a
+ ret
+espera_actualizar_velocidad:
+
+	dec   a
+	ld	(actualizar_direccion), a
+ ret
+
+
+
+
+
+
+
+rebote_tabla_direcciones:
+
+	ld	a, (rebote_control_direcction)
+	;; Get jump value
+	ld	hl, #control_direction_X 
+	ld	e, a
+	ld 	d, #0
+	add	hl, de
+
+	;; Comprobar final del salto
+	ld	a, (hl)
+	cp	#0x80
+	jr	z, fin_ciclo_velocidades
+
+	;; Cambia la velocidad segun la tabla
+	ld	d, a
+	ld	e_vx(ix), a
+
+	ld	a, (rebote_control_direcction)
+	ld	hl, #control_direction_Y
+	ld	e, a
+	ld 	d, #0
+	add	hl, de
+
+	ld	a, (hl)
+	ld	d, a
+	ld	e_vy(ix), a
+
+	;; Cambia el indice actual en la tabla
+	ld	a, (rebote_control_direcction)
+	inc	a
+	ld	(rebote_control_direcction), a
+	ret
+	;; se reinicia el satlo
+fin_ciclo_velocidades:
+		ld	a, #0		
+		ld	(rebote_control_direcction), a
+	ret
+
+
+sys_ai_perseguir:
+	_ent_array_ptr_temp_perseguir = . + 2
+	ld	iy, #0x0000					;; se almacena el jugador
+
+	;; Devuelve: A 
+	call sys_ai_detectarJugador
+	dec a
+	jr z, perseguir_seguirEjecutando
+	ld	a, #e_ai_st_rebotar		;; cambia a la IA de persecucion
+	ld	e_ai_st(ix), a
+	ld 	a, #0
+	ld	e_vx(ix), a
+	ld	e_vy(ix), a
+perseguir_seguirEjecutando:
+
+
+	ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

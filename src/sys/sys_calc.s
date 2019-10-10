@@ -19,6 +19,33 @@ dividir_d_e::
       djnz .-8
    ret
 
+;Inputs:
+;     d es el numerador
+;Outputs:
+;     a es el resto
+;     d es el resultado de d/8
+;Destruye:
+;     a,b,d,e 
+dividir_d_entre_8::
+   ld a, #8
+   ld e, a
+   call dividir_d_e
+   ret
+
+
+;Inputs:
+;     d es el numerador
+;Outputs:
+;     a es el resto
+;     d es el resultado de d/4
+;Destruye:
+;     a,b,d,e 
+dividir_d_entre_4::
+   ld a, #4
+   ld e, a
+   call dividir_d_e
+   ret
+
 
 
 ; Inputs:
@@ -61,16 +88,16 @@ multiplicar_d_e_8bits::
 ;     A, B, C, D, H, L
 ;===============================================================
 multiplicar_d_c_16bits::
-   xor a         ;This is an optimised way to set A to zero. 4 cycles, 1 byte.
-   ld b,#8        ;Number of bits in E, so number of times we will cycle through
+   xor a          ;nos aseguramos de que a vale cero
+   ld b, #8        ;número de bits en E, es decir, el número de veces que haremos loop
    multiplicar_d_e_16bitsLoop:
-   add a,a       ;We double A, so we shift it left. Overflow goes into the c flag.
-   rl c          ;Rotate overflow in and get the next bit of C in the c flag
-   jr nc,.+6     ;If it is 0, we don't need to add anything to A
-      add a,d     ;Since it was 1, we do A+1*D
-      jr nc,.+3   ;Check if there was overflow
-         inc c     ;If there was overflow, we need to increment E
-      djnz multiplicar_d_e_16bitsLoop     ;Decrements B, if it isn't zero yet, jump back to Loop:
+   add a, a       ;Duplicamos a, así nos movemos hacia la izquierda. Se activa el flag c.
+   rl c           ;Rotamos C y ponemos el próximo bit en el flag c
+   jr nc, . + 6   ;Si es 0, no le sumamos nada a a
+      add a, d    ;Como no era cero, hacemos A+1*D
+      jr nc, . + 3;Comprobamos si hay carry
+         inc c    ;Si hay carry, incrementamos c
+      djnz multiplicar_d_e_16bitsLoop     ;Decrementa B, si todavía no es cero, volvemos al loop:
    ld h, c
    ld l, a
    ret

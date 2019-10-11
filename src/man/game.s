@@ -24,7 +24,7 @@ bool_mostrar_menu: .db #0
 .globl _hero_sp_2
 
 ;; Manager Variables
-ent1: DefineCmp_Entity 50,    40,    0,    0, 4,  8, _hero_sp_1, e_ai_st_noAI
+ent1: DefineCmp_Entity 40,    50,    0,    0, 4,  8, _hero_sp_1, e_ai_st_noAI
 ent2: DefineCmp_Entity 70,  0, 0xFF, 0xFE, 4,  8, _hero_sp_2, e_ai_st_stand_by
 ;ent3: DefineCmp_Entity 40, 0,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
 ;ent4: DefineCmp_Entity 50,  0,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
@@ -35,6 +35,7 @@ obst3: DefineCmp_Obstacle 60, 104,    20, 8, 0x0F
 obst4: DefineCmp_Obstacle  0, 152,   40, 8, 0x0F
 obst5: DefineCmp_Obstacle  40, 152,   40, 8, 0x0F
 obst6: DefineCmp_Obstacle  0, 40,    24, 8, 0x0F
+obst_fake:: DefineCmp_Obstacle  0, 0, 4, 8, 0xF0
 ;; //////////////////
 ;; Manager Game Init
 ;; Input: -

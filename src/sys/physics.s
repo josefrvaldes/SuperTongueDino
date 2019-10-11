@@ -8,6 +8,7 @@
 .include "man/man_obstacle.h.s"
 .include "sys/collisions.h.s"
 .include "sys/sys_calc.h.s"
+.include "man/game.h.s" ; cambiar por man_obstacles
 
 
 .module sys_entity_physics
@@ -51,6 +52,10 @@ jump_table_left:              ;; Tabla hacia la DERECHA cuando colisionamos por 
 
 resto_x: .db #0
 resto_y: .db #0
+nueva_x: .db #0
+nueva_y: .db #0
+direccion_movimiento: .db #0
+pos_memoria_tile_origen: .dw #0
 
 
 ;;
@@ -123,10 +128,11 @@ get_pos_tile_memoria::
 ; ESTO NO--   hl: pos en memoria del obstáculo
 ;     resto_y y resto_x: cargadas en memoria
 ;     a:  pos del obstáculo según el dibujo de abajo
-;     |1 2 3|
-;     |4 E 5|
-;     |6 7 8|
-crear_obstaculo::
+;     |8 1 2|
+;     |7 E 3|
+;     |6 5 4|
+crear_obstaculos_segun_direccion::
+   ld a, (#direccion_movimiento)
    dec a
    jr z, era_1
    dec a
@@ -144,6 +150,26 @@ crear_obstaculo::
    dec a
    jr z, era_8
 
+   ; la velocidad es positiva, es decir, vamos hacia abajo, por lo tanto hay que
+   ; comprobar con los 3 tiles de abajo, /|\, para ello, necesitamos su posición en el tilemap
+   ld   a, e_x(ix)
+   ld   e, a
+   ld   a, e_y(ix) ; para probar lo vamos a hacer con un solo tile en vertical debajo del monigote
+   ld   d, a
+   call get_pos_tile_memoria
+   ld (#pos_memoria_tile_origen), hl
+
+
+   ld a, e_x(ix)
+   ld d, a
+   call dividir_d_entre_4
+   ld (resto_x), a
+
+   ld a, e_y(ix)
+   ld d, a
+   call dividir_d_entre_8
+   ld (resto_y), a
+
 
    era_1:
    ret
@@ -154,10 +180,45 @@ crear_obstaculo::
    era_4:
    ret
    era_5:
+   ; dirección hacia abajo
+   ; si modulo de x/4 es 0, solo necesitamos un obstáculo, el de abajo
+   
+   ; aquí a vale el resto de la división
+   ld a, (resto_x)
+   or a
+   jr nz, resto_no_cero_5
+   resto_cero_5:
+   ; como el resto es cero, la pos del obstáculo estará en
+   ; x_obs = x
+   ; y_obs = y + alto + 8 - resto_y
+   
+   ; calculamos la nueva x, como el resto en x es cero, la x y la nueva_x son iguales
+   ld a, e_x(ix) ; cargamos en a la x
+   ld (nueva_x), a
+
+
+   ld a, e_y(ix)   ; cargamos en a la y
+   add #16         ; le sumamos el alto dos veces (porque la fórmula es alto + 8 - 1)
+   
+   ld b, a         ; guardamos el acumulado de la operación en b
+   ld a, (resto_y) ; cargamos en a el resto en y
+   ld h, a
+   ld a, b
+   sub a, h
+   ld (nueva_y), a
+
+   obs: 
+   DefineCmp_Obstacle (nueva_x), (nueva_y), 4, 8, 0xF0
+   ld hl, #obs
+   call man_obstacle_create
+   resto_no_cero_5:
    ret
+
    era_6:
    ret
-   era_7:
+
+   era_7: 
+
    ret
    era_8:
    ret
@@ -172,6 +233,7 @@ crear_obstaculo::
 ;      /|\
 ;     6 54
 get_direccion_movimiento::
+   ; esto de aquí es debug, para mostrar en pantalla una pista de dónde estamos
    ld hl, #0xC000
    ld (hl), #00
    inc hl
@@ -216,6 +278,7 @@ get_direccion_movimiento::
    ld hl, #0xC004
    ld (hl), #0xFF
    ld a, #4
+   ld (direccion_movimiento), a
    ret
 
 
@@ -233,6 +296,7 @@ get_direccion_movimiento::
    ld hl, #0xC003
    ld (hl), #0xFF
    ld a, #3
+   ld (direccion_movimiento), a
    ret
 
 
@@ -250,123 +314,109 @@ get_direccion_movimiento::
    ld hl, #0xC002
    ld (hl), #0xFF
    ld a, #2
+   ld (direccion_movimiento), a
    ret
 
    vy_vx_son_negativas::
    ld hl, #0xC008
    ld (hl), #0xFF
    ld a, #8
+   ld (direccion_movimiento), a
    ret
 
    vy_negativa_vx_cero::
    ld hl, #0xC001
    ld (hl), #0xFF
    ld a, #1
+   ld (direccion_movimiento), a
    ret
    
    vy_cero_vx_negativa::
    ld hl, #0xC007
    ld (hl), #0xFF
    ld a, #7
+   ld (direccion_movimiento), a
    ret
    
    vy_cero_vx_cero::
    ld hl, #0xC000
    ld (hl), #0xFF
    ld a, #0
+   ld (direccion_movimiento), a
    ret
 
    vy_positiva_vx_negativa::
    ld hl, #0xC006
    ld (hl), #0xFF
    ld a, #6
+   ld (direccion_movimiento), a
    ret
 
    vy_positiva_vx_cero::
    ld hl, #0xC005
    ld (hl), #0xFF
    ld a, #5
+   ld (direccion_movimiento), a
    ret
 
 
 ; Input: 
 ;     HL, pos de memoria de la entidad origen
-analizar_obstaculos_vy_positiva::
-   ; necesitamos el resto de la división entre y/8 para saber cuántos píxeles estamos desplazados.
-   ; Ese resto habrá que sumárselo a la y de la entidad origen + el alto del tile para encontrar la 
-   ; pos Y de los obstáculos
-   ld d, e_y(ix)
-   call dividir_d_entre_8
-   ; en este punto, a es el resto en y
-   ld (#resto_y), a
+; analizar_obstaculos_vy_positiva::
+;    ; necesitamos el resto de la división entre y/8 para saber cuántos píxeles estamos desplazados.
+;    ; Ese resto habrá que sumárselo a la y de la entidad origen + el alto del tile para encontrar la 
+;    ; pos Y de los obstáculos
+;    ld d, e_y(ix)
+;    call dividir_d_entre_8
+;    ; en este punto, a es el resto en y
+;    ld (#resto_y), a
 
-   ld d, e_x(ix)
-   call dividir_d_entre_4
-   ; en este punto, a es el resto en y
-   ld (#resto_x), a
+;    ld d, e_x(ix)
+;    call dividir_d_entre_4
+;    ; en este punto, a es el resto en y
+;    ld (#resto_x), a
 
 
-   ; para obtener el tiled de abajo, sumo 20 a la pos de memoria
-   ; para obtener el diagonal abajo izq, sumo 19, y para el diagonal abajo dch, sumo 21
-   push hl
-   ld   bc, #19 
-   add  hl, bc  ; sumamos 19 a hl para coger el obstáculo abajo-izq
-   ld a, (hl)   ; cogemos el valor de esa posición de memoria
-   or a         ; comprobamos si es cero. Si a == 0, el tile es fondo y por tanto no es obstáculo, si a != 0, el tile es obstáculo
-   call nz, crear_obstaculo
+;    ; para obtener el tiled de abajo, sumo 20 a la pos de memoria
+;    ; para obtener el diagonal abajo izq, sumo 19, y para el diagonal abajo dch, sumo 21
+;    push hl
+;    ld   bc, #19 
+;    add  hl, bc  ; sumamos 19 a hl para coger el obstáculo abajo-izq
+;    ld a, (hl)   ; cogemos el valor de esa posición de memoria
+;    or a         ; comprobamos si es cero. Si a == 0, el tile es fondo y por tanto no es obstáculo, si a != 0, el tile es obstáculo
+;    call nz, crear_obstaculo
    
-   inc hl       ; nos posicionamos en hl + 20, que es la posición debajo de la entidad origen
-   ld a, (hl)   ; hacemos la misma comprobación de arriba
-   or a
-   call nz, crear_obstaculo
+;    inc hl       ; nos posicionamos en hl + 20, que es la posición debajo de la entidad origen
+;    ld a, (hl)   ; hacemos la misma comprobación de arriba
+;    or a
+;    call nz, crear_obstaculo
    
-   inc hl
-   ld a, (hl)
-   or a
-   call nz, crear_obstaculo
-   pop hl
-   ret
+;    inc hl
+;    ld a, (hl)
+;    or a
+;    call nz, crear_obstaculo
+;    pop hl
+;    ret
 
    
-   colision_vertical:
-   call crear_obstaculo
-   cpctm_setBorder_asm HW_RED
-   pop hl
-   ret
+;    colision_vertical:
+;    call crear_obstaculo
+;    cpctm_setBorder_asm HW_RED
+;    pop hl
+;    ret
 
 
 
 ;; Función que re-rellena el array de obstáculos en base a la posición y velocidad de la entidad recibida en iy
 ;; Input: IX - Puntero a la entidad a revisar
 re_rellenar_array_obstacles::
-   ;call man_obstacle_init ; vaciamos el array de obstacles
+   ; en este momento tenemos la dirección de movimiento guardada en una variable
+   call man_obstacle_init ; vaciamos el array de obstacles
+   ld hl, #obst_fake
+   call man_obstacle_create
 
-   ; la velocidad es positiva, es decir, vamos hacia abajo, por lo tanto hay que
-   ; comprobar con los 3 tiles de abajo, /|\, para ello, necesitamos su posición en el tilemap
-   ld   a, e_x(ix)
-   ld   e, a
-   ld   a, e_y(ix) ; para probar lo vamos a hacer con un solo tile en vertical debajo del monigote
-   ld   d, a
-   call get_pos_tile_memoria
-
-   ; comprobamos si la vy es positiva, es decir, si va hacia abajo
-   ld a, e_vy(ix)
-   call check_if_negative ; devuelve en a 0 si 0 o positivo, 1 si negativo
-   jr nz, vy_negativa
-   ; si estamos aquí es que la vy es cero o positiva
-   ld a, e_vy(ix)
-   or a
-   jr nz, vy_positiva
-   call vy_cero
-
-   vy_negativa:
-
-   vy_positiva:
-   call analizar_obstaculos_vy_positiva
-      
-
-
-   vy_cero:
+   ;call get_direccion_movimiento
+   ;call crear_obstaculos_segun_direccion
 
    ret
 
@@ -379,7 +429,7 @@ re_rellenar_array_obstacles::
 ;; Stack Use: 2 bytes
 sys_physics_update::
    ld (_ent_counter), a
-   call get_direccion_movimiento
+
 
    ;; commprobamos si somos el HEROE o un ENEMIGO para pocesar el salto
    ld a, e_ai_st(ix)
@@ -387,17 +437,19 @@ sys_physics_update::
    jr nz, _update_loop
       ;; SOMOS EL HEROE
       call check_jump_tables_init
+   
+   ;call re_rellenar_array_obstacles
 
 ;; BUCLE QUE RECORRE TODAS LAS ENTIDADES CON FISICAS 
 _update_loop:
-   call re_rellenar_array_obstacles
+
    ;; COLISIONES CON LOS OBJETOS
    call sys_check_collision
 
    ;; tenemos en D = VX en E = VY
    ld a, d
    add   e                             ;; sumo variacion en D y variacion en E
-   jr nz,   equals                        ;Si !=0 es que NO HAY COLISION EN LAS ESQUINAS
+   jr nz,   equals                     ;Si !=0 es que NO HAY COLISION EN LAS ESQUINAS
 
       ld a, #0
       add   d

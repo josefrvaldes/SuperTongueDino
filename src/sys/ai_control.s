@@ -12,9 +12,10 @@
 .module sys_ai_control
 
 
-ai_rangoDetectar_rebote_X = 10
+ai_rangoDetectar_rebote_X = 15
 ai_rangoDetectar_rebote_Y = ai_rangoDetectar_rebote_X + ai_rangoDetectar_rebote_X
 reducir_velocidad: .db #0      ;; 1 NORMAL   //  -1 NO ENTRAR
+defender_pausa:	.db #0
 actualizar_direccion: .db #0      ;; 1 NORMAL   //  -1 NO ENTRAR
 
 
@@ -41,6 +42,7 @@ sys_ai_control_init::
 	ld 	(_ent_array_ptr_temp_standby), ix  ;; temporal
 	ld 	(_ent_array_ptr_temp_rebotar), ix  ;; temporal
 	ld 	(_ent_array_ptr_temp_perseguir), ix  ;; temporal
+	ld 	(_ent_array_ptr_temp_defender), ix  ;; temporal
 	ld 	(_ent_array_ptr), ix
 	ret
 
@@ -119,6 +121,7 @@ _endif_y:
 ;; Destroy: AF, BC, DE, IX
 ;; Stack Use: 2 bytes
 sys_ai_control_update::
+
 	ld	(_ent_counter), a
 
 _ent_array_ptr = . + 2
@@ -138,6 +141,8 @@ _AI_ent:
 	call	z, sys_ai_rebotar
 	cp 	#e_ai_st_perseguir
 	call	z, sys_ai_perseguir
+	cp 	#e_ai_st_defender
+	call	z, sys_ai_defender
 _no_AI_ent:
 
 _ent_counter = . + 1
@@ -152,8 +157,6 @@ _ent_counter = . + 1
 	add	ix, de
 
 	jr	_loop
-
-
 
 ; Entrada: IX -> al enemigo
 sys_ai_rebotar:
@@ -174,13 +177,26 @@ sys_ai_rebotar:
 	call sys_ai_detectarJugador
 	dec a
 	jr nz, rebote_seguirEjecutando
+	;; debemos poner el contador de decision a 0 antes
+	ld	a, #30
+	ld	(actualizar_direccion), a
+
+	call	rebotar_elegirAtaqueDefensa
+	dec 	a
+	jr 	z, rebotar_elegirAtaque
+	ld	a, #e_ai_st_defender		;; cambia a la IA de defensa
+	ld	e_ai_st(ix), a
+	jr 	rebote_seguirEjecutando
+	rebotar_elegirAtaque:
 	ld	a, #e_ai_st_perseguir		;; cambia a la IA de persecucion
 	ld	e_ai_st(ix), a
-	ld 	a, #0
-	ld	e_vx(ix), a
-	ld	e_vy(ix), a
+	;; ahora cambiamos de estado
+	;ld	a, #e_ai_st_perseguir		;; cambia a la IA de persecucion
+	;ld	e_ai_st(ix), a
+	;ld 	a, #0
+	;ld	e_vx(ix), a
+	;ld	e_vy(ix), a
 	rebote_seguirEjecutando:
-
 
 	ld	a, #2
 	ld	(reducir_velocidad), a
@@ -197,14 +213,10 @@ espera_movimiento:
 	add	e_y(ix)
 	ld	e_y(ix), a
 
-
 	ld	a, (reducir_velocidad)
 	dec   a
 	ld	(reducir_velocidad), a
  ret
-
-
-
 
 
 
@@ -264,13 +276,10 @@ out_screem_UP:
     ld  b,    #0x08
         call cpct_drawSolidBox_asm
 
-
     ld	a, #1
 ret
 
 __no_collision:
-
-
     ld  de,   #0xC000
     ld  a,   #0x00
     ld  c,    #0x04
@@ -278,18 +287,11 @@ __no_collision:
         call cpct_drawSolidBox_asm
 
     ld	a, #0
-
   ret
 
 
 
-
-
-
-
 movimiento_aleatorio:
-
-
 	ld	a, (actualizar_direccion)
 	cp	#0
 	jr	nz, espera_actualizar_velocidad
@@ -297,7 +299,7 @@ movimiento_aleatorio:
 	;; SOLO AQUI ACTUALIZAMOS VELOCIDAD
 	call rebote_tabla_direcciones
 
-	ld	a, #60
+	ld	a, #50
 	ld	(actualizar_direccion), a
  ret
 espera_actualizar_velocidad:
@@ -309,11 +311,7 @@ espera_actualizar_velocidad:
 
 
 
-
-
-
 rebote_tabla_direcciones:
-
 	ld	a, (rebote_control_direcction)
 	;; Get jump value
 	ld	hl, #control_direction_X 
@@ -352,22 +350,29 @@ fin_ciclo_velocidades:
 	ret
 
 
-sys_ai_perseguir:
-	_ent_array_ptr_temp_perseguir = . + 2
-	ld	iy, #0x0000					;; se almacena el jugador
-
-	;; Devuelve: A 
-	call sys_ai_detectarJugador
-	dec a
-	jr z, perseguir_seguirEjecutando
-	ld	a, #e_ai_st_rebotar		;; cambia a la IA de persecucion
-	ld	e_ai_st(ix), a
-	ld 	a, #0
-	ld	e_vx(ix), a
-	ld	e_vy(ix), a
-perseguir_seguirEjecutando:
 
 
+
+
+;;
+;; METODO QUE CALCULA LA MEJOR OPCION ENTRE ATACAR O DEFENDER
+;; RETURN: A: -1 defensa // 1 ataque
+;; Delete: A, DE
+rebotar_elegirAtaqueDefensa:
+	ld	a, #76
+	sub	e_x(ix)
+	ld	d, a    ; almacena en de la distancia a la salida
+
+	ld	a, e_x(ix)
+	sub	e_x(iy)
+	jr	c, rebotar_perseguirJugador
+	cp	d
+	jr	c, rebotar_perseguirJugador
+	ld	a, #-1
+	ret
+
+	rebotar_perseguirJugador:
+	ld 	a, #1
 	ret
 
 
@@ -382,9 +387,144 @@ perseguir_seguirEjecutando:
 
 
 
+sys_ai_perseguir:
+	;; para simular una velocidad de 0,5 entraremos en el metodo la mitad de veces
+	ld	a, (reducir_velocidad)
+	cp	#0
+	jr	nz, espera_movimiento2
+
+	_ent_array_ptr_temp_perseguir = . + 2
+	ld	iy, #0x0000					;; se almacena el jugador
+
+	;; Devuelve: A 
+	call sys_ai_detectarJugador
+	dec a
+	jr z, perseguir_seguirEjecutando
+	ld	a, #e_ai_st_rebotar		;; cambia a la IA de persecucion
+	ld	e_ai_st(ix), a
+
+	ret
+perseguir_seguirEjecutando:
+	call atacar_calcularVelocidad
+  		ld  a, d
+  		ld   e_vx(ix), a
+  		ld  a, e
+  		ld   e_vy(ix), a
+
+	ld	a, #2
+	ld	(reducir_velocidad), a
+ ret
+espera_movimiento2:
+	;; cotraposicion de la velocidad
+	ld	a, e_vx(ix)
+	neg
+	add	e_x(ix)
+	ld	e_x(ix), a
+
+	ld	a, e_vy(ix)
+	neg
+	add	e_y(ix)
+	ld	e_y(ix), a
+
+
+	ld	a, (reducir_velocidad)
+	dec   a
+	ld	(reducir_velocidad), a
+ ret
+
+
+
+
+atacar_calcularVelocidad:
+  	ld  d, #0
+  	ld  e, #0
+	;; PERSECUCION DEL HERO
+	ld	a, e_x(ix)		;; en A la posicion X del enemigo
+	sub	e_x(iy)
+	jr	c, move_enemy_right  ;; tenemos al hero en la parte derecha
+	jr	z, move_axisY
+		ld	d, #-1
+	jr	move_axisY
+move_enemy_right:
+		ld	d, #1
+move_axisY:
+	ld	a, e_y(ix)		;; en A la posicion X del enemigo
+	sub	e_y(iy)
+	jr	c, move_enemy_down  ;; tenemos al hero en la parte derecha
+	ret	z
+		ld	e, #-1
+	ret
+move_enemy_down:
+		ld	e, #1
+	ret
 
 
 
 
 
 
+
+
+
+
+
+;////////////////////////////////
+; Defender
+;////////////////////////////////
+sys_ai_defender:
+  _ent_array_ptr_temp_defender = . + 2
+  ld  iy, #0x0000
+
+  ld  a, #0
+  ld   e_vx(ix), a
+  ld   e_vy(ix), a
+  ld  a, (defender_pausa)
+  cp  #0
+  jr  nz, defender_reiniciarPausa
+  ld  a, #1
+  ld  (defender_pausa), a
+
+  call sys_ai_detectarJugador
+  dec a
+  jr z, defender_seguirEjecutando
+  ld  a, #e_ai_st_rebotar    ;; cambia a la IA a rebotar
+  ld  e_ai_st(ix), a
+  defender_seguirEjecutando:
+
+  call defender_calcularVelocidad  ; Devuelve d -> velocidadX,  e -> velocidadY
+  ld  a, d
+  ld   e_vx(ix), a
+  ld  a, c
+  ld   e_vy(ix), a
+
+  ret
+defender_reiniciarPausa:
+  dec   a
+  ld  (defender_pausa), a
+  ret
+
+
+
+
+
+; Devuelve d -> velocidadX,  e -> velocidadY
+; Elimina: AF, DE
+defender_calcularVelocidad:
+  ld  d, #0
+  ld  c, #0
+  ld   a, #76
+  sub  e_x(iy)
+  jr   z, defender_calcularY
+  ld  d, #1
+  
+
+  defender_calcularY:
+  ld   a, e_y(ix)
+  sub  e_y(iy)
+  jr  c, defender_AbajoY
+  ret  z
+  ld  c, #-1
+  ret
+  defender_AbajoY:
+  ld  c, #1
+  ret

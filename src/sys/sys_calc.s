@@ -61,6 +61,24 @@ check_if_negative::
    ret
 
 
+; Inputs:
+;     A: el valor a comprobar
+; Outputs:
+;     A: 0 si positivo o cero, 1 si negativo
+; Destroys:
+;     A
+check_if_negative2::
+   bit 7, a
+   jr z, era_positivo
+   era_negativo:
+   ld a, #1
+   ret
+   era_positivo:
+   ld a, #0
+   ret
+
+
+
 ;Input:
 ;     D: multiplicador 1
 ;     E: multiplicador 2

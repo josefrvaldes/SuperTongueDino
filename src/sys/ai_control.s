@@ -8,14 +8,13 @@
 .include "cpct_functions.h.s"
 
 
-
 .module sys_ai_control
 
 
 ai_rangoDetectar_rebote_X = 15
 ai_rangoDetectar_rebote_Y = ai_rangoDetectar_rebote_X + ai_rangoDetectar_rebote_X
 reducir_velocidad: .db #0      ;; 1 NORMAL   //  -1 NO ENTRAR
-defender_pausa:	.db #0
+IA_pausaAtaqueDefensa:	.db #0
 actualizar_direccion: .db #0      ;; 1 NORMAL   //  -1 NO ENTRAR
 
 
@@ -58,7 +57,6 @@ _ent_array_ptr_temp_standby = . + 2
 	ld 	a, e_ai_aim_x(iy)
 	or 	a
 	ret	z
-
 	;; Cambiar estado si se pulsa una tecla
 	ld	a, e_x(iy)
 	ld	e_ai_aim_x(ix), a
@@ -91,7 +89,6 @@ _objx_greater_or_equal:
 _arrived_x:
 	ld	e_vx(ix), #0
 _endif_x:
-
 	;; DETECTAR Y
 	ld	a, e_ai_aim_y(ix)		;; A = obj_y
 	sub	e_y(ix)			;; A = obj_y - y
@@ -115,6 +112,7 @@ _endif_y:
 
 
 
+
 ;; //////////////////
 ;; Sys AI CONTROL UPDATE
 ;; Input: IX -> puntero al array de entidades,    A -> numero de elementos en el array 
@@ -128,7 +126,6 @@ _ent_array_ptr = . + 2
 	ld	ix, #0x0000
 
 _loop:
-
 	ld	a, e_ai_st(ix)
 	cp	#e_ai_st_noAI
 	jr	z, _no_AI_ent
@@ -144,13 +141,10 @@ _AI_ent:
 	cp 	#e_ai_st_defender
 	call	z, sys_ai_defender
 _no_AI_ent:
-
 _ent_counter = . + 1
 	ld 	a, #0
 	dec	a
 	ret 	z
-
-
 	ld	(_ent_counter), a
 	;; salta a la siguiente entidad
 	ld	de, #sizeof_e
@@ -158,9 +152,14 @@ _ent_counter = . + 1
 
 	jr	_loop
 
+
+
+
+;; //////////////////////////////////////////
+;; REBOTAR IA
+;; //////////////////////////////////////////
 ; Entrada: IX -> al enemigo
 sys_ai_rebotar:
-
 	;; para simular una velocidad de 0,5 entraremos en el metodo la mitad de veces
 	ld	a, (reducir_velocidad)
 	cp	#0
@@ -190,12 +189,6 @@ sys_ai_rebotar:
 	rebotar_elegirAtaque:
 	ld	a, #e_ai_st_perseguir		;; cambia a la IA de persecucion
 	ld	e_ai_st(ix), a
-	;; ahora cambiamos de estado
-	;ld	a, #e_ai_st_perseguir		;; cambia a la IA de persecucion
-	;ld	e_ai_st(ix), a
-	;ld 	a, #0
-	;ld	e_vx(ix), a
-	;ld	e_vy(ix), a
 	rebote_seguirEjecutando:
 
 	ld	a, #2
@@ -260,7 +253,6 @@ out_screem_UP:
   add  e_h(ix)
   ld  c, a            ;; en C tengo el verdadero alto
 ;====================================================================================
-
   ld  a, c
   sub  e_y(iy)
   jr  c, __no_collision
@@ -278,7 +270,6 @@ out_screem_UP:
 
     ld	a, #1
 ret
-
 __no_collision:
     ld  de,   #0xC000
     ld  a,   #0x00
@@ -385,56 +376,47 @@ rebotar_elegirAtaqueDefensa:
 
 
 
-
-
+;////////////////////////////////
+; Perseguir
+;////////////////////////////////
 sys_ai_perseguir:
-	;; para simular una velocidad de 0,5 entraremos en el metodo la mitad de veces
-	ld	a, (reducir_velocidad)
-	cp	#0
-	jr	nz, espera_movimiento2
-
 	_ent_array_ptr_temp_perseguir = . + 2
 	ld	iy, #0x0000					;; se almacena el jugador
 
+	;; para simular una velocidad de 0,5 entraremos en el metodo la mitad de veces
+	ld	a, #0
+	ld	e_vx(ix), a
+	ld	e_vy(ix), a
+	ld	a, (IA_pausaAtaqueDefensa)
+	cp	#0
+	jr	nz, espera_movimiento2
+	ld	a, #2
+	ld	(IA_pausaAtaqueDefensa), a
+
+	call atacar_calcularVelocidad
+	ld  a, d
+	ld   e_vx(ix), a
+	ld  a, e
+	ld   e_vy(ix), a
+
 	;; Devuelve: A 
 	call sys_ai_detectarJugador
-	dec a
-	jr z, perseguir_seguirEjecutando
+	dec 	a
+	ret  	z
 	ld	a, #e_ai_st_rebotar		;; cambia a la IA de persecucion
 	ld	e_ai_st(ix), a
 
 	ret
-perseguir_seguirEjecutando:
-	call atacar_calcularVelocidad
-  		ld  a, d
-  		ld   e_vx(ix), a
-  		ld  a, e
-  		ld   e_vy(ix), a
-
-	ld	a, #2
-	ld	(reducir_velocidad), a
- ret
 espera_movimiento2:
 	;; cotraposicion de la velocidad
-	ld	a, e_vx(ix)
-	neg
-	add	e_x(ix)
-	ld	e_x(ix), a
-
-	ld	a, e_vy(ix)
-	neg
-	add	e_y(ix)
-	ld	e_y(ix), a
-
-
-	ld	a, (reducir_velocidad)
 	dec   a
-	ld	(reducir_velocidad), a
+	ld	(IA_pausaAtaqueDefensa), a
  ret
 
 
 
-
+; Devuelve d -> velocidadX,  c -> velocidadY
+; Elimina: AF, DE, C
 atacar_calcularVelocidad:
   	ld  d, #0
   	ld  e, #0
@@ -478,11 +460,17 @@ sys_ai_defender:
   ld  a, #0
   ld   e_vx(ix), a
   ld   e_vy(ix), a
-  ld  a, (defender_pausa)
+  ld  a, (IA_pausaAtaqueDefensa)
   cp  #0
   jr  nz, defender_reiniciarPausa
   ld  a, #1
-  ld  (defender_pausa), a
+  ld  (IA_pausaAtaqueDefensa), a
+
+  call defender_calcularVelocidad  ; Devuelve d -> velocidadX,  e -> velocidadY
+  ld  a, d
+  ld   e_vx(ix), a
+  ld  a, c
+  ld   e_vy(ix), a
 
   call sys_ai_detectarJugador
   dec a
@@ -491,24 +479,18 @@ sys_ai_defender:
   ld  e_ai_st(ix), a
   defender_seguirEjecutando:
 
-  call defender_calcularVelocidad  ; Devuelve d -> velocidadX,  e -> velocidadY
-  ld  a, d
-  ld   e_vx(ix), a
-  ld  a, c
-  ld   e_vy(ix), a
-
   ret
 defender_reiniciarPausa:
   dec   a
-  ld  (defender_pausa), a
+  ld  (IA_pausaAtaqueDefensa), a
   ret
 
 
 
 
 
-; Devuelve d -> velocidadX,  e -> velocidadY
-; Elimina: AF, DE
+; Devuelve d -> velocidadX,  c -> velocidadY
+; Elimina: AF, D, C
 defender_calcularVelocidad:
   ld  d, #0
   ld  c, #0
@@ -517,7 +499,6 @@ defender_calcularVelocidad:
   jr   z, defender_calcularY
   ld  d, #1
   
-
   defender_calcularY:
   ld   a, e_y(ix)
   sub  e_y(iy)

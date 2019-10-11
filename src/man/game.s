@@ -125,11 +125,11 @@ man_game_update::				;; MEJORAR!!! esto ya que estoy pasando IX al update y se p
 	call man_entity_getArray
 	call sys_input_update
 
-
+	cpctm_setBorder_asm HW_RED
 	call man_entity_getArray
 	call sys_ai_control_update
 
-
+	cpctm_setBorder_asm HW_WHITE
 	call man_entity_getArray
 	call sys_physics_update
 

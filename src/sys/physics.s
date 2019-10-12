@@ -132,6 +132,23 @@ get_pos_tile_memoria::
 ;     |7 E 3|
 ;     |6 5 4|
 crear_obstaculos_segun_direccion::
+   ld   a, e_x(ix)
+   ld   e, a
+   ld   a, e_y(ix) 
+   ld   d, a
+   call get_pos_tile_memoria
+   ld (#pos_memoria_tile_origen), hl
+
+   ld a, e_x(ix)
+   ld d, a
+   call dividir_d_entre_4
+   ld (resto_x), a
+
+   ld a, e_y(ix)
+   ld d, a
+   call dividir_d_entre_8
+   ld (resto_y), a
+
    ld a, (#direccion_movimiento)
    dec a
    jr z, era_1
@@ -150,25 +167,7 @@ crear_obstaculos_segun_direccion::
    dec a
    jr z, era_8
 
-   ; la velocidad es positiva, es decir, vamos hacia abajo, por lo tanto hay que
-   ; comprobar con los 3 tiles de abajo, /|\, para ello, necesitamos su posición en el tilemap
-   ld   a, e_x(ix)
-   ld   e, a
-   ld   a, e_y(ix) ; para probar lo vamos a hacer con un solo tile en vertical debajo del monigote
-   ld   d, a
-   call get_pos_tile_memoria
-   ld (#pos_memoria_tile_origen), hl
-
-
-   ld a, e_x(ix)
-   ld d, a
-   call dividir_d_entre_4
-   ld (resto_x), a
-
-   ld a, e_y(ix)
-   ld d, a
-   call dividir_d_entre_8
-   ld (resto_y), a
+   
 
 
    era_1:
@@ -179,7 +178,20 @@ crear_obstaculos_segun_direccion::
    ret
    era_4:
    ret
+
+
    era_5:
+   ld hl, (#pos_memoria_tile_origen) ; aquí está el tile de origen
+   ld bc, #20
+   add hl, bc
+   ld a, (resto_y) ; cargamos en a el resto en y
+   or a            ; comprobamos si el resto de y es cero
+   jr nz, . + 2    ; si el resto no es cero, hay que sumar de nuevo el 20
+   add hl, bc ; ahora estamos apuntando al tile de abajo, el que sería nuestro obstáculo
+   ld a, (hl) ; esta es la información que tiene el tile de abajo, si es 0 es fondo, si no, es obstáculo
+   or a
+   ret z
+
    ; dirección hacia abajo
    ; si modulo de x/4 es 0, solo necesitamos un obstáculo, el de abajo
    
@@ -190,26 +202,42 @@ crear_obstaculos_segun_direccion::
    resto_cero_5:
    ; como el resto es cero, la pos del obstáculo estará en
    ; x_obs = x
-   ; y_obs = y + alto + 8 - resto_y
+   ; SI RESTO Y != 0 -- y_obs = y + alto + 8 - resto_y
+   ; SI RESTO Y == 0 -- y_obs = y + alto
    
    ; calculamos la nueva x, como el resto en x es cero, la x y la nueva_x son iguales
    ld a, e_x(ix) ; cargamos en a la x
    ld (nueva_x), a
 
-
-   ld a, e_y(ix)   ; cargamos en a la y
-   add #16         ; le sumamos el alto dos veces (porque la fórmula es alto + 8 - 1)
-   
-   ld b, a         ; guardamos el acumulado de la operación en b
    ld a, (resto_y) ; cargamos en a el resto en y
-   ld h, a
-   ld a, b
-   sub a, h
+   or a            ; comprobamos si el resto de y es cero
+   jr nz, resto_y_no_cero_5
+   ld a, e_y(ix)   ; cargamos en a la y
+   add #8          ; le sumamos el alto 
+   ld (nueva_y), a
+   jr crear_obstaculo_5
+
+   
+   resto_y_no_cero_5:
+   ld a, e_y(ix)   ; cargamos en a la y
+   add #16          ; le sumamos el alto 
+   ld b, a         ; guardamos el acumulado de la operación en b
+   ld a, (resto_y) ; guardamos el resto en h
+   ld h, a         ; guardamos el resto en h
+   ld a, b         ; devolvemos el acumulado de la operación a a
+   sub a, h        ; le restamos el resto y
    ld (nueva_y), a
 
-   obs: 
-   DefineCmp_Obstacle (nueva_x), (nueva_y), 4, 8, 0xF0
-   ld hl, #obs
+
+   crear_obstaculo_5:
+   ld h, a ; nueva_y
+   ld a, (nueva_x)
+   ld iy, #obst_fake
+   ld obs_x(iy), a
+   ld obs_y(iy), h
+   ld obs_w(iy), #4
+   ld obs_h(iy), #8
+   ld hl, #obst_fake
    call man_obstacle_create
    resto_no_cero_5:
    ret
@@ -415,8 +443,9 @@ re_rellenar_array_obstacles::
    ld hl, #obst_fake
    call man_obstacle_create
 
-   ;call get_direccion_movimiento
-   ;call crear_obstaculos_segun_direccion
+   call man_entity_getArray
+   call get_direccion_movimiento
+   call crear_obstaculos_segun_direccion
 
    ret
 
@@ -438,7 +467,9 @@ sys_physics_update::
       ;; SOMOS EL HEROE
       call check_jump_tables_init
    
-   ;call re_rellenar_array_obstacles
+   call re_rellenar_array_obstacles
+   call man_obstacle_getArray ; como en la llamada anterior hemos consultado los arrays, nos posicionamos de nuevo en la primera posición
+   call man_entity_getArray
 
 ;; BUCLE QUE RECORRE TODAS LAS ENTIDADES CON FISICAS 
 _update_loop:

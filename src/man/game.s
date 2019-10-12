@@ -35,7 +35,7 @@ obst3: DefineCmp_Obstacle 60, 104,    20, 8, 0x0F
 obst4: DefineCmp_Obstacle  0, 152,   40, 8, 0x0F
 obst5: DefineCmp_Obstacle  40, 152,   40, 8, 0x0F
 obst6: DefineCmp_Obstacle  0, 40,    24, 8, 0x0F
-obst_fake:: DefineCmp_Obstacle  0, 0, 5, 9, 0xBB
+	
 ;; //////////////////
 ;; Manager Game Init
 ;; Input: -

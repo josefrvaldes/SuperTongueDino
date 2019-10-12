@@ -20,6 +20,7 @@ resto_x: .db #0
 resto_y: .db #0
 nueva_x: .db #0
 nueva_y: .db #0
+combinacion_restos: .db #0
 direccion_movimiento: .db #0
 pos_memoria_tile_origen: .dw #0
 
@@ -108,9 +109,252 @@ man_obstacle_re_rellenar_array::
 
    call man_entity_getArray
    call get_direccion_movimiento
-   call crear_obstaculos_segun_direccion
+   jp crear_obstaculos_segun_direccion
+
+
+
+; Input 
+;     nueva_x y nueva_y tienen que estar calculadas previamente
+; Output
+crear_obstaculo_por_nueva_xy:
+   ld a, (nueva_y)
+   ld l, a ; nueva_y
+   ld a, (nueva_x)
+   ld h, a
+   ld iy, #obst_fake
+   ld obs_x(iy), h
+   ld obs_y(iy), l
+   ld obs_w(iy), #4
+   ld obs_h(iy), #8
+   ld hl, #obst_fake
+   jp man_obstacle_create
+
+
+; Input:
+;     resto_x y resto_y calculados de antemano
+; Output:
+;     A: 0 si ambos restos son 0
+;        1 si x es distinto de cero
+;        2 si y es distinto de cero
+;        3 si ambos son distintos de cero
+calcular_combinacion_restos:
+   ; comparo si son iguales
+   ; si SÍ son, miro si uno de ellos es cero, si lo es, ambos son 0, si no, ambos son 1
+   ; si NO son, miro si uno de ellos es cero, si lo es, ese es cero 0, y el otro 1, sino, al revés
+   ld a, #0
+   ld h, a
+   ld a, (resto_x) 
+   ld b, a
+   ld a, (resto_y) 
+   cp b
+   jr nz, restos_no_iguales
+
+   restos_iguales:
+   cp h     ; comparamos si a (resto_x) es cero
+   jr z, ambos_son_cero
+   
+   ambos_son_no_cero:
+   ld a, #3
+   ret
+
+   ambos_son_cero:
+   ld a, #0
+   ret
+
+   restos_no_iguales:
+   cp h
+   jr nz, x_no_es_cero
+   y_no_es_cero:
+   ld a, #2
+   ret
+
+   x_no_es_cero:
+   ld a, #1
+   ret
+
+
+
+crear_obstaculos_dir_5:
+   
+   
+   ld hl, (#pos_memoria_tile_origen) ; aquí está el tile de origen
+   ld bc, #20
+   add hl, bc
+   ld a, (resto_y) ; cargamos en a el resto en y
+   or a            ; comprobamos si el resto de y es cero
+   jr nz, . + 2    ; si el resto no es cero, hay que sumar de nuevo el 20
+   add hl, bc ; ahora estamos apuntando al tile de abajo, el que sería nuestro obstáculo
+   ld a, (hl) ; esta es la información que tiene el tile de abajo, si es 0 es fondo, si no, es obstáculo
+   or a
+   ret z
+
+   ; dirección hacia abajo
+   ; si modulo de x/4 es 0, solo necesitamos un obstáculo, el de abajo
+   
+   ; aquí a vale el resto de la división
+   ld a, (resto_x)
+   or a
+   jr nz, resto_no_cero_5
+   resto_cero_5:
+
+   ; como el resto es cero, la pos del obstáculo estará en
+   ; x_obs = x
+   ; SI RESTO Y != 0 -- y_obs = y + alto + 8 - resto_y
+   ; SI RESTO Y == 0 -- y_obs = y + alto
+   
+   ; calculamos la nueva x, como el resto en x es cero, la x y la nueva_x son iguales
+   ld a, e_x(ix) ; cargamos en a la x
+   ld (nueva_x), a
+
+   ld a, (resto_y) ; cargamos en a el resto en y
+   or a            ; comprobamos si el resto de y es cero
+   jr nz, resto_y_no_cero_5
+   ld a, e_y(ix)   ; cargamos en a la y
+   add #8          ; le sumamos el alto 
+   ld (nueva_y), a
+   jr crear_obstaculo_5
+
+   
+   resto_y_no_cero_5:
+   ld a, e_y(ix)   ; cargamos en a la y
+   add #16          ; le sumamos el alto 
+   ld b, a         ; guardamos el acumulado de la operación en b
+   ld a, (resto_y) ; guardamos el resto en h
+   ld h, a         ; guardamos el resto en h
+   ld a, b         ; devolvemos el acumulado de la operación a a
+   sub a, h        ; le restamos el resto y
+   ld (nueva_y), a
+
+
+   crear_obstaculo_5:
+   call crear_obstaculo_por_nueva_xy
+   resto_no_cero_5:
+   ret
+
+
+; Input
+; ESTO NO--   hl: pos en memoria del obstáculo
+;     resto_y y resto_x: cargadas en memoria
+;     a:  pos del obstáculo según el dibujo de abajo
+;     |8 1 2|
+;     |7 E 3|
+;     |6 5 4|
+crear_obstaculos_segun_direccion::
+   ; obtenemos la posición en memoria del tile origen y la guardamos en su variable
+   ld   a, e_x(ix)
+   ld   e, a
+   ld   a, e_y(ix) 
+   ld   d, a
+   call get_pos_tile_memoria
+   ld (pos_memoria_tile_origen), hl
+
+   ; calculamos el resto_x
+   ld a, e_x(ix)
+   ld d, a
+   call dividir_d_entre_4
+   ld (resto_x), a
+
+   ; calculamos el resto_y
+   ld a, e_y(ix)
+   ld d, a
+   call dividir_d_entre_8
+   ld (resto_y), a
+
+   call calcular_combinacion_restos
+
+   ld a, (direccion_movimiento)
+   dec a
+   jr z, era_1
+   dec a
+   jr z, era_2
+   dec a
+   jr z, era_3
+   dec a
+   jr z, era_4
+   dec a
+   jr z, era_5
+   dec a
+   jr z, era_6
+   dec a
+   jr z, era_7
+   dec a
+   jr z, era_8
+
+   
+
+
+   era_1:
+   ret
+   era_2:
+   ret
+   era_3:
+   ret
+   era_4:
+   ret
+
+   era_5:
+   jp crear_obstaculos_dir_5
+
+   era_6:
+   ret
+
+   era_7: 
 
    ret
+   era_8:
+   ret
+
+
+
+
+
+
+; Recibe una x y una y del mapa (en bytes) y devuelve la posición de memoria
+; donde se encuentra ese tile en el tilemap en memoria.
+; Por ahora solo funciona para 1 solo tilemap. Para hacer que funcione con más,
+; habrá que pasar próximamente otra variable con el número de nivel en el que nos encontramos
+; Input 
+;     E: x
+;     D: y
+; Output
+;    HL: la pos de memoria mapeada de la x e y que le hemos pasado
+get_pos_tile_memoria::
+   ; la posición del tile en memoria es:
+   ; pos_ini_tilemap + x + ancho_tilemap * y ---- 4000 + x + 20y
+   ; en este caso de prueba, sabemos que nuestro tilemap empieza en 4000
+   ; así que: pos_ini_tilemap = 4000
+   ; sabemos que el ancho del tilemap es de 20: ancho_tilemap = 20
+   
+   push de ; guardamos en la pila el valor de x, porque lo vamos a perder en las siguientes llamadas
+
+   ; aquí d ya contiene la pos y en bytes
+   ; hay que dividir entre 8 la posición y, porque cada tile son 8 bytes en altura
+   call dividir_d_entre_8
+   ; ahora en d ya no tenemos la y original, sino la y/8, que es la que necesitamos
+
+
+   ld a, #20 ; cargamos en c el ancho en tiles del tilemap, que es 20
+   ld c, a
+   call multiplicar_d_c_16bits ; ya tenemos 20y que nos hace falta para la operación
+   ; ahora en HL tenemos el resultado de la operación 20y
+
+   ; recuperamos el valor de x, que lo teníamos en la pila
+   pop  de
+   ld   d, e ; y lo guardamos en d, que es donde tiene que estar para llamar a esta función
+   call dividir_d_entre_4 ; dividimos entre 4 porque en ancho, cada tile son 4 bytes
+   ; ahora en d ya no tenemos la y original, sino la y/4, que es la que necesitamos
+
+   ; las 4 operaciones de abajo son para preparar la suma de hl con de, que contiene la división de la pos x
+   ld  a, d           ; metemos en a el valor de la divisón de x/4
+   ld de, #0          ; ponemos de a cero
+   ld  e, a           ; y ponemos en e el valor de x/4
+   add hl, de         ; sumamos 20y + x
+
+   ld bc, #0x4000 ; cargamos en bc la pos inicial en memoria de nuestro tilemap
+   add hl, bc     ; y ya sumamos 4000 + x + 20y
+   ret
+   
+
 
 
 
@@ -249,184 +493,3 @@ get_direccion_movimiento::
    ld a, #5
    ld (direccion_movimiento), a
    ret
-
-
-
-
-; Input
-; ESTO NO--   hl: pos en memoria del obstáculo
-;     resto_y y resto_x: cargadas en memoria
-;     a:  pos del obstáculo según el dibujo de abajo
-;     |8 1 2|
-;     |7 E 3|
-;     |6 5 4|
-crear_obstaculos_segun_direccion::
-   ld   a, e_x(ix)
-   ld   e, a
-   ld   a, e_y(ix) 
-   ld   d, a
-   call get_pos_tile_memoria
-   ld (#pos_memoria_tile_origen), hl
-
-   ld a, e_x(ix)
-   ld d, a
-   call dividir_d_entre_4
-   ld (resto_x), a
-
-   ld a, e_y(ix)
-   ld d, a
-   call dividir_d_entre_8
-   ld (resto_y), a
-
-   ld a, (#direccion_movimiento)
-   dec a
-   jr z, era_1
-   dec a
-   jr z, era_2
-   dec a
-   jr z, era_3
-   dec a
-   jr z, era_4
-   dec a
-   jr z, era_5
-   dec a
-   jr z, era_6
-   dec a
-   jr z, era_7
-   dec a
-   jr z, era_8
-
-   
-
-
-   era_1:
-   ret
-   era_2:
-   ret
-   era_3:
-   ret
-   era_4:
-   ret
-
-
-   era_5:
-   ld hl, (#pos_memoria_tile_origen) ; aquí está el tile de origen
-   ld bc, #20
-   add hl, bc
-   ld a, (resto_y) ; cargamos en a el resto en y
-   or a            ; comprobamos si el resto de y es cero
-   jr nz, . + 2    ; si el resto no es cero, hay que sumar de nuevo el 20
-   add hl, bc ; ahora estamos apuntando al tile de abajo, el que sería nuestro obstáculo
-   ld a, (hl) ; esta es la información que tiene el tile de abajo, si es 0 es fondo, si no, es obstáculo
-   or a
-   ret z
-
-   ; dirección hacia abajo
-   ; si modulo de x/4 es 0, solo necesitamos un obstáculo, el de abajo
-   
-   ; aquí a vale el resto de la división
-   ld a, (resto_x)
-   or a
-   jr nz, resto_no_cero_5
-   resto_cero_5:
-   ; como el resto es cero, la pos del obstáculo estará en
-   ; x_obs = x
-   ; SI RESTO Y != 0 -- y_obs = y + alto + 8 - resto_y
-   ; SI RESTO Y == 0 -- y_obs = y + alto
-   
-   ; calculamos la nueva x, como el resto en x es cero, la x y la nueva_x son iguales
-   ld a, e_x(ix) ; cargamos en a la x
-   ld (nueva_x), a
-
-   ld a, (resto_y) ; cargamos en a el resto en y
-   or a            ; comprobamos si el resto de y es cero
-   jr nz, resto_y_no_cero_5
-   ld a, e_y(ix)   ; cargamos en a la y
-   add #8          ; le sumamos el alto 
-   ld (nueva_y), a
-   jr crear_obstaculo_5
-
-   
-   resto_y_no_cero_5:
-   ld a, e_y(ix)   ; cargamos en a la y
-   add #16          ; le sumamos el alto 
-   ld b, a         ; guardamos el acumulado de la operación en b
-   ld a, (resto_y) ; guardamos el resto en h
-   ld h, a         ; guardamos el resto en h
-   ld a, b         ; devolvemos el acumulado de la operación a a
-   sub a, h        ; le restamos el resto y
-   ld (nueva_y), a
-
-
-   crear_obstaculo_5:
-   ld h, a ; nueva_y
-   ld a, (nueva_x)
-   ld iy, #obst_fake
-   ld obs_x(iy), a
-   ld obs_y(iy), h
-   ld obs_w(iy), #4
-   ld obs_h(iy), #8
-   ld hl, #obst_fake
-   call man_obstacle_create
-   resto_no_cero_5:
-   ret
-
-   era_6:
-   ret
-
-   era_7: 
-
-   ret
-   era_8:
-   ret
-
-
-
-
-
-
-; Recibe una x y una y del mapa (en bytes) y devuelve la posición de memoria
-; donde se encuentra ese tile en el tilemap en memoria.
-; Por ahora solo funciona para 1 solo tilemap. Para hacer que funcione con más,
-; habrá que pasar próximamente otra variable con el número de nivel en el que nos encontramos
-; Input 
-;     E: x
-;     D: y
-; Output
-;    HL: la pos de memoria mapeada de la x e y que le hemos pasado
-get_pos_tile_memoria::
-   ; la posición del tile en memoria es:
-   ; pos_ini_tilemap + x + ancho_tilemap * y ---- 4000 + x + 20y
-   ; en este caso de prueba, sabemos que nuestro tilemap empieza en 4000
-   ; así que: pos_ini_tilemap = 4000
-   ; sabemos que el ancho del tilemap es de 20: ancho_tilemap = 20
-   
-   push de ; guardamos en la pila el valor de x, porque lo vamos a perder en las siguientes llamadas
-
-   ; aquí d ya contiene la pos y en bytes
-   ; hay que dividir entre 8 la posición y, porque cada tile son 8 bytes en altura
-   call dividir_d_entre_8
-   ; ahora en d ya no tenemos la y original, sino la y/8, que es la que necesitamos
-
-
-   ld a, #20 ; cargamos en c el ancho en tiles del tilemap, que es 20
-   ld c, a
-   call multiplicar_d_c_16bits ; ya tenemos 20y que nos hace falta para la operación
-   ; ahora en HL tenemos el resultado de la operación 20y
-
-   ; recuperamos el valor de x, que lo teníamos en la pila
-   pop  de
-   ld   d, e ; y lo guardamos en d, que es donde tiene que estar para llamar a esta función
-   call dividir_d_entre_4 ; dividimos entre 4 porque en ancho, cada tile son 4 bytes
-   ; ahora en d ya no tenemos la y original, sino la y/4, que es la que necesitamos
-
-   ; las 4 operaciones de abajo son para preparar la suma de hl con de, que contiene la división de la pos x
-   ld  a, d           ; metemos en a el valor de la divisón de x/4
-   ld de, #0          ; ponemos de a cero
-   ld  e, a           ; y ponemos en e el valor de x/4
-   add hl, de         ; sumamos 20y + x
-
-   ld bc, #0x4000 ; cargamos en bc la pos inicial en memoria de nuestro tilemap
-   add hl, bc     ; y ya sumamos 4000 + x + 20y
-   ret
-   

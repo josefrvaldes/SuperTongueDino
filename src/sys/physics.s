@@ -693,3 +693,4 @@ invalid_x_patrullar:
 	ld	e_vx(ix), a
 endif_x_patrullar:
 	ret
+	

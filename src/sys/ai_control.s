@@ -10,13 +10,16 @@
 
 .module sys_ai_control
 
-
+;; ESTO DEBERIAN  SER COMPONENTES
 ai_rangoDetectar_rebote_X = 15
 ai_rangoDetectar_rebote_Y = ai_rangoDetectar_rebote_X + ai_rangoDetectar_rebote_X
 reducir_velocidad: .db #0      ;; 1 NORMAL   //  -1 NO ENTRAR
 IA_pausaAtaqueDefensa:	.db #0
 actualizar_direccion: .db #0      ;; 1 NORMAL   //  -1 NO ENTRAR
 
+IA_patrullar_cambioGravedad: .db #0
+tempo1_patrullar: .db 0x20    
+tempo2_patrullar: .db 0x20
 
 rebote_control_direcction: 	.db #0
 control_direction_X:						;; Tabla de salto normal (hacia arriba)
@@ -42,6 +45,7 @@ sys_ai_control_init::
 	ld 	(_ent_array_ptr_temp_rebotar), ix  ;; temporal
 	ld 	(_ent_array_ptr_temp_perseguir), ix  ;; temporal
 	ld 	(_ent_array_ptr_temp_defender), ix  ;; temporal
+	ld 	(_ent_array_ptr_temp_patrullar), ix  ;; temporal
 	ld 	(_ent_array_ptr), ix
 	ret
 
@@ -140,6 +144,8 @@ _AI_ent:
 	call	z, sys_ai_perseguir
 	cp 	#e_ai_st_defender
 	call	z, sys_ai_defender
+	cp 	#e_ai_st_patrullar
+	call	z, sys_ai_patrullar
 _no_AI_ent:
 _ent_counter = . + 1
 	ld 	a, #0
@@ -478,15 +484,11 @@ sys_ai_defender:
   ld  a, #e_ai_st_rebotar    ;; cambia a la IA a rebotar
   ld  e_ai_st(ix), a
   defender_seguirEjecutando:
-
   ret
 defender_reiniciarPausa:
   dec   a
   ld  (IA_pausaAtaqueDefensa), a
   ret
-
-
-
 
 
 ; Devuelve d -> velocidadX,  c -> velocidadY
@@ -509,3 +511,46 @@ defender_calcularVelocidad:
   defender_AbajoY:
   ld  c, #1
   ret
+
+
+
+
+
+
+
+
+;////////////////////////////////
+; PATRULLAR
+;////////////////////////////////
+sys_ai_patrullar:
+	_ent_array_ptr_temp_patrullar = . + 2
+	ld	iy, #0x0000
+
+	call sys_ai_patrullar_cambiarGravedad
+	call sys_ai_detectarJugador
+	;; realizar algo al detectar al jugador
+
+	ret
+
+sys_ai_patrullar_cambiarGravedad:
+	;; TEMPORIZADOR
+	ld  a, (tempo1_patrullar)
+	dec  a
+	ld  (tempo1_patrullar), a
+	jr  nz, salto_tempo_patrullar
+	ld  a, #0x20
+	ld  (tempo1_patrullar), a
+
+	ld  a, (tempo2_patrullar)
+	dec  a
+	ld  (tempo2_patrullar), a
+	jr  nz, salto_tempo_patrullar
+		ld  a, #0x20
+		ld  (tempo2_patrullar), a
+		ld	a, e_vy(ix)
+		neg
+		ld	e_vy(ix), a
+salto_tempo_patrullar:
+	ret
+
+

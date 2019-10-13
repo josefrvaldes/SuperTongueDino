@@ -46,6 +46,8 @@ e_ai_st_move_to	= 2
 e_ai_st_rebotar	= 3
 e_ai_st_perseguir = 4
 e_ai_st_defender  = 5
+e_ai_st_patrullar = 6
+e_ai_st_saltar    = 7
 
 ;; Default constructor for entity components
 .macro DefineCmp_Entity_default

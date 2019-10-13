@@ -14,6 +14,8 @@
 ;; Physics system constants
 screen_width  = 80
 screen_height = 200
+;; Contador patrullar IA
+IA_pausaPatrullar:	.db #0	
 ;;
 ;; VARIABLES CONTROL DEL SALTO Y REBOTES
 ;;
@@ -102,33 +104,12 @@ equals:	;; si no son iguales HA HABIDO COLISION SEGURO
 
 
 
-
-	;; colisiones enemigo ///////////////////////////////////////////////////////////
-	ld	a, e_ai_st(ix)
-	cp	#e_ai_st_rebotar
-
-	ld a, (#col_hay_colision_top)
-	dec a
-	jr nz, comprobar_vel_Y
-	;jr	nz, no_mas_saltos  ;; se comprueba si el enemigo rebota
-	;ld a, d
-	;or a
-	;jr z, comprobar_vel_Y   ;; se comprueba si colisiona en X, en caso afirmativo se le niega la vx
-	ld  a, e_vx(ix)
-	neg
-	ld  e_vx(ix), a
-	comprobar_vel_Y:
-	ld a, (#col_hay_colision_left)
-	dec a
-	jr nz, no_mas_saltos
-	;ld a, c
-	;or a
-	;jr z, no_mas_saltos	;; se comprueba si colisiona en Y, en caso afirmativo se le niega la vy
-	ld  a, e_vy(ix)
-	neg
-	ld  e_vy(ix), a
+	; ////////////////////////////////////////////////////////////////////////////////
+	;; colisiones ENEMIGOS ///////////////////////////////////////////////////////////
+	call physics_IA_enemigos
 	jr no_mas_saltos
-	; /////////////////////////////////////////////////////////////////////////
+	; ////////////////////////////////////////////////////////////////////////////////
+	; ////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -154,8 +135,16 @@ only_collision_corner:
 parar_salto_vetical:
 	call	end_of_jump
 no_mas_saltos:
-	;; COLISIONES CON LOS BORDES DE LA PANTALLA
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_patrullar
+	jr	z, no_mas_saltos_patrullar
+	;; COLISIONES CON LOS BORDES DE LA PANTALLA y actualizar pos
 	call sys_check_borderScreem
+	jr continuar_actualizar_pos
+
+	no_mas_saltos_patrullar:
+	call sys_check_borderScreem_patrullar ;; COLISIONES CON LOS BORDES DE LA PANTALLA y actualizar pos para la IA patrullar
+	continuar_actualizar_pos:
 
 	_ent_counter = . + 1
 	ld	a, #0
@@ -589,3 +578,120 @@ active_jump_right:
 	ret
 
 
+
+
+
+
+
+
+; ////////////////////////////////////////
+; ENEMIGOS
+physics_IA_enemigos:
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_rebotar
+	jr	nz, enemigo_patrullar_physic
+	ld 	a, (#col_hay_colision_top)
+	dec 	a
+	jr 	nz, comprobar_vel_Y
+	;jr	nz, no_mas_saltos  ;; se comprueba si el enemigo rebota
+	;ld a, d
+	;or a
+	;jr z, comprobar_vel_Y   ;; se comprueba si colisiona en X, en caso afirmativo se le niega la vx
+	ld  	a, e_vx(ix)
+	neg
+	ld  	e_vx(ix), a
+	comprobar_vel_Y:
+	ld 	a, (#col_hay_colision_left)
+	dec 	a
+	ret	nz
+	;ld a, c
+	;or a
+	;jr z, no_mas_saltos	;; se comprueba si colisiona en Y, en caso afirmativo se le niega la vy
+	ld  	a, e_vy(ix)
+	neg
+	ld  	e_vy(ix), a
+	ret
+
+	; IA PATRULLAR
+	enemigo_patrullar_physic:
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_patrullar
+	ret	nz
+	ld 	a, (#col_hay_colision_top)
+	dec 	a
+	jr 	nz, patrullar_comprobar_vel_Y
+	ld  	a, e_vx(ix)
+	neg
+	ld  	e_vx(ix), a
+	patrullar_comprobar_vel_Y: ; -> no puede ser ya que si entra a este call hay colision con algo
+	ret
+
+
+
+
+;; CHOQUES CON LOS BORDES DE LA PANTALLA
+sys_check_borderScreem_patrullar:
+
+	;; UPDATE Y
+	call sys_check_borderScreem_patrullar_Y
+
+	;; TEMPORIZADOR
+	ld  a, (IA_pausaPatrullar)
+	cp  #0
+	jr  nz, patrullar_reiniciarPausa
+	ld  a, #10
+	ld  (IA_pausaPatrullar), a
+
+	ld 	a, (#col_hay_colision_left)
+	dec 	a
+	ret 	nz
+
+	;; UPDATE X
+	call sys_check_borderScreem_patrullar_X
+	ret
+patrullar_reiniciarPausa:
+	ld  a, (IA_pausaPatrullar)
+	dec   a
+	ld  (IA_pausaPatrullar), a
+	ret
+
+
+;; UPDATE Y
+sys_check_borderScreem_patrullar_Y:
+	;; UPDATE Y
+	ld	a, #screen_height + 1
+	sub	e_h(ix)
+	ld	c, a
+	ld	a, e_y(ix)
+	add	e_vy(ix)
+	cp	c
+	jr	nc, invalid_y_patrullar
+valid_y_patrullar:
+	ld	e_y(ix), a
+	jr endif_y_patrullar
+invalid_y_patrullar:
+	ld 	a, #1
+	ld 	(#col_hay_colision_left), a
+endif_y_patrullar:
+	ret
+
+;; UPDATE X
+sys_check_borderScreem_patrullar_X:
+	;; UPDATE X
+	ld	a, #screen_width + 1
+	sub	e_w(ix)
+	ld	c, a
+
+	ld	a, e_x(ix)
+	add	e_vx(ix)
+	cp	c
+	jr	nc, invalid_x_patrullar
+valid_x_patrullar:
+	ld	e_x(ix), a
+	jr endif_x_patrullar
+invalid_x_patrullar:
+	ld	a, e_vx(ix)
+	neg				;; para cambiar a negativo
+	ld	e_vx(ix), a
+endif_x_patrullar:
+	ret

@@ -20,7 +20,7 @@ resto_x: .db #0
 resto_y: .db #0
 nueva_x: .db #0
 nueva_y: .db #0
-combinacion_restos: .db #0
+se_creara_obstaculo: .db #0
 direccion_movimiento: .db #0
 pos_memoria_tile_origen: .dw #0
 
@@ -134,102 +134,186 @@ crear_obstaculo_por_nueva_xy:
 ;     resto_x y resto_y calculados de antemano
 ; Output:
 ;     A: 0 si ambos restos son 0
-;        1 si x es distinto de cero
-;        2 si y es distinto de cero
+;        1 si y es cero
+;        2 si x es cero
 ;        3 si ambos son distintos de cero
-calcular_combinacion_restos:
+calcular_combinacion_restos::
    ; comparo si son iguales
    ; si SÍ son, miro si uno de ellos es cero, si lo es, ambos son 0, si no, ambos son 1
    ; si NO son, miro si uno de ellos es cero, si lo es, ese es cero 0, y el otro 1, sino, al revés
-   ld a, #0
-   ld h, a
-   ld a, (resto_x) 
-   ld b, a
-   ld a, (resto_y) 
-   cp b
-   jr nz, restos_no_iguales
-
-   restos_iguales:
-   cp h     ; comparamos si a (resto_x) es cero
-   jr z, ambos_son_cero
-   
-   ambos_son_no_cero:
-   ld a, #3
-   ret
-
-   ambos_son_cero:
-   ld a, #0
-   ret
-
-   restos_no_iguales:
-   cp h
-   jr nz, x_no_es_cero
-   y_no_es_cero:
-   ld a, #2
-   ret
-
-   x_no_es_cero:
-   ld a, #1
-   ret
-
-
-
-crear_obstaculos_dir_5:
-   
-   
-   ld hl, (#pos_memoria_tile_origen) ; aquí está el tile de origen
-   ld bc, #20
-   add hl, bc
-   ld a, (resto_y) ; cargamos en a el resto en y
-   or a            ; comprobamos si el resto de y es cero
-   jr nz, . + 2    ; si el resto no es cero, hay que sumar de nuevo el 20
-   add hl, bc ; ahora estamos apuntando al tile de abajo, el que sería nuestro obstáculo
-   ld a, (hl) ; esta es la información que tiene el tile de abajo, si es 0 es fondo, si no, es obstáculo
-   or a
-   ret z
-
-   ; dirección hacia abajo
-   ; si modulo de x/4 es 0, solo necesitamos un obstáculo, el de abajo
-   
-   ; aquí a vale el resto de la división
    ld a, (resto_x)
-   or a
-   jr nz, resto_no_cero_5
-   resto_cero_5:
+   ld h, a  ; x
+   ld a, (resto_y)
+   ld b, a  ; y
+   ld a, #0 ; comparador
 
-   ; como el resto es cero, la pos del obstáculo estará en
-   ; x_obs = x
-   ; SI RESTO Y != 0 -- y_obs = y + alto + 8 - resto_y
-   ; SI RESTO Y == 0 -- y_obs = y + alto
-   
-   ; calculamos la nueva x, como el resto en x es cero, la x y la nueva_x son iguales
-   ld a, e_x(ix) ; cargamos en a la x
-   ld (nueva_x), a
+   cp h
+   jr z, x_es_cero
+   x_no_es_cero:
+      cp b
+      jr z, y_es_cero
+      y_no_es_cero:
+      ld a, #3
+      ret
 
-   ld a, (resto_y) ; cargamos en a el resto en y
-   or a            ; comprobamos si el resto de y es cero
-   jr nz, resto_y_no_cero_5
-   ld a, e_y(ix)   ; cargamos en a la y
-   add #8          ; le sumamos el alto 
-   ld (nueva_y), a
-   jr crear_obstaculo_5
-
-   
-   resto_y_no_cero_5:
-   ld a, e_y(ix)   ; cargamos en a la y
-   add #16          ; le sumamos el alto 
-   ld b, a         ; guardamos el acumulado de la operación en b
-   ld a, (resto_y) ; guardamos el resto en h
-   ld h, a         ; guardamos el resto en h
-   ld a, b         ; devolvemos el acumulado de la operación a a
-   sub a, h        ; le restamos el resto y
-   ld (nueva_y), a
+      y_es_cero:
+      ld a, #1
+      ret
 
 
-   crear_obstaculo_5:
-   call crear_obstaculo_por_nueva_xy
-   resto_no_cero_5:
+   x_es_cero:
+      cp b
+      jr z, ambos_son_cero
+      ; y no es cero
+      ld a, #2
+      ret
+
+      ambos_son_cero:
+      ld a, #0
+      ret
+
+; Input
+;     pos_memoria_tile_origen cargada
+;     a, offset con respecto al tile origen (ejemplo, 20 si es el de la fila de abajo, -20 si es de arriba, 1 si es el de la dch, -1 si es el de la izq)
+; Output
+;     a 0 si no es obstaculo, != 0 si sí lo es
+analizar_si_tile_cercano_es_obstaculo:
+   ld  bc, #0
+   ld  hl, (#pos_memoria_tile_origen) ; aquí está el tile de origen
+   ld   c, a
+   add hl, bc                        ; ahora estamos posicionados en el tile destino
+   ld   a, (hl)                      ; cargamos en a el contenido del tile destino
    ret
+
+
+; Input
+;     pos_memoria_tile_origen cargada 
+;     a, offset con respecto al tile origen (ejemplo, 20 si es el de la fila de abajo, -20 si es de arriba, 1 si es el de la dch, -1 si es el de la izq)
+; Output
+;     d tendrá cargados los bits de los obstáculos que se deberán crear
+get_d_dir_5:
+   ld   d, #0  ; ponemos d a cero porque es el registro que usaremos para saber qué obstáculos hay que crear y cuales no
+   call analizar_si_tile_cercano_es_obstaculo
+   or   a        ; si el contenido es cero, no hay obstáculo
+   jr   z, . + 4
+   set  0, d      ; con esto decimos que queremos CREAR el primer tile
+   
+   inc hl
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   ret  z
+   set  1, d      ; con esto decimos que queremos CREAR el segundo tile
+   ret
+
+
+crear_obstaculos_dir_5::
+   ld a, #0
+   ld d, a
+   call calcular_combinacion_restos ; en a, cargamos la combinación de restos
+   cp d
+   jr z, ambos_cero_dir_5
+   dec a
+   jr z, x_no_cero_dir_5
+   dec a
+   jr z, y_no_cero_dir_5
+   dec a
+   jr z, ninguno_cero_dir_5
+
+   ambos_cero_dir_5::
+      ld   a, #20
+      call analizar_si_tile_cercano_es_obstaculo
+      or   a        ; si el contenido es cero, no hay obstáculo, salimos
+      ret  z
+
+      ; si el contenido del tile destino es obstaculo, calculamos las posiciones del mismo
+      ld a, e_x(ix)
+      ld (nueva_x), a
+      ld a, e_y(ix)
+      add #8
+      ld (nueva_y), a
+      call crear_obstaculo_por_nueva_xy
+      ret
+
+   y_no_cero_dir_5::
+      ld   a, #40
+      call analizar_si_tile_cercano_es_obstaculo
+      or   a        ; si el contenido es cero, no hay obstáculo, salimos
+      ret  z
+      
+
+      ld a, e_x(ix)
+      ld (nueva_x), a
+      ld a, e_y(ix)
+      add #16
+      ld b, a         ; guardamos el acumulado de la operacion
+      ld a, (resto_y) ; guardamos en a el resto_y
+      ld h, a         ; guardamos en h el resto_y
+      ld a, b         ; guardamos en a el acumulado de la operación
+      sub a, h        ; le restamos a 'a' el valor de 'h', es decir, el acumulado menos el resto
+      ld (nueva_y), a
+      call crear_obstaculo_por_nueva_xy
+      ret
+
+   ninguno_cero_dir_5::      
+      ld   a, #40
+      call get_d_dir_5
+      or d          ; si todos los tiles eran fondo..
+      ret z         ; ..nos salimos
+
+      ld  a, (resto_x) ; guardamos en a el resto_x
+      ld  h, a         ; guardamos en h el resto_x
+      ld  a, e_x(ix)   ; guardamos la x en a
+      sub h            ; le restamos a la x el resto
+      ld (nueva_x), a  ; ya tenemos la nueva x
+      ld a, e_y(ix)
+      add #16
+      ld b, a         ; guardamos el acumulado de la operacion
+      ld a, (resto_y) ; guardamos en a el resto_y
+      ld h, a         ; guardamos en h el resto_y
+      ld a, b         ; guardamos en a el acumulado de la operación
+      sub a, h        ; le restamos a 'a' el valor de 'h', es decir, el acumulado menos el resto
+      ld (nueva_y), a
+      push de
+      bit 0, d         ; lo hemos calculado porque el primero siempre es obligatorio
+      jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+      call crear_obstaculo_por_nueva_xy
+      pop de
+
+      ld a, (nueva_x)
+      add a, #4
+      ld (nueva_x), a
+      bit 1, d         ; si este obstáculo no hay que crearlo.. 
+      ret z            ; ..nos salimos
+      call crear_obstaculo_por_nueva_xy
+      ret
+   
+   x_no_cero_dir_5::
+      ld   a, #20
+      call get_d_dir_5
+      or d          ; si todos los tiles eran fondo..
+      ret z         ; ..nos salimos
+
+      ld  a, (resto_x) ; guardamos en a el resto_x
+      ld  h, a         ; guardamos en h el resto_x
+      ld  a, e_x(ix)   ; guardamos la x en a
+      sub h            ; le restamos a la x el resto
+      ld (nueva_x), a  ; ya tenemos la nueva x
+      ld a, e_y(ix)
+      add #8
+      ld (nueva_y), a
+      push de
+      bit 0, d         ; lo hemos calculado porque el primero siempre es obligatorio
+      jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+      call crear_obstaculo_por_nueva_xy
+      pop de
+
+      ld a, (nueva_x)
+      add a, #4
+      ld (nueva_x), a
+      bit 1, d         ; si este obstáculo no hay que crearlo.. 
+      ret z            ; ..nos salimos
+      call crear_obstaculo_por_nueva_xy
+      ret
 
 
 ; Input
@@ -259,8 +343,6 @@ crear_obstaculos_segun_direccion::
    ld d, a
    call dividir_d_entre_8
    ld (resto_y), a
-
-   call calcular_combinacion_restos
 
    ld a, (direccion_movimiento)
    dec a

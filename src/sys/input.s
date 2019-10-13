@@ -82,4 +82,14 @@ M_Pressed:
 M_NotPressed:
 
 
+ld	hl, #Key_E
+	call cpct_isKeyPressed_asm
+	jr	z, E_NotPressed
+E_Pressed:
+	;; Para activar la invisibilidad ponemos a 1 el parametro de la entidad
+    	ld  a,  #1
+    	ld  e_invisi(ix), a
+E_NotPressed:
+
+
 	ret

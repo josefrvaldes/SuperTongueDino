@@ -1,0 +1,1 @@
+.globl aplicate_invisibility

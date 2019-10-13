@@ -13,9 +13,7 @@
 
 ;; Physics system constants
 screen_width  = 80
-screen_height = 200
-;; Contador patrullar IA
-IA_pausaPatrullar:	.db #0	
+screen_height = 200	
 ;;
 ;; VARIABLES CONTROL DEL SALTO Y REBOTES
 ;;
@@ -636,11 +634,11 @@ sys_check_borderScreem_patrullar:
 	call sys_check_borderScreem_patrullar_Y
 
 	;; TEMPORIZADOR
-	ld  a, (IA_pausaPatrullar)
+	ld  a, e_ai_pausaVel(ix)
 	cp  #0
 	jr  nz, patrullar_reiniciarPausa
 	ld  a, #10
-	ld  (IA_pausaPatrullar), a
+	ld  e_ai_pausaVel(ix), a
 
 	ld 	a, (#col_hay_colision_left)
 	dec 	a
@@ -650,9 +648,9 @@ sys_check_borderScreem_patrullar:
 	call sys_check_borderScreem_patrullar_X
 	ret
 patrullar_reiniciarPausa:
-	ld  a, (IA_pausaPatrullar)
+	ld  a, e_ai_pausaVel(ix)
 	dec   a
-	ld  (IA_pausaPatrullar), a
+	ld  e_ai_pausaVel(ix), a
 	ret
 
 

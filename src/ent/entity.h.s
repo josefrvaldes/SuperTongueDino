@@ -5,7 +5,7 @@
 max_entities == 4
 
 ;; Defines a new entity component
-.macro DefineCmp_Entity _x, _y, _vx, _vy, _w, _h, _pspr, _tipoEntidad, _aist
+.macro DefineCmp_Entity _x, _y, _vx, _vy, _w, _h, _pspr, _tipoEntidad, _aist, _pausaVel, _clock1, _clock2, _cambioDirec
 	.db 	_x, _y	
 	.db	_vx, _vy
 	.db	_w, _h
@@ -14,23 +14,31 @@ max_entities == 4
 	.db	_tipoEntidad ;; que tipo de entidad es
 	.db	_aist		 ;; estatus del tipo de IA
 	.dw	0xCCCC	 ;; Last video memory pointer value
+	.db	_pausaVel	 ;; contador para ralentizar la velocidad de los enemigos
+	.db	_clock1	 ;; contador 1 de reloj para IA de patrullar
+	.db	_clock2	 ;; contador 2 de reloj para IA de patrullar
+	.db	_cambioDirec ;; contador para cuando cambia de direccion la IA de rebotar
 .endm
 
-e_x		= 0
-e_y		= 1
-e_vx		= 2
-e_vy		= 3
-e_w		= 4
-e_h		= 5
-e_pspr_l	= 6
-e_pspr_h	= 7
-e_ai_aim_x	= 8
-e_ai_aim_y  = 9
-e_tipo	= 10
-e_ai_st	= 11
-e_lastVP_l	= 12
-e_lastVP_h	= 13
-sizeof_e	= 14
+e_x		  = 0
+e_y		  = 1
+e_vx		  = 2
+e_vy		  = 3
+e_w		  = 4
+e_h		  = 5
+e_pspr_l	  = 6
+e_pspr_h	  = 7
+e_ai_aim_x	  = 8
+e_ai_aim_y    = 9
+e_tipo	  = 10
+e_ai_st	  = 11
+e_lastVP_l	  = 12
+e_lastVP_h	  = 13
+e_ai_pausaVel = 14
+e_ai_reloj1   = 15
+e_ai_reloj2	  = 16
+e_ai_cambioDirecccion = 17
+sizeof_e	  = 18
 
 
 ;; Enumeracion de tipos de Entidad
@@ -51,7 +59,7 @@ e_ai_st_saltar    = 7
 
 ;; Default constructor for entity components
 .macro DefineCmp_Entity_default
-	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_tipo_enemigo1, e_ai_st_noAI  ;; reserva el espacio de una entidad, NO!! crea una entidad
+	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_tipo_enemigo1, e_ai_st_noAI, 0, 0x20, 0x20, 0  ;; reserva el espacio de una entidad, NO!! crea una entidad
 .endm
 
 ;; Defines entity array for components

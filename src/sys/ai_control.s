@@ -13,13 +13,8 @@
 ;; ESTO DEBERIAN  SER COMPONENTES
 ai_rangoDetectar_rebote_X = 15
 ai_rangoDetectar_rebote_Y = ai_rangoDetectar_rebote_X + ai_rangoDetectar_rebote_X
-reducir_velocidad: .db #0      ;; 1 NORMAL   //  -1 NO ENTRAR
-IA_pausaAtaqueDefensa:	.db #0
-actualizar_direccion: .db #0      ;; 1 NORMAL   //  -1 NO ENTRAR
 
-IA_patrullar_cambioGravedad: .db #0
-tempo1_patrullar: .db 0x20    
-tempo2_patrullar: .db 0x20
+
 
 rebote_control_direcction: 	.db #0
 control_direction_X:						;; Tabla de salto normal (hacia arriba)
@@ -167,7 +162,7 @@ _ent_counter = . + 1
 ; Entrada: IX -> al enemigo
 sys_ai_rebotar:
 	;; para simular una velocidad de 0,5 entraremos en el metodo la mitad de veces
-	ld	a, (reducir_velocidad)
+	ld	a, e_ai_pausaVel(ix)
 	cp	#0
 	jr	nz, espera_movimiento
 
@@ -184,7 +179,7 @@ sys_ai_rebotar:
 	jr nz, rebote_seguirEjecutando
 	;; debemos poner el contador de decision a 0 antes
 	ld	a, #30
-	ld	(actualizar_direccion), a
+	ld	e_ai_cambioDirecccion(ix), a
 
 	call	rebotar_elegirAtaqueDefensa
 	dec 	a
@@ -198,7 +193,7 @@ sys_ai_rebotar:
 	rebote_seguirEjecutando:
 
 	ld	a, #2
-	ld	(reducir_velocidad), a
+	ld	e_ai_pausaVel(ix), a
  ret
 espera_movimiento:
 	;; cotraposicion de la velocidad
@@ -212,9 +207,9 @@ espera_movimiento:
 	add	e_y(ix)
 	ld	e_y(ix), a
 
-	ld	a, (reducir_velocidad)
+	ld	a, e_ai_pausaVel(ix)
 	dec   a
-	ld	(reducir_velocidad), a
+	ld	e_ai_pausaVel(ix), a
  ret
 
 
@@ -289,7 +284,7 @@ __no_collision:
 
 
 movimiento_aleatorio:
-	ld	a, (actualizar_direccion)
+	ld	a, e_ai_cambioDirecccion(ix)
 	cp	#0
 	jr	nz, espera_actualizar_velocidad
 
@@ -297,12 +292,12 @@ movimiento_aleatorio:
 	call rebote_tabla_direcciones
 
 	ld	a, #50
-	ld	(actualizar_direccion), a
+	ld	e_ai_cambioDirecccion(ix), a
  ret
 espera_actualizar_velocidad:
 
 	dec   a
-	ld	(actualizar_direccion), a
+	ld	e_ai_cambioDirecccion(ix), a
  ret
 
 
@@ -393,11 +388,11 @@ sys_ai_perseguir:
 	ld	a, #0
 	ld	e_vx(ix), a
 	ld	e_vy(ix), a
-	ld	a, (IA_pausaAtaqueDefensa)
+	ld	a, e_ai_pausaVel(ix)
 	cp	#0
 	jr	nz, espera_movimiento2
 	ld	a, #2
-	ld	(IA_pausaAtaqueDefensa), a
+	ld	e_ai_pausaVel(ix), a
 
 	call atacar_calcularVelocidad
 	ld  a, d
@@ -416,7 +411,7 @@ sys_ai_perseguir:
 espera_movimiento2:
 	;; cotraposicion de la velocidad
 	dec   a
-	ld	(IA_pausaAtaqueDefensa), a
+	ld	e_ai_pausaVel(ix), a
  ret
 
 
@@ -466,11 +461,11 @@ sys_ai_defender:
   ld  a, #0
   ld   e_vx(ix), a
   ld   e_vy(ix), a
-  ld  a, (IA_pausaAtaqueDefensa)
+  ld  a, e_ai_pausaVel(ix)
   cp  #0
   jr  nz, defender_reiniciarPausa
   ld  a, #1
-  ld  (IA_pausaAtaqueDefensa), a
+  ld  e_ai_pausaVel(ix), a
 
   call defender_calcularVelocidad  ; Devuelve d -> velocidadX,  e -> velocidadY
   ld  a, d
@@ -487,7 +482,7 @@ sys_ai_defender:
   ret
 defender_reiniciarPausa:
   dec   a
-  ld  (IA_pausaAtaqueDefensa), a
+  ld  e_ai_pausaVel(ix), a
   ret
 
 
@@ -534,19 +529,19 @@ sys_ai_patrullar:
 
 sys_ai_patrullar_cambiarGravedad:
 	;; TEMPORIZADOR
-	ld  a, (tempo1_patrullar)
+	ld  a, e_ai_reloj1(ix)
 	dec  a
-	ld  (tempo1_patrullar), a
+	ld  e_ai_reloj1(ix), a
 	jr  nz, salto_tempo_patrullar
 	ld  a, #0x20
-	ld  (tempo1_patrullar), a
+	ld  e_ai_reloj1(ix), a
 
-	ld  a, (tempo2_patrullar)
+	ld  a, e_ai_reloj2(ix)
 	dec  a
-	ld  (tempo2_patrullar), a
+	ld  e_ai_reloj2(ix), a
 	jr  nz, salto_tempo_patrullar
 		ld  a, #0x20
-		ld  (tempo2_patrullar), a
+		ld  e_ai_reloj2(ix), a
 		ld	a, e_vy(ix)
 		neg
 		ld	e_vy(ix), a

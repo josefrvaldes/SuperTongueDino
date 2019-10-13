@@ -11,6 +11,8 @@
 .globl cpct_scanKeyboard_f_asm
 .globl cpct_isKeyPressed_asm
 
+.globl cpct_hflipSpriteM0_asm
+
 .globl cpct_memset_f64_asm
 .globl cpct_setDrawCharM0_asm
 .globl cpct_drawStringM0_asm

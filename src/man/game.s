@@ -13,6 +13,7 @@
 .include "sys/ai_control.h.s"
 .include "man/menuIngame.h.s"
 .include "man_invisibility.h.s"
+;.include "man/sprite.h.s"
 
 .module game_manager
 
@@ -27,7 +28,7 @@ bool_mostrar_menu: .db #0
 
 
 ;; Manager Variables
-ent1: DefineCmp_Entity 50,  40,  0,  0, 4, 8, 0, _hero_sp_2,     e_tipo_jugador,  e_ai_st_noAI
+ent1: DefineCmp_Entity 50,  40,  0,  0, 4, 8, 0, _hero_sp_0,     e_tipo_jugador,  e_ai_st_noAI
 ent2: DefineCmp_Entity 30,  30,  1,  1, 4, 8, 0, _enemigo1_sp_0, e_tipo_enemigo1, e_ai_st_rebotar
 ;ent3: DefineCmp_Entity 40, 0,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
 ;ent4: DefineCmp_Entity 50,  0,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
@@ -125,6 +126,9 @@ man_game_update::				;; MEJORAR!!! esto ya que estoy pasando IX al update y se p
 
 	call man_entity_getArray
 	call sys_input_update
+
+	;call man_entity_getArray
+	;call set_sprite_hero
 
 	call man_entity_getArray
 	call aplicate_invisibility

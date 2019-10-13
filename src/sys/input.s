@@ -9,6 +9,7 @@
 ;.include "sys/colisions.h.s"
 .include "physics.h.s"
 .include "man/game.h.s"
+.include "man/sprite.h.s"
 
 
 
@@ -24,6 +25,13 @@ sys_input_init::
 ;; Destroy: AF, BC, DE, HL, IX
 sys_input_update::
 	;; Reset velocities
+	ld	a, e_vx(ix)
+	dec 	a
+	inc	a
+	jr	z, no_guardar_VX
+	call guardar_VX
+no_guardar_VX:
+
 	ld	e_vx(ix), #0
 	ld 	e_vy(ix), #0
 

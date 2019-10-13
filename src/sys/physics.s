@@ -7,6 +7,7 @@
 .include "man/entity.h.s"
 .include "man/man_obstacle.h.s"
 .include "sys/collisions.h.s"
+.include "man/sprite.h.s"
 
 
 .module sys_entity_physics
@@ -75,12 +76,15 @@ sys_physics_init::
 sys_physics_update::
 	ld	(_ent_counter), a
 
+
+	call set_sprite_hero
 	;; commprobamos si somos el HEROE o un ENEMIGO para pocesar el salto
 	ld	a, e_ai_st(ix)
 	cp	#e_ai_st_noAI	;; comparamos si no tiene IA
 	jr	nz, _update_loop
 		;; SOMOS EL HEROE
 		call check_jump_tables_init
+
 
 ;; BUCLE QUE RECORRE TODAS LAS ENTIDADES CON FISICAS 
 _update_loop:

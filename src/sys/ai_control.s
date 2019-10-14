@@ -10,11 +10,8 @@
 
 .module sys_ai_control
 
-;; ESTO DEBERIAN  SER COMPONENTES
-ai_rangoDetectar_rebote_X = 15
-ai_rangoDetectar_rebote_Y = ai_rangoDetectar_rebote_X + ai_rangoDetectar_rebote_X
 
-
+patrullar_llamaPerseguir: 	.db #0
 
 rebote_control_direcction: 	.db #0
 control_direction_X:						;; Tabla de salto normal (hacia arriba)
@@ -25,8 +22,6 @@ control_direction_Y:					;; Tabla de salto que simula la gravedad
     	.db #0, #-1, #-2, #-1
     	.db #0, #1,  #2,  #1
     	.db #0x80
-
-
 
 
 
@@ -159,12 +154,15 @@ _ent_counter = . + 1
 ;; //////////////////////////////////////////
 ;; REBOTAR IA
 ;; //////////////////////////////////////////
-; Entrada: IX -> al enemigo
+; Entrada: IX -> al enemigo,    IY -> jugador
+; Destruye: A
 sys_ai_rebotar:
 	;; para simular una velocidad de 0,5 entraremos en el metodo la mitad de veces
 	ld	a, e_ai_pausaVel(ix)
 	cp	#0
 	jr	nz, espera_movimiento
+	ld	a, #2
+	ld	e_ai_pausaVel(ix), a
 
 	_ent_array_ptr_temp_rebotar = . + 2
 	ld	iy, #0x0000					;; se almacena el jugador
@@ -172,28 +170,8 @@ sys_ai_rebotar:
 
 	;; METODO MOVIMIENTO ALEATORIO
 	call movimiento_aleatorio
-
-	;; Devuelve: A 
-	call sys_ai_detectarJugador
-	dec a
-	jr nz, rebote_seguirEjecutando
-	;; debemos poner el contador de decision a 0 antes
-	ld	a, #30
-	ld	e_ai_cambioDirecccion(ix), a
-
-	call	rebotar_elegirAtaqueDefensa
-	dec 	a
-	jr 	z, rebotar_elegirAtaque
-	ld	a, #e_ai_st_defender		;; cambia a la IA de defensa
-	ld	e_ai_st(ix), a
-	jr 	rebote_seguirEjecutando
-	rebotar_elegirAtaque:
-	ld	a, #e_ai_st_perseguir		;; cambia a la IA de persecucion
-	ld	e_ai_st(ix), a
-	rebote_seguirEjecutando:
-
-	ld	a, #2
-	ld	e_ai_pausaVel(ix), a
+	call rebotar_elegirCambioEstado
+	
  ret
 espera_movimiento:
 	;; cotraposicion de la velocidad
@@ -213,55 +191,92 @@ espera_movimiento:
  ret
 
 
+;; puede cambiar el estado de la IA
+;; Destruye: A, BC, DE
+rebotar_elegirCambioEstado:
+	;; Devuelve: A
+	ld	d, #15
+	call sys_ai_detectarJugador
+	dec 	a
+	jr nz, patrullar_verJugador
+	;; debemos poner el contador de decision a 0 antes
+	ld	a, #30
+	ld	e_ai_cambioDirecccion(ix), a
+
+	call	rebotar_elegirAtaqueDefensa
+	dec 	a
+	jr 	z, rebotar_elegirAtaque
+	ld	a, #e_ai_st_defender		;; cambia a la IA de defensa
+	ld	e_ai_st(ix), a
+	ret
+	rebotar_elegirAtaque:
+	ld	a, #e_ai_st_perseguir		;; cambia a la IA de persecucion
+	ld	e_ai_st(ix), a
+	ret
+
+	patrullar_verJugador:			;; Comprueba si la IA patrullar lo ha visto
+	ld	a, (patrullar_llamaPerseguir)
+	dec	a
+	ret	nz
+	ld	a, #e_ai_st_perseguir		;; cambia a la IA de persecucion en caso de haberlo visto la de patrullar
+	ld	e_ai_st(ix), a
+
+	ret
 
 
-;; Entrada: IX -> al enemigo, IY -> al jugador
+
+;; Entrada: IX -> al enemigo, IY -> al jugador, D -> el ancho de la zona de deteccion
+;; Salida:  A=0 -> no se detecta,  A=1 -> se detecta al jugador
+;; Destruye; A, BC, DE
 sys_ai_detectarJugador:  ; colision basica luego añadir distancia ESTO ESTA EN PRUEBAS
+	ld	a, d   ;; Ancho en X
+	add	d
+	ld	e, a	 ;; Ancho en Y
 ;=======================================================================
-  ;; X con rango  
-  ld  a, e_x(ix) 
-  sub   #ai_rangoDetectar_rebote_X 
-  jr  nc, out_screem_LEFT 
-    ld  a, #0
+ ;; X con rango
+	ld  	a, e_x(ix) 
+	sub   d
+	jr  	nc, out_screem_LEFT 
+	ld  	a, #0
 out_screem_LEFT:
-  ld  b, a            ;; en B tengo la verdade X
-  ;; ANCHO con rango
-  ld  a, #ai_rangoDetectar_rebote_X 
-  add  e_x(ix)
-  add  e_w(ix)
-  ld  c, a            ;; en C tengo el verdadero ancho
+	ld  	b, a            ;; en B tengo la verdade X
+	;; ANCHO con rango
+	ld  	a, d
+	add  	e_x(ix)
+	add  	e_w(ix)
+	ld  	c	, a            ;; en C tengo el verdadero ancho
 ;===============================================================================
-  ld  a, c
-  sub  e_x(iy)
-  jr  c, __no_collision
+	ld  	a, c
+	sub  	e_x(iy)
+	jr  	c, __no_collision
 
-  ld  a, e_x(iy)
-  add  e_w(iy)
-  sub  b
-  jr  c, __no_collision
+	ld  	a, e_x(iy)
+	add  	e_w(iy)
+	sub 	b
+	jr  	c, __no_collision
 
 ;============================================================================
-  ;; Y con rango  
-  ld  a, e_y(ix) 
-  sub   #ai_rangoDetectar_rebote_Y
-  jr  nc, out_screem_UP 
-    ld  a, #0
+;; Y con rango  
+	ld  	a, e_y(ix) 
+	sub   e
+	jr  	nc, out_screem_UP 
+	ld  	a, #0
 out_screem_UP:
-  ld  b, a  
-  ;; ALTO con rango
-  ld  a, #ai_rangoDetectar_rebote_Y  
-  add  e_y(ix)
-  add  e_h(ix)
-  ld  c, a            ;; en C tengo el verdadero alto
+	ld  	b, a  
+	;; ALTO con rango
+	ld  	a, e 
+	add  	e_y(ix)
+	add  	e_h(ix)
+	ld  	c, a            ;; en C tengo el verdadero alto
 ;====================================================================================
-  ld  a, c
-  sub  e_y(iy)
-  jr  c, __no_collision
+	ld  	a, c
+	sub  	e_y(iy)
+	jr  	c, __no_collision
 
-  ld  a, e_y(iy)
-  add  e_h(iy)
-  sub  b
-  jr  c, __no_collision
+	ld  	a, e_y(iy)
+	add  	e_h(iy)
+	sub  	b
+	jr  	c, __no_collision
 
     ld  de,   #0xC000
     ld  a,   #0xFF
@@ -295,7 +310,6 @@ movimiento_aleatorio:
 	ld	e_ai_cambioDirecccion(ix), a
  ret
 espera_actualizar_velocidad:
-
 	dec   a
 	ld	e_ai_cambioDirecccion(ix), a
  ret
@@ -340,10 +354,6 @@ fin_ciclo_velocidades:
 		ld	a, #0		
 		ld	(rebote_control_direcction), a
 	ret
-
-
-
-
 
 
 ;;
@@ -395,12 +405,13 @@ sys_ai_perseguir:
 	ld	e_ai_pausaVel(ix), a
 
 	call atacar_calcularVelocidad
-	ld  a, d
-	ld   e_vx(ix), a
-	ld  a, e
-	ld   e_vy(ix), a
+	ld  	a, d
+	ld   	e_vx(ix), a
+	ld  	a, e
+	ld   	e_vy(ix), a
 
 	;; Devuelve: A 
+	ld	d, #15
 	call sys_ai_detectarJugador
 	dec 	a
 	ret  	z
@@ -456,33 +467,34 @@ move_enemy_down:
 ;////////////////////////////////
 sys_ai_defender:
   _ent_array_ptr_temp_defender = . + 2
-  ld  iy, #0x0000
+  ld   iy, #0x0000
 
-  ld  a, #0
+  ld	 a, #0
   ld   e_vx(ix), a
   ld   e_vy(ix), a
-  ld  a, e_ai_pausaVel(ix)
-  cp  #0
-  jr  nz, defender_reiniciarPausa
-  ld  a, #1
-  ld  e_ai_pausaVel(ix), a
+  ld   a, e_ai_pausaVel(ix)
+  cp   #0
+  jr   nz, defender_reiniciarPausa
+  ld   a, #1
+  ld   e_ai_pausaVel(ix), a
 
   call defender_calcularVelocidad  ; Devuelve d -> velocidadX,  e -> velocidadY
-  ld  a, d
+  ld   a, d
   ld   e_vx(ix), a
-  ld  a, c
+  ld   a, c
   ld   e_vy(ix), a
 
+  ld	 d, #15
   call sys_ai_detectarJugador
-  dec a
-  jr z, defender_seguirEjecutando
-  ld  a, #e_ai_st_rebotar    ;; cambia a la IA a rebotar
-  ld  e_ai_st(ix), a
+  dec  a
+  jr   z, defender_seguirEjecutando
+  ld   a, #e_ai_st_rebotar    ;; cambia a la IA a rebotar
+  ld   e_ai_st(ix), a
   defender_seguirEjecutando:
   ret
 defender_reiniciarPausa:
   dec   a
-  ld  e_ai_pausaVel(ix), a
+  ld    e_ai_pausaVel(ix), a
   ret
 
 
@@ -522,29 +534,38 @@ sys_ai_patrullar:
 	ld	iy, #0x0000
 
 	call sys_ai_patrullar_cambiarGravedad
+
+	ld	d, #3
 	call sys_ai_detectarJugador
-	;; realizar algo al detectar al jugador
+	dec	a
+	jr	nz, patrullar_noAvisar
+	ld	a, #1
+	ld	(patrullar_llamaPerseguir), a
+	ret
+	patrullar_noAvisar:
+	ld	a, #0
+	ld	(patrullar_llamaPerseguir), a
 
 	ret
 
 sys_ai_patrullar_cambiarGravedad:
 	;; TEMPORIZADOR
-	ld  a, e_ai_reloj1(ix)
-	dec  a
-	ld  e_ai_reloj1(ix), a
-	jr  nz, salto_tempo_patrullar
-	ld  a, #0x20
-	ld  e_ai_reloj1(ix), a
+	ld	a, e_ai_reloj1(ix)
+	dec  	a
+	ld  	e_ai_reloj1(ix), a
+	jr  	nz, salto_tempo_patrullar
+	ld  	a, #0x20
+	ld  	e_ai_reloj1(ix), a
 
-	ld  a, e_ai_reloj2(ix)
-	dec  a
-	ld  e_ai_reloj2(ix), a
-	jr  nz, salto_tempo_patrullar
-		ld  a, #0x20
-		ld  e_ai_reloj2(ix), a
-		ld	a, e_vy(ix)
-		neg
-		ld	e_vy(ix), a
+	ld  	a, e_ai_reloj2(ix)
+	dec  	a
+	ld  	e_ai_reloj2(ix), a
+	jr  	nz, salto_tempo_patrullar
+	ld  	a, #0x20
+	ld  	e_ai_reloj2(ix), a
+	ld	a, e_vy(ix)
+	neg
+	ld	e_vy(ix), a
 salto_tempo_patrullar:
 	ret
 

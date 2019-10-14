@@ -18,7 +18,7 @@ aplicate_invisibility::
     dec a
     ret nz                    ;; si no se hace 0 es que no era invisible
 
-loop:
+
     ld  a, (tempo1)
     dec  a
     ld  (tempo1), a
@@ -34,11 +34,11 @@ loop:
       jr  nz, salto_tempo
 
         ;; PINTAMOS ALGO, CUALQUIER COSA CONNNNNYOOOO
-          ld  de, #0xC000
-          ld  a, #0xFF
-          ld  c, #8
-          ld  b, #8
-              call cpct_drawSolidBox_asm
+         ; ld  de, #0xC000
+         ; ld  a, #0xFF
+         ; ld  c, #8
+         ; ld  b, #8
+         ;     call cpct_drawSolidBox_asm
 
         ;;VOLVEMOS AL ESTADO PRINCIPAL
         ld  a,  #0

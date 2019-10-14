@@ -5,3 +5,4 @@
 .globl check_if_negative2
 .globl multiplicar_d_e_8bits
 .globl multiplicar_d_c_16bits
+.globl resta_de_a_hl

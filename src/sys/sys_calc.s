@@ -119,3 +119,10 @@ multiplicar_d_c_16bits::
    ld h, c
    ld l, a
    ret
+
+
+
+resta_de_a_hl::
+   and  a     
+   sbc  hl, de
+   ret

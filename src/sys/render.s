@@ -62,7 +62,7 @@ sys_eren_load_tilemap::
 
 	ld hl, #0xC000
 	ld de, #tilemap_ptr
-	;call cpct_etm_drawTilemap4x8_ag_asm
+	call cpct_etm_drawTilemap4x8_ag_asm
 	ret
 
 
@@ -70,7 +70,7 @@ sys_eren_load_tilemap::
 sys_eren_update::
 	call sys_eren_render_entities
 	call man_obstacle_getArray
-	call sys_eren_render_obstacles
+	;call sys_eren_render_obstacles
 	ret
 
 

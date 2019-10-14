@@ -943,6 +943,357 @@ crear_obstaculos_y_no_cero::
 
 
 
+
+;  ____
+; |    |
+; | O  |
+; |    |
+; |____|
+get_d_ninguno_cero::
+   ;  ____
+   ; |X   | 
+   ; | O  |
+   ; |    |
+   ; |____|
+   ld  hl, (#pos_memoria_tile_origen) ; aquí está el tile de origen
+   ld   a, #21   ; nos posicionamos en el primer tile arriba a la izq a analizar
+                 ; para ello le restamos 21 a la pos de memoria del tile de origen
+   ld  de, #0
+   ld   e, a
+   call resta_de_a_hl
+   ld   de, #0    ; ponemos d a cero porque será nuestro byte de booleanos
+   ld   a, (hl)                      ; cargamos en a el contenido del tile destino
+   or   a        ; si el contenido es cero, no hay obstáculo
+   jr   z, . + 4
+   set  0, d      ; con esto decimos que queremos CREAR el primer tile
+   
+   ;  ____
+   ; | X  |
+   ; | O  |
+   ; |    |
+   ; |____|
+   inc  hl
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   jr   z, . + 4
+   set  1, d      ; con esto decimos que queremos CREAR el segundo tile
+   
+   ;  ____
+   ; |  X |
+   ; | O  |
+   ; |    |
+   ; |___ |
+   inc  hl
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   jr   z, . + 4
+   set  2, d      ; con esto decimos que queremos CREAR el segundo tile
+   
+   ;  ____
+   ; |   X|
+   ; | O  |
+   ; |    |
+   ; |___ |
+   inc  hl
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   jr   z, . + 4
+   set  3, d      ; con esto decimos que queremos CREAR el segundo tile
+   
+   ;  ____
+   ; |    |
+   ; |XO  |
+   ; |    |
+   ; |____|
+   ld  bc, #17
+   add hl, bc
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   jr   z, . + 4
+   set  4, d      ; con esto decimos que queremos CREAR el segundo tile
+   
+   ;  ____
+   ; |    |
+   ; | O X|
+   ; |    |
+   ; |____|
+   inc hl
+   inc hl
+   inc hl
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   jr   z, . + 4
+   set  5, d      ; con esto decimos que queremos CREAR el segundo tile
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |X   |
+   ; |____|
+   ld  bc, #17
+   add hl, bc
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   jr   z, . + 4
+   set  6, d      ; con esto decimos que queremos CREAR el segundo tile
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |   X|
+   ; |____|
+   inc hl
+   inc hl
+   inc hl
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   jr   z, . + 4
+   set  7, d      ; con esto decimos que queremos CREAR el segundo tile  
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |    |
+   ; |X___|
+   ld  bc, #17
+   add hl, bc
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   jr   z, . + 4
+   set  0, e      ; con esto decimos que queremos CREAR el segundo tile
+
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |    |
+   ; |_X__|
+   inc hl
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   jr   z, . + 4
+   set  1, e      ; con esto decimos que queremos CREAR el segundo tile  
+
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |    |
+   ; |__X_|
+   inc hl
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   jr   z, . + 4
+   set  2, e      ; con esto decimos que queremos CREAR el segundo tile  
+
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |    |
+   ; |___X|
+   inc hl
+   ld   a, (hl)         ; cargamos en a el contenido del tile destino
+   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   jr   z, . + 4
+   set  3, e      ; con esto decimos que queremos CREAR el segundo tile  
+   ret
+
+
+crear_obstaculos_ninguno_cero::
+   call get_d_ninguno_cero
+
+   ;  ____
+   ; |X   |
+   ; | O  |
+   ; |    |
+   ; |____|
+   ld  a, (resto_x)
+   add #4
+   ld  b, a
+   ld  a, e_x(ix)   ; guardamos en a la x
+   sub b
+   ld (nueva_x), a
+   ld  a, (resto_y)
+   add #8
+   ld  b, a
+   ld  a, e_y(ix)   ; guardamos en a la x
+   sub b
+   ld (nueva_y), a
+   push de
+   bit 0, d         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+
+   ;  ____
+   ; | X  |
+   ; | O  |
+   ; |    |
+   ; |____|
+   ld  a, (nueva_x)   ; guardamos en a la nueva x
+   add #4
+   ld (nueva_x), a
+   push de
+   bit 1, d         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+
+   ;  ____
+   ; |  X |
+   ; | O  |
+   ; |    |
+   ; |___ |
+   ld  a, (nueva_x)   ; guardamos en a la nueva x
+   add #4
+   ld (nueva_x), a
+   push de
+   bit 2, d         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+
+   ;  ____
+   ; |   X|
+   ; | O  |
+   ; |    |
+   ; |___ |
+   ld  a, (nueva_x)   ; guardamos en a la nueva x
+   add #4
+   ld (nueva_x), a
+   push de
+   bit 3, d         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+   
+   ;  ____
+   ; |    |
+   ; |XO  |
+   ; |    |
+   ; |____|
+   ld  a, (nueva_x)   ; guardamos en a la nueva x
+   sub #12
+   ld (nueva_x), a
+   ld  a, (nueva_y)   ; guardamos en a la nueva y
+   add #8
+   ld (nueva_y), a
+   push de
+   bit 4, d         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+   
+   ;  ____
+   ; |    |
+   ; | O X|
+   ; |    |
+   ; |____|
+   ld  a, (nueva_x)   ; guardamos en a la nueva x
+   add #12
+   ld (nueva_x), a
+   push de
+   bit 5, d         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |X   |
+   ; |____|
+   ld  a, (nueva_x)   ; guardamos en a la nueva x
+   sub #12
+   ld (nueva_x), a
+   ld  a, (nueva_y)   ; guardamos en a la nueva y
+   add #8
+   ld (nueva_y), a
+   push de
+   bit 6, d         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |   X|
+   ; |____|
+   ld  a, (nueva_x)   ; guardamos en a la nueva x
+   add #12
+   ld (nueva_x), a
+   push de
+   bit 7, d         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |    |
+   ; |X___|
+   ld  a, (nueva_x)   ; guardamos en a la nueva x
+   sub #12
+   ld (nueva_x), a
+   ld  a, (nueva_y)   ; guardamos en a la nueva y
+   add #8
+   ld (nueva_y), a
+   push de
+   bit 0, e         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+   
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |    |
+   ; |_X__|
+   ld  a, (nueva_x)   ; guardamos en a la nueva x
+   add #4
+   ld (nueva_x), a
+   push de
+   bit 1, e         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |    |
+   ; |__X_|
+   ld  a, (nueva_x)   ; guardamos en a la nueva x
+   add #4
+   ld (nueva_x), a
+   push de
+   bit 2, e         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+   
+   ;  ____
+   ; |    |
+   ; | O  |
+   ; |    |
+   ; |___X|
+   ld  a, (nueva_x)   ; guardamos en a la nueva x
+   add #4
+   ld (nueva_x), a
+   push de
+   bit 3, e         ; lo hemos calculado porque el primero siempre es obligatorio
+   jr  z, . + 5     ; pero si no hay que crearlo, no lo creamos
+   call crear_obstaculo_por_nueva_xy
+   pop de
+   ret
+
+
+
+
 ; Input
 ; ESTO NO--   hl: pos en memoria del obstáculo
 ;     resto_y y resto_x: cargadas en memoria
@@ -992,7 +1343,7 @@ crear_obstaculos::
    call crear_obstaculos_y_no_cero
    ret
    ninguno_cero:
-   ;call crear_obstaculos_ninguno_cero:
+   call crear_obstaculos_ninguno_cero
    ret
 
 

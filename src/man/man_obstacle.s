@@ -102,12 +102,13 @@ man_obstacle_create::
 ;; Función que re-rellena el array de obstáculos en base a la posición y velocidad de la entidad recibida en iy
 ;; Input: IX - Puntero a la entidad a revisar
 man_obstacle_re_rellenar_array::
+   push ix
    ; en este momento tenemos la dirección de movimiento guardada en una variable
    call man_obstacle_init ; vaciamos el array de obstacles
    ld hl, #obst_fake
    call man_obstacle_create
-
-   call man_entity_getArray
+   pop ix
+   ;call man_entity_getArray
    jp crear_obstaculos
 
 

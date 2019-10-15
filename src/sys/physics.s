@@ -91,11 +91,16 @@ sys_physics_update::
 		;; SOMOS EL HEROE
 		call check_jump_tables_init
 
-   call man_obstacle_re_rellenar_array
-   call man_obstacle_getArray ; como en la llamada anterior hemos consultado los arrays, nos posicionamos de nuevo en la primera posición
-   call man_entity_getArray
+   ;call man_obstacle_re_rellenar_array
+   ;call man_obstacle_getArray ; como en la llamada anterior hemos consultado los arrays, nos posicionamos de nuevo en la primera posición
+   ;call man_entity_getArray
 ;; BUCLE QUE RECORRE TODAS LAS ENTIDADES CON FISICAS 
 _update_loop:
+
+   push ix
+   call man_obstacle_re_rellenar_array
+   call man_obstacle_getArray ; como en la llamada anterior hemos consultado los arrays, nos posicionamos de nuevo en la primera posición
+   pop ix
 
    ;; COLISIONES CON LOS OBJETOS
    call sys_check_collision

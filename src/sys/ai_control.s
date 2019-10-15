@@ -229,6 +229,10 @@ rebotar_elegirCambioEstado:
 ;; Salida:  A=0 -> no se detecta,  A=1 -> se detecta al jugador
 ;; Destruye; A, BC, DE
 sys_ai_detectarJugador:  ; colision basica luego añadir distancia ESTO ESTA EN PRUEBAS
+	ld	a, e_invisi(iy)	
+	dec	a
+	jr 	z, __no_collision	;; Comprobar si el enemigo es invisible
+
 	ld	a, d   ;; Ancho en X
 	add	d
 	ld	e, a	 ;; Ancho en Y
@@ -284,7 +288,7 @@ out_screem_UP:
     ld  b,    #0x08
         call cpct_drawSolidBox_asm
 
-    ld	a, #1
+    	ld	a, #1
 ret
 __no_collision:
     ld  de,   #0xC000

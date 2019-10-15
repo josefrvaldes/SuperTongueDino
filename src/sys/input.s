@@ -9,6 +9,7 @@
 ;.include "sys/colisions.h.s"
 .include "physics.h.s"
 .include "man/game.h.s"
+.include "man/sprite.h.s"
 
 
 
@@ -24,6 +25,13 @@ sys_input_init::
 ;; Destroy: AF, BC, DE, HL, IX
 sys_input_update::
 	;; Reset velocities
+	ld	a, e_vx(ix)
+	dec 	a
+	inc	a
+	jr	z, no_guardar_VX
+	call guardar_VX
+no_guardar_VX:
+
 	ld	e_vx(ix), #0
 	ld 	e_vy(ix), #0
 
@@ -80,6 +88,16 @@ ld	hl, #Key_M
 M_Pressed:
 	call abrir_cerrar_menuIngame
 M_NotPressed:
+
+
+ld	hl, #Key_E
+	call cpct_isKeyPressed_asm
+	jr	z, E_NotPressed
+E_Pressed:
+	;; Para activar la invisibilidad ponemos a 1 el parametro de la entidad
+    	ld  a,  #1
+    	ld  e_invisi(ix), a
+E_NotPressed:
 
 
 	ret

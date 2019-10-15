@@ -7,6 +7,7 @@
 .include "man/entity.h.s"
 .include "man/man_obstacle.h.s"
 .include "sys/collisions.h.s"
+.include "man/sprite.h.s"
 .include "sys/sys_calc.h.s"
 .include "man/game.h.s" ; cambiar por man_obstacles
 
@@ -15,7 +16,7 @@
 
 ;; Physics system constants
 screen_width  = 80
-screen_height = 200
+screen_height = 200	
 ;;
 ;; VARIABLES CONTROL DEL SALTO Y REBOTES
 ;;
@@ -31,23 +32,22 @@ press_now_W:         .db #-1     ;; variable que nos indica si estamos saltando 
 ;;
 ;;TABLAS DE SALTO Y GRAVEDAD
 ;;
-jump_table:                ;; Tabla de salto normal (hacia arriba)
-   .db #-7, #-5, #-4, #-3
-      .db #-2, #-2, #-2, #-1
-      .db #-1, #-1, #-1
-      .db #0x80               ;; Ultima posicion de la tabla, para saber que he terminado (nunca tendre una velocidad tan alta)
-gravity_table:             ;; Tabla de salto que simula la gravedad
-      .db #00, #00, #00
-      .db #1, #1, #1, #2
-      .db #2, #2, #3, #5
-   .db #7 
-      .db #0x80
-jump_table_right:             ;; Tabla hacia la IZQUIERDA cuando colisionamos por la DERECHA
-   .db #2, #2, #1, #1, #1, #00
-   .db #0x80
-jump_table_left:              ;; Tabla hacia la DERECHA cuando colisionamos por la IZQUIERDA
-   .db #-2, #-2, #-1, #-1, #-1,#00  
-   .db #0x80
+jump_table:						;; Tabla de salto normal (hacia arriba)
+	.db #-7, #-5, #-4, #-3
+    	.db #-2, #-2, #-2, #-1
+    	.db #-1, #-1, #-1
+    	.db #0x80					;; Ultima posicion de la tabla, para saber que he terminado (nunca tendre una velocidad tan alta)
+gravity_table:					;; Tabla de salto que simula la gravedad
+    	.db #00, #00, #00
+    	.db #1, #1, #1, #2
+    	.db #2, #3, #4
+    	.db #0x80
+jump_table_right:  				;; Tabla hacia la IZQUIERDA cuando colisionamos por la DERECHA
+	.db #2, #2, #1, #1, #1, #00
+	.db #0x80
+jump_table_left:  				;; Tabla hacia la DERECHA cuando colisionamos por la IZQUIERDA
+	.db #-2, #-2, #-1, #-1, #-1,#00	
+	.db #0x80
 
 
 
@@ -83,35 +83,55 @@ sys_physics_update::
    ld (_ent_counter), a
 
 
-   ;; commprobamos si somos el HEROE o un ENEMIGO para pocesar el salto
-   ld a, e_ai_st(ix)
-   cp #e_ai_st_noAI  ;; comparamos si no tiene IA
-   jr nz, _update_loop
-      ;; SOMOS EL HEROE
-      call check_jump_tables_init
-   
+	call set_sprite_hero
+	;; commprobamos si somos el HEROE o un ENEMIGO para pocesar el salto
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_noAI	;; comparamos si no tiene IA
+	jr	nz, _update_loop
+		;; SOMOS EL HEROE
+		call check_jump_tables_init
+
    call man_obstacle_re_rellenar_array
    call man_obstacle_getArray ; como en la llamada anterior hemos consultado los arrays, nos posicionamos de nuevo en la primera posición
    call man_entity_getArray
-
 ;; BUCLE QUE RECORRE TODAS LAS ENTIDADES CON FISICAS 
 _update_loop:
 
    ;; COLISIONES CON LOS OBJETOS
    call sys_check_collision
 
-   ;; tenemos en D = VX en E = VY
    ld a, d
-   add   e                             ;; sumo variacion en D y variacion en E
-   jr nz,   equals                     ;Si !=0 es que NO HAY COLISION EN LAS ESQUINAS
+   add   e
+   jr nz, equals        ; !=0 hay colisiones en las esquinas 
 
-      ld a, #0
-      add   d
-      jr z, only_collision_corner                  ;; SI UNA DE LAS DOS ES 0, LAS DOS LO ERAN (D y E) y por tanto comprobar colisiones en las esquinas
-equals:  ;; si no son iguales HA HABIDO COLISION SEGURO
-   ld a, e_ai_st(ix)
-   cp #e_ai_st_noAI
-   jr nz, no_mas_saltos
+		ld	a, #0
+		add	d
+		jr	z, only_collision_corner   					;; SI UNA DE LAS DOS ES 0, LAS DOS LO ERAN (D y E) y por tanto comprobar colisiones en las esquinas
+equals:	;; si no son iguales HA HABIDO COLISION SEGURO
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_noAI
+	jr	z, continuar_saltando
+
+
+
+	; ////////////////////////////////////////////////////////////////////////////////
+	;; colisiones ENEMIGOS ///////////////////////////////////////////////////////////
+	call physics_IA_enemigos
+	jr no_mas_saltos
+	; ////////////////////////////////////////////////////////////////////////////////
+	; ////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+continuar_saltando:
+    		ld  a, e_y(ix)
+    		add e_vy(ix)
+    		ld  c, a
+    		ld  a, e_vy(ix)
+    		sub c
+    		jr	z, no_mas_saltos
+    		jr  nc, parar_salto_vetical  						;; velocidad positiva
 
          ld  a, e_y(ix)
          add e_vy(ix)
@@ -133,13 +153,21 @@ only_collision_corner:
 parar_salto_vetical:
    call  end_of_jump
 no_mas_saltos:
-   ;; COLISIONES CON LOS BORDES DE LA PANTALLA
-   call sys_check_borderScreem
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_patrullar
+	jr	z, no_mas_saltos_patrullar
+	;; COLISIONES CON LOS BORDES DE LA PANTALLA y actualizar pos
+	call sys_check_borderScreem
+	jr continuar_actualizar_pos
 
-   _ent_counter = . + 1
-   ld a, #0
-   dec   a
-   ret   z
+	no_mas_saltos_patrullar:
+	call sys_check_borderScreem_patrullar ;; COLISIONES CON LOS BORDES DE LA PANTALLA y actualizar pos para la IA patrullar
+	continuar_actualizar_pos:
+
+	_ent_counter = . + 1
+	ld	a, #0
+	dec 	a
+	ret	z
 
    ld (_ent_counter), a
    ld de, #sizeof_e
@@ -360,8 +388,11 @@ gravedad_hero:
    ret                        ;; SALIMOS
    ;; se reinicia el satlo
 max_gravity:
-      ;; MALA PROGRAMACION -- VALOR PUESTO A PELO
-      ld a, #11               ;; GUARDAMOS EN A EL INDICE ULTIMO DE NUESTRA TABLA = GRAVEDAD MAXIMA
+
+		ld	a, #4						;; SUMAMOS EN D el indice actual+ VY
+		ld	e_vy(ix), a	
+		;; MALA PROGRAMACION -- VALOR PUESTO A PELO
+		ld	a, #9					;; GUARDAMOS EN A EL INDICE ULTIMO DE NUESTRA TABLA = GRAVEDAD MAXIMA
 
       ld (hero_gravity), a
    ret
@@ -558,8 +589,128 @@ active_jump_right:
    cp #-1
    ret   z                       ;; el valor era -1 y po lo tanto no se esta saltando
 
-      ld a, #0
-      ;; el control deja de estar en el usuario y se le pasa a la jump table
-      ld (hero_jump_right), a             ;; a 0 es que esta ACTIVO
-      ld (V_jumpControlVX_keyboardO), a         ;; a 0 es que esta ACTIVO
-   ret
+		ld	a, #0
+		;; el control deja de estar en el usuario y se le pasa a la jump table
+		ld	(hero_jump_right), a    			;; a 0 es que esta ACTIVO
+		ld	(V_jumpControlVX_keyboardO), a    		;; a 0 es que esta ACTIVO
+	ret
+
+
+
+
+
+
+
+
+; ////////////////////////////////////////
+; ENEMIGOS
+physics_IA_enemigos:
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_rebotar
+	jr	nz, enemigo_patrullar_physic
+	ld 	a, (#col_hay_colision_top)
+	dec 	a
+	jr 	nz, comprobar_vel_Y
+	;jr	nz, no_mas_saltos  ;; se comprueba si el enemigo rebota
+	;ld a, d
+	;or a
+	;jr z, comprobar_vel_Y   ;; se comprueba si colisiona en X, en caso afirmativo se le niega la vx
+	ld  	a, e_vx(ix)
+	neg
+	ld  	e_vx(ix), a
+	comprobar_vel_Y:
+	ld 	a, (#col_hay_colision_left)
+	dec 	a
+	ret	nz
+	;ld a, c
+	;or a
+	;jr z, no_mas_saltos	;; se comprueba si colisiona en Y, en caso afirmativo se le niega la vy
+	ld  	a, e_vy(ix)
+	neg
+	ld  	e_vy(ix), a
+	ret
+
+	; IA PATRULLAR
+	enemigo_patrullar_physic:
+	ld	a, e_ai_st(ix)
+	cp	#e_ai_st_patrullar
+	ret	nz
+	ld 	a, (#col_hay_colision_top)
+	dec 	a
+	jr 	nz, patrullar_comprobar_vel_Y
+	ld  	a, e_vx(ix)
+	neg
+	ld  	e_vx(ix), a
+	patrullar_comprobar_vel_Y: ; -> no puede ser ya que si entra a este call hay colision con algo
+	ret
+
+
+
+
+;; CHOQUES CON LOS BORDES DE LA PANTALLA
+sys_check_borderScreem_patrullar:
+
+	;; UPDATE Y
+	call sys_check_borderScreem_patrullar_Y
+
+	;; TEMPORIZADOR
+	ld  a, e_ai_pausaVel(ix)
+	cp  #0
+	jr  nz, patrullar_reiniciarPausa
+	ld  a, #10
+	ld  e_ai_pausaVel(ix), a
+
+	ld 	a, (#col_hay_colision_left)
+	dec 	a
+	ret 	nz
+
+	;; UPDATE X
+	call sys_check_borderScreem_patrullar_X
+	ret
+patrullar_reiniciarPausa:
+	ld  a, e_ai_pausaVel(ix)
+	dec   a
+	ld  e_ai_pausaVel(ix), a
+	ret
+
+
+;; UPDATE Y
+sys_check_borderScreem_patrullar_Y:
+	;; UPDATE Y
+	ld	a, #screen_height + 1
+	sub	e_h(ix)
+	ld	c, a
+	ld	a, e_y(ix)
+	add	e_vy(ix)
+	cp	c
+	jr	nc, invalid_y_patrullar
+valid_y_patrullar:
+	ld	e_y(ix), a
+	jr endif_y_patrullar
+invalid_y_patrullar:
+	ld 	a, #1
+	ld 	(#col_hay_colision_left), a
+endif_y_patrullar:
+	ret
+
+;; UPDATE X
+sys_check_borderScreem_patrullar_X:
+	;; UPDATE X
+	ld	a, #screen_width + 1
+	sub	e_w(ix)
+	ld	c, a
+
+	ld	a, e_x(ix)
+	add	e_vx(ix)
+	cp	c
+	jr	nc, invalid_x_patrullar
+valid_x_patrullar:
+	ld	e_x(ix), a
+	jr endif_x_patrullar
+invalid_x_patrullar:
+	ld	a, e_vx(ix)
+	neg				;; para cambiar a negativo
+	ld	e_vx(ix), a
+endif_x_patrullar:
+	ret
+	

@@ -6,10 +6,20 @@
 .include "ent/ent_obstacle.h.s"
 .include "man/entity.h.s"
 .include "cpct_functions.h.s"
-
+.include "man/game.h.s"
 
 .module sys_ai_control
  
+
+dificultadRango_1 = 10			;; para cambiar la dificultad de los enemigos dependiendo del nivel
+dificultadRango_2 = 15
+dificultadRango_3 = 20
+dificultad_0 = 0
+dificultad_1 = 1
+dificultad_2 = 2
+dificultad_3 = 3
+dificultadEnemigos: .db #0		;; selector dificultad
+
 
 patrullar_llamaPerseguir: 	.db #0
 
@@ -30,6 +40,7 @@ control_direction_Y:					;; Tabla de salto que simula la gravedad
 ;; //////////////////
 ;; Inits AI system
 ;; Input: IX -> puntero al array de entidades
+;; Destroy: A
 sys_ai_control_init::
 	ld 	(_ent_array_ptr_temp_standby), ix  ;; temporal
 	ld 	(_ent_array_ptr_temp_rebotar), ix  ;; temporal
@@ -37,6 +48,14 @@ sys_ai_control_init::
 	ld 	(_ent_array_ptr_temp_defender), ix  ;; temporal
 	ld 	(_ent_array_ptr_temp_patrullar), ix  ;; temporal
 	ld 	(_ent_array_ptr), ix
+
+	ld 	a, #0
+	ld	(dificultadEnemigos), a
+	ld	(patrullar_llamaPerseguir), a
+	ld	(rebote_control_direcction), a
+
+	call setDificultadEnemigos
+
 	ret
 
 
@@ -119,6 +138,8 @@ sys_ai_control_update::
 _ent_array_ptr = . + 2
 	ld	ix, #0x0000
 
+	
+
 _loop:
 	ld	a, e_ai_st(ix)
 	cp	#e_ai_st_noAI
@@ -167,9 +188,15 @@ sys_ai_rebotar:
 	_ent_array_ptr_temp_rebotar = . + 2
 	ld	iy, #0x0000					;; se almacena el jugador
 
-
+	ld	a, (dificultadEnemigos)
+	cp	#dificultad_0
+	ret	z
 	;; METODO MOVIMIENTO ALEATORIO
 	call movimiento_aleatorio
+
+	ld	a, (dificultadEnemigos)
+	cp	#dificultad_1
+	ret	z
 	call rebotar_elegirCambioEstado
 	
  ret
@@ -202,6 +229,10 @@ rebotar_elegirCambioEstado:
 	;; debemos poner el contador de decision a 0 antes
 	ld	a, #30
 	ld	e_ai_cambioDirecccion(ix), a
+
+	ld	a, (dificultadEnemigos) 	;; elegir ataque si la dificultad es 3 o menos
+	cp	#dificultad_2
+	jr	z, rebotar_elegirAtaque
 
 	call	rebotar_elegirAtaqueDefensa
 	dec 	a
@@ -537,7 +568,15 @@ sys_ai_patrullar:
 	_ent_array_ptr_temp_patrullar = . + 2
 	ld	iy, #0x0000
 
+	ld	a, (dificultadEnemigos)
+	cp	#dificultad_0
+	jr	z, acabar_patrulla
+
 	call sys_ai_patrullar_cambiarGravedad
+
+	ld	a, (dificultadEnemigos)
+	cp	#dificultad_3
+	jr	nz, acabar_patrulla
 
 	ld	d, #3
 	call sys_ai_detectarJugador
@@ -550,6 +589,7 @@ sys_ai_patrullar:
 	ld	a, #0
 	ld	(patrullar_llamaPerseguir), a
 
+acabar_patrulla:
 	ret
 
 sys_ai_patrullar_cambiarGravedad:
@@ -574,3 +614,38 @@ salto_tempo_patrullar:
 	ret
 
 
+
+
+;; Destroy: A, B
+setDificultadEnemigos:
+	ld	a, (nivel)
+	ld	b, a
+
+	ld	a, #dificultadRango_1
+	cp	b
+	jr	c, probar_Rango2
+	ld	a, #dificultad_0
+	ld	(dificultadEnemigos), a
+	ret
+
+	probar_Rango2:
+	ld	a, #dificultadRango_2
+	cp	b
+	jr	c, probar_Rango3
+	ld	a, #dificultad_1
+	ld	(dificultadEnemigos), a
+	ret
+
+	probar_Rango3:
+	ld	a, #dificultadRango_3
+	cp	b
+	jr	c, probar_Rango4
+	ld	a, #dificultad_2
+	ld	(dificultadEnemigos), a
+	ret
+
+	probar_Rango4:
+	ld	a, #dificultad_3
+	ld	(dificultadEnemigos), a
+
+	ret

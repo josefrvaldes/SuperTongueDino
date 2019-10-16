@@ -10,8 +10,7 @@
 .include "physics.h.s"
 .include "man/game.h.s"
 .include "man/sprite.h.s"
-
-
+.include "man/state.h.s"
 
 ;; //////////////////
 ;; SYS_Input Init
@@ -60,44 +59,77 @@ P_Presed:
 			ld	e_vx(ix), #1
 P_NotPressed:
 
-	ld 	e_ai_aim_x(ix), #0		;; comprueba si se ha pulsado el espacio para cambiar la IA
-	ld	hl, #Key_Space
+;	ld 	e_ai_aim_x(ix), #0		;; comprueba si se ha pulsado el espacio para cambiar la IA
+;	ld	hl, #Key_Space
+;	call cpct_isKeyPressed_asm
+;	jr	z, Space_NotPressed
+;Space_Pressed:
+;	ld 	e_ai_aim_x(ix), #1
+;Space_NotPressed:
+
+
+	
+	ld	hl, #Key_Q
 	call cpct_isKeyPressed_asm
-	jr	z, Space_NotPressed
-Space_Pressed:
-	ld 	e_ai_aim_x(ix), #1
-Space_NotPressed:
+	jr	z, Q_NotPressed
+Q_Pressed:
+	ld 	a, (ent_input_Q_pressed)  ;; se comprueba si estaba pulsada anteriormente
+	dec	a
+	jr	z, jumping
 
-
-
-	ld	hl, #Key_W
-	call cpct_isKeyPressed_asm
-	jr	z, W_NotPressed
-W_Pressed:
 	call start_jump
+
+	ld	a, #1
+	ld	(ent_input_Q_pressed), a
 	jr	jumping
-W_NotPressed:
+Q_NotPressed:
 	call not_jump
+	ld	a, #0
+	ld	(ent_input_Q_pressed), a
 jumping:
 
 
 
-ld	hl, #Key_M
+
+	ld	hl, #Key_M
 	call cpct_isKeyPressed_asm
 	jr	z, M_NotPressed
 M_Pressed:
+	ld 	a, (ent_input_M_pressed)  ;; se comprueba si estaba pulsada anteriormente
+	dec	a
+	jr	z, M_Holded_OrPressed
+
 	call abrir_cerrar_menuIngame
+
+	ld	a, #1
+	ld	(ent_input_M_pressed), a
+	jr	M_Holded_OrPressed
 M_NotPressed:
+	ld	a, #0
+	ld	(ent_input_M_pressed), a
+M_Holded_OrPressed:
 
 
-ld	hl, #Key_E
+
+
+	ld	hl, #Key_A
 	call cpct_isKeyPressed_asm
-	jr	z, E_NotPressed
-E_Pressed:
+	jr	z, A_NotPressed
+A_Pressed:
+	ld 	a, (ent_input_A_pressed)  ;; se comprueba si estaba pulsada anteriormente
+	dec	a
+	jr	z, A_Holded_OrPressed
+
 	;; Para activar la invisibilidad ponemos a 1 el parametro de la entidad
-    	ld  a,  #1
-    	ld  e_invisi(ix), a
-E_NotPressed:
+    	ld  	a,  #1
+    	ld  	e_invisi(ix), a
+
+	ld	(ent_input_A_pressed), a
+	jr	A_Holded_OrPressed
+A_NotPressed:
+	ld	a, #0
+	ld	(ent_input_A_pressed), a
+A_Holded_OrPressed:
 
 
 	ret

@@ -7,9 +7,9 @@
 .include "sys/render.h.s"
 .include "man/state.h.s"
 
-string_menuIngame_info: .asciz "Estamos en el menu"
-string_menuIngame_continuar: .asciz "C para continuar"
-string_menuIngame_salir: .asciz "ESC para salir"
+string_menuIngame_info: .asciz "MENU INGAME / PAUSE"
+string_menuIngame_continuar: .asciz "Press M to continue"
+string_menuIngame_salir: .asciz "Press ESC to exit"
 
 
 ;//////////// INTI
@@ -64,6 +64,9 @@ menuIngame_init::
 	ld   IY, #string_menuIngame_salir    ;; IY = Pointer to the string 
 	call cpct_drawStringM0_asm  ;; Draw the string
 
+	ld	a, #1
+	ld	(ent_input_ESC_pressed), a   ;; se utiliza para evitar que al abrir el menu se vaya al menu principal al tener pulsada la tecla
+
 	ret
 
 
@@ -83,22 +86,49 @@ menuIngame_render::
 menuIngame_input::
 	call cpct_scanKeyboard_f_asm
 
-	ld	hl, #Key_C
+
+	ld	hl, #Key_M
 	call cpct_isKeyPressed_asm
-	jr	z, C_NotPressed_menuIngame
-C_Pressed_menuIngame:
+	jr	z, M_NotPressed_menuIngame
+M_Pressed_menuIngame:
+	ld 	a, (ent_input_M_pressed)  ;; se comprueba si estaba pulsada anteriormente
+	dec	a
+	jr	z, M_Holded_OrPressed_menuIngame
+
 	call abrir_cerrar_menuIngame
-	jr fin_mainMenu_Input
-C_NotPressed_menuIngame:
+
+	ld	a, #1
+	ld	(ent_input_M_pressed), a
+	jr	fin_mainMenu_Input
+M_NotPressed_menuIngame:
+	ld	a, #0
+	ld	(ent_input_M_pressed), a
+M_Holded_OrPressed_menuIngame:
+
+
 
 	ld	hl, #Key_Esc
 	call cpct_isKeyPressed_asm
 	jr	z, Esc_NotPressed_menuIngame
 Esc_Pressed_menuIngame:
+	ld 	a, (ent_input_ESC_pressed)  ;; se comprueba si estaba pulsada anteriormente
+	dec	a
+	jr	z, ESC_Holded_OrPressed_menuIngame
+
 	ld a, #0
 	call man_state_setEstado
 	call man_game_cerrarMenuIngame ;; modificar
+
+	ld	a, #1
+	ld	(ent_input_ESC_pressed), a
+	jr	fin_mainMenu_Input
 Esc_NotPressed_menuIngame:
+	ld	a, #0
+	ld	(ent_input_ESC_pressed), a
+ESC_Holded_OrPressed_menuIngame:
+
+
+
 
 fin_mainMenu_Input:
 	ret

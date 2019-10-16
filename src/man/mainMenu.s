@@ -7,8 +7,8 @@
 .include "man/state.h.s"
 
 .globl _hero_pal
-string_menuIngame_info: .asciz "Menu Principal"
-string_menuIngame_jugar: .asciz "Enter to play"
+string_menuIngame_info: .asciz "MAIN MENU"
+string_menuIngame_jugar: .asciz "Press Q to play"
 
 
 ;//////////// INTI
@@ -56,6 +56,10 @@ man_mainMenu_init::
 	ld   IY, #string_menuIngame_jugar    ;; IY = Pointer to the string 
 	call cpct_drawStringM0_asm  ;; Draw the string
 
+
+	ld	a, #1
+	ld	(ent_input_Q_pressed), a   ;; se utiliza para evitar que al iniciar el juego se entre al juego al tener pulsada la tecla y no se vea el menu
+
 	ret
 
 
@@ -75,12 +79,23 @@ man_mainMenu_render::
 mainMenu_input:
 	call cpct_scanKeyboard_f_asm
 
-	ld	hl, #Key_Return
+	ld	hl, #Key_Q
 	call cpct_isKeyPressed_asm
-	jr	z, Return_NotPressed_mainMenu
-Return_Pressed_mainMenu:
+	jr	z, Q_NotPressed_mainMenu
+Q_Pressed_mainMenu:
+	ld 	a, (ent_input_Q_pressed)  ;; se comprueba si estaba pulsada anteriormente
+	dec	a
+	jr	z, M_Holded_OrPressed_mainMenu
+
 	ld	a, #1
 	call man_state_setEstado  ;; cambia el estado
 
-Return_NotPressed_mainMenu:
+	ld	(ent_input_Q_pressed), a
+	jr	M_Holded_OrPressed_mainMenu
+Q_NotPressed_mainMenu:
+	ld	a, #0
+	ld	(ent_input_Q_pressed), a
+M_Holded_OrPressed_mainMenu:
+
+
 	ret

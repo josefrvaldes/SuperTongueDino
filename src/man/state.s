@@ -5,6 +5,12 @@
 .include "man/mainMenu.h.s"
 
 
+ent_input_M_pressed:: .db 0
+ent_input_Q_pressed:: .db 0
+ent_input_A_pressed:: .db 0
+ent_input_ESC_pressed:: .db 0
+
+
 
 estado: .db #0
 estado_anterior: .db #0

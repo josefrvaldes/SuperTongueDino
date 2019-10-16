@@ -281,3 +281,20 @@ no_collision_EY_EW:
     ret
 
 
+
+
+
+check_collisions_entity::
+
+
+
+    ret
+
+
+
+
+
+
+ 
+
+

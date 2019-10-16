@@ -86,7 +86,7 @@ sys_eren_render_entities::
 _update_loop:
 	;; Erase Previous Instance
 
-	cpctm_setBorder_asm HW_RED
+	;cpctm_setBorder_asm HW_RED
 
 
 	ld 	e, e_lastVP_l(ix)
@@ -114,7 +114,7 @@ _update_loop:
 	pop	bc
 	call cpct_drawSprite_asm
 
-	cpctm_setBorder_asm HW_WHITE
+	;cpctm_setBorder_asm HW_WHITE
 
 	_ent_counter = . + 1
 		ld	a, #0

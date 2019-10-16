@@ -13,6 +13,7 @@
 .include "sys/ai_control.h.s"
 .include "man/menuIngame.h.s"
 .include "man_invisibility.h.s"
+.include "sys/sys_collision_entity.h.s"
 ;.include "man/sprite.h.s"
 
 .module game_manager
@@ -82,6 +83,7 @@ man_game_init::
 	call sys_eren_init
 	call sys_physics_init
 	call sys_input_init
+	call sys_collision_entity_init
 
 	;; Init 3 entities
 	ld hl, #ent1
@@ -135,13 +137,16 @@ man_game_update::				;; MEJORAR!!! esto ya que estoy pasando IX al update y se p
 	call man_entity_getArray
 	call aplicate_invisibility
 
-	cpctm_setBorder_asm HW_RED
+	;cpctm_setBorder_asm HW_RED
 	call man_entity_getArray
 	call sys_ai_control_update
 
-	cpctm_setBorder_asm HW_WHITE
+	;cpctm_setBorder_asm HW_WHITE
 	call man_entity_getArray
 	call sys_physics_update
+
+	call man_entity_getArray
+	call sys_collision_entity_update
 
 	ret
 
@@ -161,10 +166,10 @@ man_game_render::
 	dec a
 	jr z, #render_menuIngame
 
-	cpctm_setBorder_asm HW_RED
+	;cpctm_setBorder_asm HW_RED
 	call man_entity_getArray
 	call sys_eren_update
-	cpctm_setBorder_asm HW_WHITE
+	;cpctm_setBorder_asm HW_WHITE
 
 	ret
 render_menuIngame:

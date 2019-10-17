@@ -1,5 +1,6 @@
 .include "cpctelera.h.s"
 .include "ent/entity.h.s"
+.include "sys/physics.h.s"
 
 ;;
 ;; IX: PUNTERO PRIMERA ENTIDAD
@@ -57,6 +58,18 @@ _next_iy:
 	call sys_collision_check
 
 	jr	c, __no_collision
+		;; HA HABIDO COLISION:
+		;; LA FORMA MAS RAPIDA DE SABER SI ENTRE EL PERSONAJE PRINCIPAL Y UN ENEMIG
+		;; O DOS ENEMIGOS ES SABIENDO SI LA ENTIDAD EN IX ES EL HERO
+		ld	a, e_ai_st(ix)
+		cp	#e_ai_st_noAI
+		jr	nz, _no_hero
+_hero:
+		;call process_dead_hero
+		;cpctm_setBorder_asm HW_RED		
+		jr	__no_collision
+_no_hero:
+		call change_direcction_entity
 		cpctm_setBorder_asm HW_RED
 __no_collision:
 

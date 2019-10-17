@@ -10,3 +10,5 @@
 
 .globl get_hero_jump_left
 .globl get_hero_jump_right
+
+.globl change_direcction_entity

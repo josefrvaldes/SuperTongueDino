@@ -354,7 +354,21 @@ no_colision_X_corner:
 
    ret
 
+;;
+;; PROCESS COLLISION ENEMY-ENEMY
+;; change direccion entity IX (for example)
+;; IMPUT: IX - FIRST ENEMY
+;;        IY - SECOND ENEMY
+;;
+change_direcction_entity::
+   ld a, e_vx(ix)
+   neg
+   ld e_vx(ix), a
+   ld a, e_vx(iy)
+   neg
+   ld e_vx(iy), a
 
+   ret
 
 
 ;=====================================================================

@@ -1,6 +1,7 @@
 .include "cpctelera.h.s"
 .include "ent/entity.h.s"
 .include "sys/physics.h.s"
+.include "man/state.h.s"
 
 ;;
 ;; IX: PUNTERO PRIMERA ENTIDAD
@@ -66,7 +67,10 @@ _next_iy:
 		jr	nz, _no_hero
 _hero:
 		;call process_dead_hero
-		;cpctm_setBorder_asm HW_RED		
+		;cpctm_setBorder_asm HW_RED
+		;ld	a, #2
+		;call man_state_setEstado  ;; cambia el estado
+
 		jr	__no_collision
 _no_hero:
 		call change_direcction_entity

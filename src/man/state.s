@@ -3,6 +3,7 @@
 ;;
 .include "man/game.h.s"
 .include "man/mainMenu.h.s"
+.include "man/man_deadAnimation.h.s"
 
 
 ent_input_M_pressed:: .db 0
@@ -12,7 +13,7 @@ ent_input_ESC_pressed:: .db 0
 
 
 
-estado: .db #0
+estado: .db #0   ; 0 -> Game,  1 -> main menu, 2 -> muerte guinyo
 estado_anterior: .db #0
 
 
@@ -33,16 +34,23 @@ man_state_init::
 	
 	ld a, (#estado)
 	or a
-	jr z, entrar_menu_init
+	jr z, entrar_menu_init  ;; en caso de ser 0
 	dec a
-	jr z, entrar_juego_init	
-	;call finJuego_init
+	jr z, entrar_juego_init	 ;; en caso de ser 1
+	dec a
+	jr z, entrar_deadAnimation_init  ;; en caso de ser 2
+	;call finJuego_init -> en caso de ser 3
 	ret
+
 entrar_menu_init:
 	call man_mainMenu_init
 	ret
 entrar_juego_init:
 	call man_game_init
+	ret
+entrar_deadAnimation_init:
+	call man_deadAnimation_init
+
 
 	ret
 
@@ -55,7 +63,9 @@ man_state_update::
 	or a
 	jr z, entrar_menu_update
 	dec a
-	jr z, entrar_juego_update	
+	jr z, entrar_juego_update
+	dec a
+	jr z, entrar_deadAnimation_update  ;; en caso de ser 2	
 	;call finJuego_update
 	ret
 entrar_menu_update:
@@ -63,6 +73,9 @@ entrar_menu_update:
 	ret
 entrar_juego_update:
 	call man_game_update
+	ret
+entrar_deadAnimation_update:
+	call man_deadAnimation_update
 	
 	ret
 
@@ -77,7 +90,9 @@ man_state_render::
 	or a
 	jr z, entrar_menu_render
 	dec a
-	jr z, entrar_juego_render	
+	jr z, entrar_juego_render
+	dec a
+	jr z, entrar_deadAnimation_render  ;; en caso de ser 2		
 	;call finJuego_render
 	jr final_state_render
 entrar_menu_render:
@@ -85,6 +100,9 @@ entrar_menu_render:
 	jr final_state_render
 entrar_juego_render:
 	call man_game_render
+	jr final_state_render
+entrar_deadAnimation_render:
+	call man_deadAnimation_render
 	jr final_state_render
 final_state_render:
 
@@ -107,11 +125,22 @@ administrarEstados:
 	ld	(#estado), a
 	or a
 	jr z, cambio_a_mainMenu
-	call man_game_init 
+	dec a
+	jr z, cambio_a_game
+	dec a
+	jr z, cambio_a_deadAnimation  ;; en caso de ser 2		
+	;call finJuego_render
 	jr no_hayCambioEstado
+
 cambio_a_mainMenu:
 	call man_mainMenu_init 
-	jr no_hayCambioEstado
+	ret
+cambio_a_game:
+	call man_game_init
+	ret
+cambio_a_deadAnimation:
+	call man_deadAnimation_init
+	ret
 no_hayCambioEstado:
 
 	ret

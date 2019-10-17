@@ -12,6 +12,7 @@
 .include "man/man_obstacle.h.s"
 .include "sys/ai_control.h.s"
 .include "man/menuIngame.h.s"
+.include "man/man_level.h.s"
 .include "man_invisibility.h.s"
 .include "sys/sys_collision_entity.h.s"
 ;.include "man/sprite.h.s"
@@ -46,6 +47,11 @@ ent2: DefineCmp_Entity 15,  20, -1, 3, 4,  8, 0, _enemigo2_sp_0, e_tipo_enemigo2
 ;; Input: -
 ;; Destroy: AF, BC, DE, HL, IX
 man_game_init::
+
+	call man_level_init
+	call man_level_insertar_niveles
+
+
 
 	;; Obstacle manager
 	call man_obstacle_init

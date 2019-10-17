@@ -9,8 +9,8 @@ max_levels == 20
    .dw   _pack_end   
 .endm
 
-e_pack_end_h        = 0
-e_pack_end_l        = 1
+lev_pack_end_l        = 0
+lev_pack_end_h        = 1
 sizeof_level        = 2
 
 

@@ -1406,18 +1406,19 @@ get_pos_tile_memoria::
    ld bc, #0x4000 ; cargamos en bc la pos inicial en memoria de nuestro tilemap
    add hl, bc     ; y ya sumamos 4000 + x + 20y
 
-   ld b, h 
-   ld c, l      ; ahora el sumatorio lo tenemos en bc, tenemos que pasarlo a otro registro porque con la siguiente llamada nos vamos a cargar hl
 
+   ; TODA LA V2 NO HACE FALTA PORQUE DESCOMPRIMIMOS LOS NIVELES TODOS EN LAS MISMAS POSICIONES DE MEMORIA
    ; v2 - ahora hay que sumarle el la parte de la fórmula relativa al número de nivel
-   ld d, #1
-   ld e, #0xF4 ; para cargar 500dec (0x1F4), lo hago en dos pasos
-   ld a, (num_current_level)
-   call multiplicar_a_de_16bits ; aquí hemos multiplicado el núm nivel por 500, que es el tamaño de cada nivel
-                                ; y tenemos el resultado en hl
+;    ld b, h 
+;    ld c, l      ; ahora el sumatorio lo tenemos en bc, tenemos que pasarlo a otro registro porque con la siguiente llamada nos vamos a cargar hl
+;    ld d, #1
+;    ld e, #0xF4 ; para cargar 500dec (0x1F4), lo hago en dos pasos
+;    ld a, (num_current_level)
+;    call multiplicar_a_de_16bits ; aquí hemos multiplicado el núm nivel por 500, que es el tamaño de cada nivel
+;                                 ; y tenemos el resultado en hl
 
-   ; y se lo sumamos al acumulado que teníamos en bc
-   add hl, bc
+;    ; y se lo sumamos al acumulado que teníamos en bc
+;    add hl, bc
 
    ret
    

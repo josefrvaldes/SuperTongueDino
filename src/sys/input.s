@@ -12,6 +12,9 @@
 .include "man/sprite.h.s"
 .include "man/state.h.s"
 
+.include "man/man_level.h.s"
+.include "man/man_tilemap.h.s"
+
 ;; //////////////////
 ;; SYS_Input Init
 sys_input_init::
@@ -59,6 +62,18 @@ P_Presed:
 			ld	e_vx(ix), #1
 P_NotPressed:
 
+
+	ld	hl, #Key_L
+	call cpct_isKeyPressed_asm
+	jr	z, L_NotPressed
+L_Presed:
+	; TEMPORAL!! SOLO PARA COMPROBAR QUE FUNCIONA EL CAMBIO DE NIVEL
+	call man_level_load_next
+	call man_tilemap_descomprimir_nuevo_nivel
+	call man_tilemap_render
+	; FIN TEMPORAL
+L_NotPressed:
+
 ;	ld 	e_ai_aim_x(ix), #0		;; comprueba si se ha pulsado el espacio para cambiar la IA
 ;	ld	hl, #Key_Space
 ;	call cpct_isKeyPressed_asm
@@ -73,6 +88,7 @@ P_NotPressed:
 	call cpct_isKeyPressed_asm
 	jr	z, Q_NotPressed
 Q_Pressed:
+
 	ld 	a, (ent_input_Q_pressed)  ;; se comprueba si estaba pulsada anteriormente
 	dec	a
 	jr	z, jumping

@@ -1,5 +1,7 @@
 .include "cpctelera.h.s"
 .include "cpct_functions.h.s"
+.include "man/man_level.h.s"
+.include "ent/ent_level.h.s"
 
 .globl _level00_pack_end
 .globl _level01_pack_end
@@ -19,8 +21,10 @@ ancho_tilemap                 = #20
 
 
 man_tilemap_load::
+   call man_level_getArray 
    ; descomprimimos tilemap del nivel que toque a continuación del tileset
-   ld hl, #_level00_pack_end
+;    ld h, lev_pack_end_h(iy)
+;    ld l, lev_pack_end_l(iy)
    call man_tilemap_descomprimir_nuevo_nivel
 
    ; descomprimimos el tileset
@@ -48,5 +52,7 @@ man_tilemap_render::
 ;     DE
 man_tilemap_descomprimir_nuevo_nivel::
    ; descomprimimos tilemap del nivel que toque a continuación del tileset
+   ld h, lev_pack_end_h(iy)
+   ld l, lev_pack_end_l(iy)
    ld de, #decompress_buffer_tilemap_end
    jp cpct_zx7b_decrunch_s_asm

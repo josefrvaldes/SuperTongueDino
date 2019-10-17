@@ -38,9 +38,15 @@
 #$(eval $(call ADD2PACK,mygraphics,gfx/background.bin))
 #$(eval $(call PACKZX7B,mygraphics,src/))
 
-$(eval $(call ADD2PACK,level0_pack,src/tilesets/castillo.bin)) # este es el tilemap, es decir, el tmx importado de tiled
-$(eval $(call ADD2PACK,level0_pack,src/tilesets/TilesCastillo.bin)) # este es el tileset, es decir, el png con los tiles base
-$(eval $(call PACKZX7B,level0_pack,src/tilesets))
+# creamos paquetes
+$(eval $(call ADD2PACK,level0_pack,src/tilesets/level0.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level1_pack,src/tilesets/level1.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,tiles_castillo_pack,src/tilesets/TilesCastillo.bin)) # este es el tileset, es decir, el png con los tiles base
+
+# comprimimos
+$(eval $(call PACKZX7B,level0_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level1_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,tiles_castillo_pack,src/tilesets/compressed))
 
 
 

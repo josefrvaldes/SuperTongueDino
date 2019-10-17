@@ -40,12 +40,6 @@ ent2: DefineCmp_Entity 15,  20, -1, 3, 4,  8, 0, _enemigo2_sp_0, e_tipo_enemigo2
 ;ent3: DefineCmp_Entity 40, 0,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
 ;ent4: DefineCmp_Entity 50,  0,    2, 0xFC, 4,  8, _hero_sp_0, e_ai_st_stand_by
 
-obst1: DefineCmp_Obstacle  0, 120,    12, 8, 0x0F
-obst2: DefineCmp_Obstacle 40, 72,    4, 80, 0x0F
-obst3: DefineCmp_Obstacle 60, 104,    20, 8, 0x0F
-obst4: DefineCmp_Obstacle  0, 152,   40, 8, 0x0F
-obst5: DefineCmp_Obstacle  40, 152,   40, 8, 0x0F
-obst6: DefineCmp_Obstacle  0, 40,    24, 8, 0x0F
 	
 ;; //////////////////
 ;; Manager Game Init
@@ -55,23 +49,8 @@ man_game_init::
 
 	;; Obstacle manager
 	call man_obstacle_init
-	ld hl, #obst1
-	call man_obstacle_create
-	ld hl, #obst2
-	call man_obstacle_create
-	ld hl, #obst3
-	call man_obstacle_create
-	ld hl, #obst4
-	call man_obstacle_create
-	ld hl, #obst5
-	call man_obstacle_create
-	ld hl, #obst6
-	call man_obstacle_create
- 
- 	;; nos da el puntero al array de obstaculos
+	;; nos da el puntero al array de obstaculos
 	call man_obstacle_getArray
-	;; TEMPORANEO!!! Para comprobar coliones, despues no se renderizara
-	call sys_eren_update_obstacle
 
 
 ;======================================================0
@@ -170,10 +149,8 @@ man_game_render::
 	dec a
 	jr z, #render_menuIngame
 
-	;cpctm_setBorder_asm HW_RED
 	call man_entity_getArray
 	call sys_eren_update
-	;cpctm_setBorder_asm HW_WHITE
 
 	ret
 render_menuIngame:

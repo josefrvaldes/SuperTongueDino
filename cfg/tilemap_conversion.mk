@@ -43,7 +43,8 @@
 
 $(eval $(call TMX2DATA, SET_FOLDER, src/tilesets/ )) 
 $(eval $(call TMX2DATA, SET_OUTPUTS, hs bin))
-$(eval $(call TMX2DATA, CONVERT, img/castillo.tmx, castillo ))
+$(eval $(call TMX2DATA, CONVERT, img/level0.tmx, level0 ))
+$(eval $(call TMX2DATA, CONVERT, img/level1.tmx, level1 ))
 
 ##
 ## OLD MACROS (For compatibility)

@@ -2,12 +2,12 @@
 ;; SQUARE RENDER SYSTEM
 ;;
 .include "cpctelera.h.s"
-.include "tilesets/cabeceras_tilesets.h.s"
 .include "man/entity.h.s"
 .include "cpct_functions.h.s"
 .include "ent/entity.h.s"
 .include "ent/ent_obstacle.h.s"
 .include "man/man_obstacle.h.s"
+.include "man/man_tilemap.h.s"
 
 
 
@@ -16,25 +16,11 @@
 
 .globl _hero_pal
 
-.globl _level0_pack_end
-.globl _level1_pack_end
-.globl _tiles_castillo_pack_end
+
 
 ;; //////////////////
 ;; Square Render System Constants
 screen_start = 0xC000
-
-
-decompress_buffer             = 0x4000
-tileset_max_size              = 0x300
-level_max_size                = 0x1F4 ; hay que acordarse de poner en el buildconfig que nuestro código empezará a partir de tileset_max_size + level_max_size, que en este caso es 4F4
-total_max_size                = tileset_max_size + level_max_size
-decompress_buffer_tilemap_end = decompress_buffer + level_max_size - 1
-decompress_buffer_tileset_end = decompress_buffer + total_max_size - 1
-tilemap_ptr                   = decompress_buffer + 0
-tileset_ptr                   = decompress_buffer + level_max_size
-
-ancho_tilemap                 = #20
 
 
 
@@ -44,44 +30,24 @@ ancho_tilemap                 = #20
 ;; Input: -
 ;; Destroy: AF, BC, DE, HL
 sys_eren_init::
-      ld    c, #0
-      call cpct_setVideoMode_asm
-      ld    hl, #_hero_pal
-      ld    de, #16
-      call cpct_setPalette_asm
-      cpctm_setBorder_asm HW_WHITE
-      call sys_eren_load_tilemap
-      ret
+	ld    c, #0
+	call cpct_setVideoMode_asm
+	ld    hl, #_hero_pal
+	ld    de, #16
+	call cpct_setPalette_asm
+	cpctm_setBorder_asm HW_WHITE
+	jp sys_eren_load_tilemap
 
 
 sys_eren_load_tilemap::
-      ; descomprimimos tilemap del nivel que toque a continuación del tileset
-      ld hl, #_level0_pack_end
-      ld de, #decompress_buffer_tilemap_end
-      call cpct_zx7b_decrunch_s_asm
-
-      ; descomprimimos el tileset
-      ld hl, #_tiles_castillo_pack_end
-      ld de, #decompress_buffer_tileset_end
-      call cpct_zx7b_decrunch_s_asm
-
-      ld bc, #0x1914       ; b = alto en tiles, c = ancho en tiles
-      ld de, #ancho_tilemap ; ancho en tiles del tilemap, en realidad será fijo, siempre será 20
-      ld hl, #tileset_ptr  ; puntero al inicio del tileset
-      call cpct_etm_setDrawTilemap4x8_ag_asm
-
-
-      ld hl, #0xC000       ; posición de memoria de video, a priori siempre será ésta
-      ld de, #tilemap_ptr  ; posición al tilemap
-      call cpct_etm_drawTilemap4x8_ag_asm
-      ret
+	call man_tilemap_load
+	jp man_tilemap_render
 
 
 
 sys_eren_update::
-      call sys_eren_render_entities
-      call man_obstacle_getArray
-      ret
+	call sys_eren_render_entities
+	jp man_obstacle_getArray
 
 
 

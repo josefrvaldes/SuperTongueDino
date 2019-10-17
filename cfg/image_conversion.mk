@@ -40,7 +40,8 @@
 #$(eval $(call IMG2SP, SET_PALETTE_FW  , $(PALETTE)         ))
 #$(eval $(call IMG2SP, CONVERT_PALETTE , $(PALETTE), g_palette ))
 #$(eval $(call IMG2SP, CONVERT         , img.png , w, h, array, palette, tileset))
-PALETTE= 26 0 1 2 3 6 9 11 12 13 15 16 18 20 24 25
+#PALETTE= 26 0 1 2 3 6 9 11 12 13 15 16 18 20 24 25
+PALETTE=14 26 0 1 2 3 4 5 6 7 8 9 11 17 18 24
 $(eval $(call IMG2SP, SET_FOLDER, src/tilesets/ ))
 $(eval $(call IMG2SP, SET_PALETTE_FW  , $(PALETTE) ))
 $(eval $(call IMG2SP, CONVERT, img/tongueBoy.png , 8, 8, hero_sp, hero_pal ))
@@ -53,7 +54,7 @@ $(eval $(call IMG2SP, SET_FOLDER, src/tilesets/ ))
 $(eval $(call IMG2SP, SET_OUTPUT, bin))
 $(eval $(call IMG2SP, SET_IMG_FORMAT, zgtiles))
 $(eval $(call IMG2SP, CONVERT_PALETTE , $(PALETTE), tilemap_pal ))
-$(eval $(call IMG2SP, CONVERT, img/TilesCastillo.png, 8, 8, tiles, ))
+$(eval $(call IMG2SP, CONVERT, img/tileset_juego.png, 8, 8, tiles, ))
 
 
 

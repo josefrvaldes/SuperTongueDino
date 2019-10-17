@@ -1,0 +1,1 @@
+num_current_level:: .db #0

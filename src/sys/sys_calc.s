@@ -121,6 +121,31 @@ multiplicar_d_c_16bits::
    ret
 
 
+; Inputs:
+;     a es un factor de 8 bits
+;    de es un factor de 16 bits
+;Outputs:
+;     hl es el resultado
+;     A,C,DE are not changed
+;     z se activa
+multiplicar_a_de_16bits::
+   ld hl, #0
+   or a
+   ret z
+   ld b, #9
+      rlca
+      dec b
+      jr nc, . - 2
+   Loop1:
+         add hl,de
+   Loop2:
+         dec b
+         ret z
+         add hl,hl
+         rlca
+         jp c, Loop1      
+         jp  Loop2
+
 
 resta_de_a_hl::
    and  a     

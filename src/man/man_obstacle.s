@@ -8,12 +8,13 @@
 .include "entity.h.s"
 .include "ent/entity.h.s"
 .include "sys/sys_calc.h.s"
+.include "man/man_level.h.s"
 
 .module obstacle_manager
 
 DefineComponentArrayStructure _obstacle, max_obstacles, DefineCmp_Obstacle_default ;; ....
 
-obst_fake: DefineCmp_Obstacle  0, 0, 5, 9, 0xBB
+obst_fake: DefineCmp_Obstacle  0, 0, 1, 1, 0xBB
 
 
 resto_x: .db #0
@@ -1367,6 +1368,15 @@ get_pos_tile_memoria::
    ; en este caso de prueba, sabemos que nuestro tilemap empieza en 4000
    ; así que: pos_ini_tilemap = 4000
    ; sabemos que el ancho del tilemap es de 20: ancho_tilemap = 20
+
+   ; v2
+   ; a esto anterior le añadimos el número de nivel, con lo cual la fórmula se nos queda muy parecida
+   ; si antes era 'pos_ini_tilemap + x + ancho_tilemap * y', ahora le añadimos el nivel:
+   ; 'pos_ini_tilemap + x + ancho_tilemap * y + num_nivel_actual * tamanyo_nivel'
+   ; RECORDATORIO: en nuestro caso:
+   ;        pos_ini_tilemap = 4000
+   ;        ancho_tilemap   = 20
+   ;        tamanyo_nivel   = 20 * 25 = 500
    
    push de ; guardamos en la pila el valor de x, porque lo vamos a perder en las siguientes llamadas
 
@@ -1395,5 +1405,19 @@ get_pos_tile_memoria::
 
    ld bc, #0x4000 ; cargamos en bc la pos inicial en memoria de nuestro tilemap
    add hl, bc     ; y ya sumamos 4000 + x + 20y
+
+   ld b, h 
+   ld c, l      ; ahora el sumatorio lo tenemos en bc, tenemos que pasarlo a otro registro porque con la siguiente llamada nos vamos a cargar hl
+
+   ; v2 - ahora hay que sumarle el la parte de la fórmula relativa al número de nivel
+   ld d, #1
+   ld e, #0xF4 ; para cargar 500dec (0x1F4), lo hago en dos pasos
+   ld a, (num_current_level)
+   call multiplicar_a_de_16bits ; aquí hemos multiplicado el núm nivel por 500, que es el tamaño de cada nivel
+                                ; y tenemos el resultado en hl
+
+   ; y se lo sumamos al acumulado que teníamos en bc
+   add hl, bc
+
    ret
    

@@ -47,7 +47,7 @@ $(eval $(call IMG2SP, SET_PALETTE_FW  , $(PALETTE) ))
 $(eval $(call IMG2SP, CONVERT, img/tongueBoy.png , 8, 8, hero_sp, hero_pal ))
 $(eval $(call IMG2SP, CONVERT, img/enemigo1.png , 8, 8, enemigo1_sp, enemigo1_pal ))
 $(eval $(call IMG2SP, CONVERT, img/enemigo2.png , 8, 8, enemigo2_sp, enemigo2_pal ))
-
+$(eval $(call IMG2SP, CONVERT, img/explosion.png , 8, 8, explosion_sp, explosion_pal ))
 
 
 $(eval $(call IMG2SP, SET_FOLDER, src/tilesets/ ))

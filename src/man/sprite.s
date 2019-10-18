@@ -21,12 +21,11 @@
 .globl _enemigo2_sp_5
 .globl _enemigo2_sp_6
 .globl _enemigo2_sp_7
+.globl _explosion_sp_0
+.globl _explosion_sp_1
+.globl _explosion_sp_2
 
 vx_actual:     .db #0
-paso_hero:      .db #0         ;; 0 PASO1 // 1 PASO2
-paso_enemy2:     .db #0         ;; 0 PASO1 // 1 PASO2
-tempo_hero:    .db #0x05
-tempo_enemy2:  .db #0x0F
 
 
 ;;
@@ -39,12 +38,15 @@ aplicate_animation::
 
 _update_loop:
 
+    ld  a, e_dead(ix)
+    cp  #0
+    jr  z, no_dead_entity
+        ;; estamos muertos == renderizar explosion
+        call animation_explosion
+        jr not_more_animation
 
-    _ent_counter = . + 1
-    ld  a, #0
-    dec     a
-    ret z
 
+no_dead_entity:
     ld  a, e_ai_st(ix)
     cp  #e_ai_st_patrullar
     jr  nz, next_ix
@@ -60,6 +62,12 @@ next_ix2:
 
 not_more_animation:
 
+    _ent_counter = . + 1
+    ld  a, #0
+    dec     a
+    ret z
+
+
    ld (_ent_counter), a
    ld de, #sizeof_e
    add   ix, de
@@ -67,12 +75,57 @@ not_more_animation:
 
 
 
+
+
+animation_explosion:
+
+    ld  a, e_timeDead(ix)
+    dec  a
+    ld  e_timeDead(ix), a
+    cp  #0
+    ret m
+
+procesar_cambios_dead:
+        ;; ACTIVAR DE ALGUN MODO EL "REPINTAR TODO EL TILED"
+        ;; ELIMINAR ENTIDAD DEL ARRAY DE ENTIDADES
+    ld  a, e_timeDead(ix)
+    cp  #0x0C
+    jp  m, explosion2
+        ld  hl,  #_explosion_sp_0
+    jr  finish_sprite_dead
+explosion2:
+
+    cp  #0x06
+    jp  m, explosion3
+        ld  hl,  #_explosion_sp_1
+    jr  finish_sprite_dead
+explosion3:
+    cp  #0x01
+    jp  m, no_more_explosion
+        ld  hl,  #_explosion_sp_2
+    jr  finish_sprite_dead
+no_more_explosion:
+    ;; SE DEBE DE LLAMAR A UN METODO QUE ELIMINE LA ENTIDAD
+    ;=========================================================================================================================
+    ;;
+    ;;           VERDADERA MUERTE AQUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ;;
+    ;=========================================================================================================================
+        ret
+
+finish_sprite_dead:
+        ld  e_pspr_h(ix), h
+        ld  e_pspr_l(ix), l
+
+    ret
+
+
 ;;
 ;; METODO PARA CAMBIO DE SPRITE
 ;; INPUT:   A sprite  al que queremos cambiar
 ;; DESTROYS: AF, HL, BC, DE
 ;;
-set_sprite_hero::
+set_sprite_hero:
 
     ;call man_entity_getArray  ;; entidad que quiero en IX
     ld a, e_vx(ix)
@@ -80,37 +133,33 @@ set_sprite_hero::
     jr  z, procesar_invisibilidad_sprite          ;; si la velocidad en x no se modifica no entro al contador
     ;; pero si debo permitir cambio de sprote de invisibilidad
 
-    ld  a,  (paso_hero)
-    ld  b, a
-
-
-    ld  a, (tempo_hero)
+    ld  a, e_timeAnimat(ix)
     dec  a
-    ld  (tempo_hero), a
+    ld  e_timeAnimat(ix), a
     jr  nz, procesar_cambios_sprite
         ;; entramos y reseteamos
         ld  a, #0x05
-        ld  (tempo_hero), a
+        ld  e_timeAnimat(ix), a
 
         ;; ACTUAMOS
-        ld  a, (paso_hero)
+        ld  a, e_stepActual(ix)
         dec a
         jr  z, es_paso2
             ;; ES PASO 1
             ld  a, #1
-            ld  (paso_hero), a
+            ld  e_stepActual(ix), a
             ;call    sprite_hero_direction_paso1
             jr  procesar_cambios_sprite
 es_paso2:
             ;; ES PASO 2
             ld  a, #0
-            ld  (paso_hero), a
+            ld  e_stepActual(ix), a
             ;call    sprite_hero_direction_paso2
             ;ret
 
 procesar_cambios_sprite:
 
-    ld  a, (paso_hero)
+    ld  a, e_stepActual(ix)
     dec a
     jr  z, procesar_paso2
         call    sprite_hero_paso1
@@ -240,32 +289,28 @@ guardar_VX:
 
 
 
-set_sprite_enemy2::
-    ld  a,  (paso_enemy2)
-    ld  b, a                                ;; guardamos el paso actual en B
-
-
-    ld  a, (tempo_enemy2)
+set_sprite_enemy2:
+    ld  a, e_timeAnimat(ix)
     dec  a
-    ld  (tempo_enemy2), a
+    ld  e_timeAnimat(ix), a
     jr  nz, procesar_cambios_sprite_enemy2
         ;; entramos y reseteamos
-        ld  a, #0x0F
-        ld  (tempo_enemy2), a
+        ld  a, #0x1F
+        ld  e_timeAnimat(ix), a
         ;; ACTUAMOS
-        ld  a, (paso_enemy2)
+        ld  a, e_stepActual(ix)
         dec a
         jr  z, es_paso2_enemy2
             ld  a, #1
-            ld  (paso_enemy2), a
+            ld  e_stepActual(ix), a
             jr  procesar_cambios_sprite_enemy2
 es_paso2_enemy2:
             ld  a, #0
-            ld  (paso_enemy2), a
+            ld  e_stepActual(ix), a
 
 procesar_cambios_sprite_enemy2:
 
-    ld  a, (paso_enemy2)
+    ld  a, e_stepActual(ix)
     dec a
     jr  z, procesar_paso2_enemy2
         call    sprite_enemy2_paso1

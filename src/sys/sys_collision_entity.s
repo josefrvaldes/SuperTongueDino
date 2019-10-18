@@ -16,8 +16,6 @@ sys_collision_entity_update::
 	ld	(_entity_counter), a
 
 
-	cpctm_setBorder_asm HW_GREEN
-
 _next_ix:
 	;; guardamos en DE el puntero IX de la entidad
 	ld__e_ixl
@@ -67,7 +65,7 @@ _next_iy:
 		jr	nz, _no_hero
 _hero:
 		;call process_dead_hero
-		;cpctm_setBorder_asm HW_RED
+		cpctm_setBorder_asm HW_RED
 		;ld	a, #2
 		;call man_state_setEstado  ;; cambia el estado
 
@@ -82,7 +80,7 @@ _trozo:
 	pop	ix
 	jr	_next_ix
 _exit:
-	cpctm_setBorder_asm HW_WHITE
+
 	ret
 
 ;; IX ENTITY 1

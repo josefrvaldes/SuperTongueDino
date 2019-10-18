@@ -97,6 +97,14 @@ sys_physics_update::
 ;; BUCLE QUE RECORRE TODAS LAS ENTIDADES CON FISICAS 
 _update_loop:
 
+
+;=============================================================================================================================================
+;; SI ESTAMOS MUERTOS NO SE ACTUALIZA EL PHYSICS - UNICAMENTE RENDERIZAREMOS ANIMACION EXPLOSION
+;=============================================================================================================================================
+   ld    a, e_dead(ix)                 ;; se crean con valor = 0 (vivos), con el valor =1 (muertas)
+   cp    #1                            
+   jr    z, continuar_actualizar_pos   ;; lo que implica que pasaremos a la siguiente entidad
+
    push ix
    call man_obstacle_re_rellenar_array
    call man_obstacle_getArray ; como en la llamada anterior hemos consultado los arrays, nos posicionamos de nuevo en la primera posición

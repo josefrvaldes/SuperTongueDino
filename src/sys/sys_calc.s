@@ -1,3 +1,5 @@
+.include "cpctelera.h.s"
+
 ;Inputs:
 ;     d es el numerador
 ;     e es el denominador
@@ -146,6 +148,33 @@ multiplicar_d_c_16bits::
       djnz multiplicar_d_e_16bitsLoop     ;Decrementa B, si todavía no es cero, volvemos al loop:
    ld h, c
    ld l, a
+   ret
+
+
+; Esta operación puede dar como valor más alto y fiable el número 511.
+; No es una función de multiplicación fiable, solamente la utilizamos para calcular la posición del tile en memoria (20y, donde y será máximo 25dec)
+; Input
+;     d: valor que queremos multiplicar por 20
+; Output
+;    hl: resultado de la operación
+; Destroys:
+;    a, hl
+multiplicar_d_por_20_no_safe::
+   ld hl, #0  ; nos aseguramos de que hl vale 0
+   ld bc, #0  ; nos aseguramos de que hl vale 0
+   ld  c, d   ;  guardamos en a el valor de d, porque luego lo necesitaremos
+   ld  l, c   ; guardamos en l el valor de d, porque es con el que vamos a operar
+   sla l      ; x2
+   sla l      ; x4
+   sla l      ; x8
+   sla l      ; x16
+   jr nc, . + 4  ; esto lo hacemos porque al multiplicar por 16 es bastante probable que haya carry y haya que poner a 1 el primer bit de h
+   set 0, h
+   add hl, bc
+   add hl, bc
+   add hl, bc
+   add hl, bc
+
    ret
 
 

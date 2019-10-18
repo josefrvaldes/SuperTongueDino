@@ -21,6 +21,8 @@ resto_x: .db #0
 resto_y: .db #0
 nueva_x: .db #0
 nueva_y: .db #0
+x_tile:  .db #0
+y_tile:  .db #0
 se_creara_obstaculo: .db #0
 direccion_movimiento: .db #0
 pos_memoria_tile_origen: .dw #0
@@ -106,11 +108,16 @@ man_obstacle_re_rellenar_array::
    push ix
    ; en este momento tenemos la dirección de movimiento guardada en una variable
    call man_obstacle_init ; vaciamos el array de obstacles
-   ld hl, #obst_fake
-   call man_obstacle_create
    pop ix
-   ;call man_entity_getArray
-   jp crear_obstaculos
+   call crear_obstaculos
+
+   ; si no había obstáculos, metemos uno dummy
+   ld a, (_obstacle_num)
+   or a
+   ret nz
+   ld hl, #obst_fake
+   jp man_obstacle_create
+
 
 
 
@@ -1304,27 +1311,27 @@ crear_obstaculos_ninguno_cero::
 ;     |7 E 3|
 ;     |6 5 4|
 crear_obstaculos::
-   ;cpctm_setBorder_asm HW_RED
-   ; obtenemos la posición en memoria del tile origen y la guardamos en su variable
-   ld   a, e_x(ix)
-   ld   e, a
-   ld   a, e_y(ix) 
-   ld   d, a
-   call get_pos_tile_memoria
-   ld (pos_memoria_tile_origen), hl
-
    ;cpctm_setBorder_asm HW_GREEN
    ; calculamos el resto_x
    ld a, e_x(ix)
    ld d, a
    call dividir_d_entre_4_f
    ld (resto_x), a
+   ld a, d
+   ld (x_tile), a
 
    ; calculamos el resto_y
    ld a, e_y(ix)
    ld d, a
    call dividir_d_entre_8_f
    ld (resto_y), a
+   ld a, d
+   ld (y_tile), a
+
+   ;cpctm_setBorder_asm HW_RED
+   ; obtenemos la posición en memoria del tile origen y la guardamos en su variable
+   call get_pos_tile_memoria_by_tile
+   ld (pos_memoria_tile_origen), hl
 
 
    call calcular_combinacion_restos ; en a, cargamos la combinación de restos
@@ -1338,19 +1345,53 @@ crear_obstaculos::
    jr z, ninguno_cero
 
    ambos_cero::
-   call crear_obstaculos_ambos_cero
-   ret
+   jp crear_obstaculos_ambos_cero
+   
    x_no_cero:
-   call crear_obstaculos_x_no_cero
-   ret
+   jp crear_obstaculos_x_no_cero
+   
    y_no_cero:
-   call crear_obstaculos_y_no_cero
-   ret
+   jp crear_obstaculos_y_no_cero
+   
    ninguno_cero:
-   call crear_obstaculos_ninguno_cero
+   jp crear_obstaculos_ninguno_cero
+   
+
+
+
+
+
+
+; Recibe una x y una y del mapa (en tiles) y devuelve la posición de memoria
+; donde se encuentra ese tile en el tilemap en memoria.
+; Input 
+;     y_tile y x_tile cargadas
+; Output
+;    HL: la pos de memoria mapeada de la x e y que le hemos pasado
+get_pos_tile_memoria_by_tile::
+   ; la posición del tile en memoria es:
+   ; pos_ini_tilemap + x + ancho_tilemap * y ---- 4000 + x + 20y
+   ; en este caso de prueba, sabemos que nuestro tilemap empieza en 4000
+   ; así que: pos_ini_tilemap = 4000
+   ; sabemos que el ancho del tilemap es de 20: ancho_tilemap = 20
+   
+   ld a, (y_tile)
+   ld d, a
+   call multiplicar_d_por_20_no_safe
+   ; ahora en HL tenemos el resultado de la operación 20y
+
+
+   ; las 4 operaciones de abajo son para preparar la suma de hl con de, que contiene la división de la pos x
+   ld de, #0          ; ponemos de a cero
+   ld a, (x_tile)
+   ld  e, a           ; y ponemos en e el valor de x/4
+   add hl, de         ; sumamos 20y + x
+
+   ld bc, #0x4000 ; cargamos en bc la pos inicial en memoria de nuestro tilemap
+   add hl, bc     ; y ya sumamos 4000 + x + 20y
+
    ret
-
-
+   
 
 
 
@@ -1402,4 +1443,3 @@ get_pos_tile_memoria::
    add hl, bc     ; y ya sumamos 4000 + x + 20y
 
    ret
-   

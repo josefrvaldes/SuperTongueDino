@@ -47,6 +47,34 @@ dividir_d_entre_4::
    ret
 
 
+dividir_d_entre_4_f::
+   xor a       ; nos aseguramos que a vale cero
+   sra d    ; desplazamos los bits hacia la dch
+   res 7, d
+   jr nc, . + 4
+   set 0, a
+   sra d    ; desplazamos los bits hacia la dch
+   res 6, d
+   jr nc, . + 4
+   set 1, a
+   ret
+
+
+dividir_d_entre_8_f::
+   xor a       ; nos aseguramos que a vale cero
+   sra d    ; desplazamos los bits hacia la dch
+   res 7, d
+   jr nc, . + 4
+   set 0, a
+   sra d    ; desplazamos los bits hacia la dch
+   res 6, d
+   jr nc, . + 4
+   set 1, a
+   sra d    ; desplazamos los bits hacia la dch
+   res 5, d
+   jr nc, . + 4
+   set 2, a
+   ret
 
 ; Inputs:
 ;     A: el valor a comprobar

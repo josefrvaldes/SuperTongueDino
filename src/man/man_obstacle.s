@@ -1304,6 +1304,7 @@ crear_obstaculos_ninguno_cero::
 ;     |7 E 3|
 ;     |6 5 4|
 crear_obstaculos::
+   ;cpctm_setBorder_asm HW_RED
    ; obtenemos la posición en memoria del tile origen y la guardamos en su variable
    ld   a, e_x(ix)
    ld   e, a
@@ -1312,16 +1313,17 @@ crear_obstaculos::
    call get_pos_tile_memoria
    ld (pos_memoria_tile_origen), hl
 
+   ;cpctm_setBorder_asm HW_GREEN
    ; calculamos el resto_x
    ld a, e_x(ix)
    ld d, a
-   call dividir_d_entre_4
+   call dividir_d_entre_4_f
    ld (resto_x), a
 
    ; calculamos el resto_y
    ld a, e_y(ix)
    ld d, a
-   call dividir_d_entre_8
+   call dividir_d_entre_8_f
    ld (resto_y), a
 
 
@@ -1368,21 +1370,14 @@ get_pos_tile_memoria::
    ; en este caso de prueba, sabemos que nuestro tilemap empieza en 4000
    ; así que: pos_ini_tilemap = 4000
    ; sabemos que el ancho del tilemap es de 20: ancho_tilemap = 20
-
-   ; v2
-   ; a esto anterior le añadimos el número de nivel, con lo cual la fórmula se nos queda muy parecida
-   ; si antes era 'pos_ini_tilemap + x + ancho_tilemap * y', ahora le añadimos el nivel:
-   ; 'pos_ini_tilemap + x + ancho_tilemap * y + num_nivel_actual * tamanyo_nivel'
-   ; RECORDATORIO: en nuestro caso:
-   ;        pos_ini_tilemap = 4000
-   ;        ancho_tilemap   = 20
-   ;        tamanyo_nivel   = 20 * 25 = 500
    
    push de ; guardamos en la pila el valor de x, porque lo vamos a perder en las siguientes llamadas
 
    ; aquí d ya contiene la pos y en bytes
    ; hay que dividir entre 8 la posición y, porque cada tile son 8 bytes en altura
-   call dividir_d_entre_8
+   ;cpctm_setBorder_asm HW_GREEN
+   call dividir_d_entre_8_f
+   ;cpctm_setBorder_asm HW_RED
    ; ahora en d ya no tenemos la y original, sino la y/8, que es la que necesitamos
 
 
@@ -1394,7 +1389,7 @@ get_pos_tile_memoria::
    ; recuperamos el valor de x, que lo teníamos en la pila
    pop  de
    ld   d, e ; y lo guardamos en d, que es donde tiene que estar para llamar a esta función
-   call dividir_d_entre_4 ; dividimos entre 4 porque en ancho, cada tile son 4 bytes
+   call dividir_d_entre_4_f ; dividimos entre 4 porque en ancho, cada tile son 4 bytes
    ; ahora en d ya no tenemos la y original, sino la y/4, que es la que necesitamos
 
    ; las 4 operaciones de abajo son para preparar la suma de hl con de, que contiene la división de la pos x
@@ -1405,20 +1400,6 @@ get_pos_tile_memoria::
 
    ld bc, #0x4000 ; cargamos en bc la pos inicial en memoria de nuestro tilemap
    add hl, bc     ; y ya sumamos 4000 + x + 20y
-
-
-   ; TODA LA V2 NO HACE FALTA PORQUE DESCOMPRIMIMOS LOS NIVELES TODOS EN LAS MISMAS POSICIONES DE MEMORIA
-   ; v2 - ahora hay que sumarle el la parte de la fórmula relativa al número de nivel
-;    ld b, h 
-;    ld c, l      ; ahora el sumatorio lo tenemos en bc, tenemos que pasarlo a otro registro porque con la siguiente llamada nos vamos a cargar hl
-;    ld d, #1
-;    ld e, #0xF4 ; para cargar 500dec (0x1F4), lo hago en dos pasos
-;    ld a, (num_current_level)
-;    call multiplicar_a_de_16bits ; aquí hemos multiplicado el núm nivel por 500, que es el tamaño de cada nivel
-;                                 ; y tenemos el resultado en hl
-
-;    ; y se lo sumamos al acumulado que teníamos en bc
-;    add hl, bc
 
    ret
    

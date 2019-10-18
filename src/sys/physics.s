@@ -97,7 +97,6 @@ sys_physics_update::
 ;; BUCLE QUE RECORRE TODAS LAS ENTIDADES CON FISICAS 
 _update_loop:
 
-
 ;=============================================================================================================================================
 ;; SI ESTAMOS MUERTOS NO SE ACTUALIZA EL PHYSICS - UNICAMENTE RENDERIZAREMOS ANIMACION EXPLOSION
 ;=============================================================================================================================================
@@ -110,8 +109,10 @@ _update_loop:
    call man_obstacle_getArray ; como en la llamada anterior hemos consultado los arrays, nos posicionamos de nuevo en la primera posición
    pop ix
 
+   cpctm_setBorder_asm HW_RED
    ;; COLISIONES CON LOS OBJETOS
    call sys_check_collision
+
 
    ld a, d
    add   e
@@ -176,6 +177,11 @@ no_mas_saltos:
 	no_mas_saltos_patrullar:
 	call sys_check_borderScreem_patrullar ;; COLISIONES CON LOS BORDES DE LA PANTALLA y actualizar pos para la IA patrullar
 	continuar_actualizar_pos:
+
+
+
+   cpctm_setBorder_asm HW_GREEN
+
 
 	_ent_counter = . + 1
 	ld	a, #0

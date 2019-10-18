@@ -15,6 +15,7 @@
 .include "man/man_level.h.s"
 .include "man_invisibility.h.s"
 .include "sys/sys_collision_entity.h.s"
+.include "man/sprite.h.s"
 ;.include "man/sprite.h.s"
 
 .module game_manager
@@ -129,6 +130,9 @@ man_game_update::				;; MEJORAR!!! esto ya que estoy pasando IX al update y se p
 	;cpctm_setBorder_asm HW_RED
 	call man_entity_getArray
 	call sys_ai_control_update
+
+	call man_entity_getArray
+	call aplicate_animation
 
 	;cpctm_setBorder_asm HW_WHITE
 	call man_entity_getArray

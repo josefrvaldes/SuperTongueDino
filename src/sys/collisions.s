@@ -13,16 +13,14 @@ col_hay_colision_left:: .db #0
 ;; IMPUT:   IY: puntero a los obstaculos
 ;;           A: total de obstaculos
 ;; DESTROY: AF, IY, BC
-check_collisions::
-	ld	(_obs_counter), a
+check_collisions_VX::
+	ld	(_obs_counterVX), a
 
 	ld	d, #0                                           ;; si D = 0 NO modifico VX = no colision VX
-    ld  e, #0                                           ;; si E = 0 NO modifico VY = no colision VT
     ld  a, #0
     ld  (#col_hay_colision_top), a
     ld  (#col_hay_colision_left), a
-_update_loop:
-
+_update_loopVX:
     ;; COLISIONES EJE X
     ld  a, e_x(ix)                                      ;; A = E_X
     add e_vx(ix)                                            
@@ -39,6 +37,32 @@ check_collision_left:                                   ;; SI MENOR 0 = COLLISIO
         call sys_colision_left                          ;; CALL COLLISION LEFT
 
 no_collision_VX:
+	_obs_counterVX = . + 1
+		ld	a, #0  ;; 1
+		dec	a      ;; 0
+		ret 	z
+
+		ld	(_obs_counterVX), a
+		ld	bc, #sizeof_obs
+		add	iy, bc
+		jr	_update_loopVX
+
+ret
+
+
+
+;;
+;; IMPUT:   IY: puntero a los obstaculos
+;;           A: total de obstaculos
+;; DESTROY: AF, IY, BC
+check_collisions_VY::
+    ld  (_obs_counterVY), a
+
+    ld  e, #0                                           ;; si D = 0 NO modifico VX = no colision VX
+    ;ld  a, #0
+    ;ld  (#col_hay_colision_top), a
+    ;ld  (#col_hay_colision_left), a
+_update_loopVY:
     ;; COLISIONES EJE Y
     ld  a, e_y(ix)
     add e_vy(ix)
@@ -55,22 +79,17 @@ check_collision_top:
         call sys_collision_Top
         
 no_collision_VY:
+    _obs_counterVY = . + 1
+        ld  a, #0  ;; 1
+        dec a      ;; 0
+        ret     z
 
-
-
-
-	_obs_counter = . + 1
-		ld	a, #0  ;; 1
-		dec	a      ;; 0
-		ret 	z
-
-		ld	(_obs_counter), a
-		ld	bc, #sizeof_obs
-		add	iy, bc
-		jr	_update_loop
+        ld  (_obs_counterVY), a
+        ld  bc, #sizeof_obs
+        add iy, bc
+        jr  _update_loopVY
 
 ret
-
 
 
 

@@ -1,5 +1,3 @@
-.globl set_sprite_hero
-
-
+.globl aplicate_animation
 
 .globl guardar_VX

@@ -20,14 +20,14 @@ screen_height = 200
 ;;
 ;; VARIABLES CONTROL DEL SALTO Y REBOTES
 ;;
-V_jumpControlVY_gravity:   .db #-1     ;; -1 GRAVITY     // 0 JUMP CONTROL
+V_jumpControlVY_gravity:      .db #-1     ;; -1 GRAVITY     // 0 JUMP CONTROL
 V_jumpControlVX_keyboardO:    .db #1      ;; -1 KEYBOARD    // 0 JUMP CONTROL           // 1 PRIMER SALTO
-V_jumpControlVX_keyboardP: .db #1      ;; -1 KEYBOARD    // 0 JUMP CONTROL          // 1 PRIMER SALTO
-hero_jump:           .db #-1           ;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
-hero_jump_left:         .db #-1     ;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
-hero_jump_right:        .db #-1     ;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
-hero_gravity:        .db #0      ;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
-press_now_W:         .db #-1     ;; variable que nos indica si estamos saltando justo en ese momento
+V_jumpControlVX_keyboardP:    .db #1      ;; -1 KEYBOARD    // 0 JUMP CONTROL          // 1 PRIMER SALTO
+hero_jump:                    .db #-1           ;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
+hero_jump_left:               .db #-1     ;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
+hero_jump_right:              .db #-1     ;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
+hero_gravity:                 .db #0      ;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
+press_now_W:                  .db #-1     ;; variable que nos indica si estamos saltando justo en ese momento
 ;spittle:            .db #6         ;; el numero de saliva es lo que le restamos a la gravedad 
 ;;
 ;;TABLAS DE SALTO Y GRAVEDAD
@@ -83,7 +83,7 @@ sys_physics_update::
    ld (_ent_counter), a
 
 
-	call set_sprite_hero
+	;call set_sprite_hero
 	;; commprobamos si somos el HEROE o un ENEMIGO para pocesar el salto
 	ld	a, e_ai_st(ix)
 	cp	#e_ai_st_noAI	;; comparamos si no tiene IA
@@ -301,8 +301,8 @@ endif_y:
 sys_check_collision:
 
    call man_obstacle_getArray          ;; RETURN: - IY puntero a obstaculos
-                           ;;      - A numero de obstaculos
-   call check_collisions               ;; RETURN: - D modificacion en e_x
+                                       ;;      - A numero de obstaculos
+   call check_collisions_VX               ;; RETURN: - D modificacion en e_x
                            ;;         - E modificacion en e_y
 
    ld a, d                    ;;tenemos la variacion en el eje X
@@ -312,7 +312,20 @@ sys_check_collision:
             ld    a, e_x(ix)
             sub    d                ;; al tener colision:
             ld    e_x(ix), a              ;; anyadimos esa modicion para que se quede en el borde
+;===============================================================================================================================
+      ;; RESVALAR
+      ;; SOLO SI SOMOS EL HERO
+      ld    a, e_ai_st(ix)
+      cp    #e_ai_st_noAI
+      jr    nz, no_colision_X
+      ld    a, #2
+      cp    e_vy(ix)
+      jp    p, no_colision_X
+         ld    e_vy(ix), a
+;===============================================================================================================================
 no_colision_X:
+   call man_obstacle_getArray 
+   call check_collisions_VY
 
    ld a, e                    ;; tenemos la variacion en el EJE Y
    add   #0                   ;; si no hay colision se debe de quedar en 0 ( -1 + 1 = 0)

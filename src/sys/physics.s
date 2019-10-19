@@ -233,13 +233,10 @@ check_jump_table_update:
 
       ret z                ;; 0, SIN VELOCIDIAD
 
-         ld  a, e_x(ix)
-         add e_vx(ix)
-         ld  c, a
          ld  a, e_vx(ix)
-         sub c
+         cp  #0
          ret  z    
-         jr  c, jump_left  ;; velocidad positiva
+         jp  p, jump_left  ;; velocidad positiva
            ;;velocidad negativa
             call active_jump_right           ;; activamos la jump table right
            ret
@@ -255,43 +252,15 @@ jump_left:           ;; velocidad positiva
 ;; DESTROY :  AF, BC
 ;;
 sys_check_borderScreem:
-;; CHOQUES CON LOS BORDES DE LA PANTALLA
    ;; UPDATE X
-   ld a, #screen_width + 1
-   sub   e_w(ix)
-   ld c, a
-
    ld a, e_x(ix)
    add   e_vx(ix)
-   cp c
-   jr nc, invalid_x
-valid_x:
    ld e_x(ix), a
-   jr endif_x
-invalid_x:
-   ld a, e_vx(ix)
-   neg            ;; para cambiar a negativo
-   ld e_vx(ix), a
-endif_x:
-
-
    ;; UPDATE Y
-   ld a, #screen_height + 1
-   sub   e_h(ix)
-   ld c, a
-
    ld a, e_y(ix)
    add   e_vy(ix)
-   cp c
-   jr nc, invalid_y
-valid_y:
    ld e_y(ix), a
-   jr endif_y
-invalid_y:
-   ld a, e_vy(ix)
-   neg            ;; para cambiar a negativo
-   ld e_vy(ix), a
-endif_y:
+
 
    ret
 

@@ -35,11 +35,13 @@ nivel:: .db #21
 
 ;; Manager Variables
 ent1: DefineCmp_Entity 60,  40,  0,  0, 4, 8, 0, _hero_sp_0,     e_tipo_jugador,  e_ai_st_noAI,      0,    0,    0, 0, 0, 0, 0x05, 0x12
-;ent2: DefineCmp_Entity 50,  40,  0,  0, 4, 8, 0, _hero_sp_0,     e_tipo_jugador,  e_ai_st_noAI,      0,    0,    0, 0, 0, 0, 0x05, 0x12
-;ent3: DefineCmp_Entity 70,  40,  0,  0, 4, 8, 0, _hero_sp_0,     e_tipo_jugador,  e_ai_st_noAI,      0,    0,    0, 0, 0, 0, 0x05, 0x12
+ent2: DefineCmp_Entity 50,  40,  0,  0, 4, 8, 0, _hero_sp_0,     e_tipo_jugador,  e_ai_st_noAI,      0,    0,    0, 0, 0, 0, 0x05, 0x12
+ent3: DefineCmp_Entity 70,  40,  0,  0, 4, 8, 0, _hero_sp_0,     e_tipo_jugador,  e_ai_st_noAI,      0,    0,    0, 0, 0, 0, 0x05, 0x12
+ent4: DefineCmp_Entity 50,  50,  0,  0, 4, 8, 0, _hero_sp_0,     e_tipo_jugador,  e_ai_st_noAI,      0,    0,    0, 0, 0, 0, 0x05, 0x12
+ent5: DefineCmp_Entity 70,  50,  0,  0, 4, 8, 0, _hero_sp_0,     e_tipo_jugador,  e_ai_st_noAI,      0,    0,    0, 0, 0, 0, 0x05, 0x12
 ;ent2: DefineCmp_Entity 30,  30,  1,  1, 4, 8, 0, _enemigo1_sp_0, e_tipo_enemigo1, e_ai_st_rebotar,  0,    0,    0, 0, 0, 0, 0x0F, 0x12
-ent2: DefineCmp_Entity 15,  20, -1, 3, 4,  8, 0, _enemigo2_sp_0, e_tipo_enemigo2, e_ai_st_patrullar, 0, 0x20, 0x20, 0, 0, 0, 0x1F, 0x12
-ent3: DefineCmp_Entity 22,  20, -1, 3, 4,  8, 0, _enemigo2_sp_0, e_tipo_enemigo2, e_ai_st_patrullar, 0, 0x20, 0x20, 0, 0, 0, 0x1F, 0x12
+;ent2: DefineCmp_Entity 15,  20, -1, 3, 4,  8, 0, _enemigo2_sp_0, e_tipo_enemigo2, e_ai_st_patrullar, 0, 0x20, 0x20, 0, 0, 0, 0x1F, 0x12
+;ent3: DefineCmp_Entity 22,  20, -1, 3, 4,  8, 0, _enemigo2_sp_0, e_tipo_enemigo2, e_ai_st_patrullar, 0, 0x20, 0x20, 0, 0, 0, 0x1F, 0x12
 ;ent4: DefineCmp_Entity 22,  30, -1, 3, 4,  8, 0, _enemigo2_sp_0, e_tipo_enemigo2, e_ai_st_patrullar, 0, 0x20, 0x20, 0, 0, 0, 0x1F, 0x12
 ;ent3: DefineCmp_Entity 10,  20, 1, 3, 4,  8, 0, _enemigo2_sp_0, e_tipo_enemigo2, e_ai_st_patrullar, 0, 0x20, 0x20, 0, 0, 0, 0x0F,  0x12
 
@@ -88,7 +90,10 @@ man_game_init::
 	call man_entity_create
 	ld hl, #ent3
 	call man_entity_create
-
+	ld hl, #ent4
+	call man_entity_create
+	ld hl, #ent5
+	call man_entity_create
 
 	ret
 

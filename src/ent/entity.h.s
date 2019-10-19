@@ -2,7 +2,7 @@
 ;; Entity ENTITY, this is the default enemy and hero entity
 ;;
 
-max_entities == 4
+max_entities == 6
 
 ;; Defines a new entity component
 .macro DefineCmp_Entity _x, _y, _vx, _vy, _w, _h, _invisibility, _pspr, _tipoEntidad, _aist, _pausaVel, _clock1, _clock2, _cambioDirec, _dead, _stepActual, _timeAnimat, _timeDead

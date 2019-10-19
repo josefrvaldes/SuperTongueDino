@@ -22,6 +22,14 @@
 .globl _enemigo2_sp_5
 .globl _enemigo2_sp_6
 .globl _enemigo2_sp_7
+.globl _enemigo1_sp_0
+.globl _enemigo1_sp_1
+.globl _enemigo1_sp_2
+.globl _enemigo1_sp_3
+.globl _enemigo1_sp_4
+.globl _enemigo1_sp_5
+.globl _enemigo1_sp_6
+.globl _enemigo1_sp_7
 .globl _explosion_sp_0
 .globl _explosion_sp_1
 .globl _explosion_sp_2
@@ -59,7 +67,7 @@ next_ix:
             call set_sprite_hero
         jr not_more_animation
 next_ix2:
-            ;;call set_sprite_enemy1
+        call set_sprite_enemy1
 
 not_more_animation:
 
@@ -90,28 +98,33 @@ procesar_cambios_dead:
         ;; ACTIVAR DE ALGUN MODO EL "REPINTAR TODO EL TILED"
         ;; ELIMINAR ENTIDAD DEL ARRAY DE ENTIDADES
     ld  a, e_timeDead(ix)
-    cp  #0x0C
+    cp  #12
     jp  m, explosion2
         ld  hl,  #_explosion_sp_0
     jr  finish_sprite_dead
 explosion2:
-
-    cp  #0x06
+    ld  a, e_timeDead(ix)
+    cp  #6
     jp  m, explosion3
         ld  hl,  #_explosion_sp_1
     jr  finish_sprite_dead
 explosion3:
-    cp  #0x01
+    ld  a, e_timeDead(ix)
+    cp  #1
     jp  m, no_more_explosion
         ld  hl,  #_explosion_sp_2
     jr  finish_sprite_dead
 no_more_explosion:
-    ;; SE DEBE DE LLAMAR A UN METODO QUE ELIMINE LA ENTIDAD
     ;=========================================================================================================================
     ;;
     ;;           VERDADERA MUERTE AQUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ld  a, #2
-        call man_state_setEstado  ;; cambia el estado
+
+    ;; 2 OPCIONES : QUE SEA EL HERO O QUE SEA UN ENEMIGO NORMAL
+        ;; HERO
+            ;ld  a, #2
+            ;call man_state_setEstado  ;; cambia el estado
+        ;; ENEMIGO
+            ;; SE DEBE DE LLAMAR A UN METODO QUE ELIMINE LA ENTIDAD
     ;;
     ;=========================================================================================================================
         ret
@@ -396,5 +409,124 @@ movIz_paso2_enemy2:
 movIz_grav_paso2_enemy2:
             ld  hl, #_enemigo2_sp_7
         ret
+
+
+
+
+
+
+
+set_sprite_enemy1:
+    ld  a, e_timeAnimat(ix)
+    dec  a
+    ld  e_timeAnimat(ix), a
+    jr  nz, procesar_cambios_sprite_enemy1
+        ;; entramos y reseteamos
+        ld  a, #0x09
+        ld  e_timeAnimat(ix), a
+        ;; ACTUAMOS
+        ld  a, e_stepActual(ix)
+        dec a
+        jr  z, es_paso2_enemy1
+            ld  a, #1
+            ld  e_stepActual(ix), a
+            jr  procesar_cambios_sprite_enemy1
+es_paso2_enemy1:
+            ld  a, #0
+            ld  e_stepActual(ix), a
+
+procesar_cambios_sprite_enemy1:
+
+    ld  a, e_stepActual(ix)
+    dec a
+    jr  z, procesar_paso2_enemy1
+        call    sprite_enemy1_paso1
+        jr  finish_sprite_enemy1
+procesar_paso2_enemy1:
+       ; call    sprite_enemy2_paso2
+        call    sprite_enemy1_paso2
+
+finish_sprite_enemy1:
+        ld  e_pspr_h(ix), h
+        ld  e_pspr_l(ix), l
+
+    ret
+
+
+
+
+;;
+;; METODO QUE MODIFICA EL SPRITE SEGUN LA DIRECCION A LA QUEMIRA
+;; INPUT: B - PASO 1 O PASO 2 (EFECTO DE ANDAR)
+;; RETURN: HL - DIRECCION DEL SPRITE
+;;
+sprite_enemy1_paso1:
+    ld  a, e_vx(ix)
+    or  a
+    jp  m, movIz_paso1_enemy1
+        ;; MOVIMINETO HACIA LA DERECHA
+   ;     ld  a, e_vy(ix)
+  ;      or  a
+ ;       jp  m, movDer_grav_paso1_enemy1
+            ;; NORMAL - GRAVEDAD INVENTIDA
+            ld  hl, #_enemigo1_sp_0
+        ret
+;movDer_grav_paso1_enemy1:
+            ;; NORMAL - GRAVEDAD INVENTIDA
+        ;    ld  hl, #_enemigo1_sp_4
+       ; ret
+
+movIz_paso1_enemy1:
+    ;; MOVIMIENTO HACIA LA IZQUIERDA
+  ;      ld  a, e_vy(ix)
+  ;      or  a
+  ;      jp  m, movIz_grav_paso1_enemy1
+            ;; NORMAL - GRAVEDAD INVENTIDA
+            ld  hl, #_enemigo1_sp_1
+        ret
+;movIz_grav_paso1_enemy2:
+;            ld  hl, #_enemigo1_sp_5
+;        ret
+
+;;
+;; METODO QUE MODIFICA EL SPRITE SEGUN LA DIRECCION A LA QUEMIRA
+;; INPUT: B - PASO 1 O PASO 2 (EFECTO DE ANDAR)
+;; RETURN: HL - DIRECCION DEL SPRITE
+;;
+sprite_enemy1_paso2:
+    ld  a, e_vx(ix)
+    or  a
+    jp  m, movIz_paso2_enemy1
+        ;; MOVIMINETO HACIA LA DERECHA
+ ;       ld  a, e_vy(ix)
+ ;       or  a
+ ;       jp  m, movDer_grav_paso2_enemy1
+            ;; NORMAL - GRAVEDAD INVENTIDA
+            ld  hl, #_enemigo1_sp_2
+        ret
+;movDer_grav_paso2_enemy1:
+;            ;; NORMAL - GRAVEDAD INVENTIDA
+;            ld  hl, #_enemigo1_sp_6
+;        ret
+
+movIz_paso2_enemy1:
+    ;; MOVIMIENTO HACIA LA IZQUIERDA
+ ;       ld  a, e_vy(ix)
+  ;      or  a
+   ;     jp  m, movIz_grav_paso2_enemy1
+            ;; NORMAL - GRAVEDAD INVENTIDA
+            ld  hl, #_enemigo1_sp_3
+        ret
+;movIz_grav_paso2_enemy1:
+ ;           ld  hl, #_enemigo1_sp_7
+  ;      ret
+
+
+
+
+
+
+
+
 
 

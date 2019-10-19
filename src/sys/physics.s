@@ -116,12 +116,10 @@ _update_loop:
 
    ld a, d
    add   e
-   jr nz, equals        ; !=0 hay colisiones en las esquinas 
+   cp    #0
+   jr z, no_mas_saltos        ; !=0 hay colisiones en las esquinas 
 
-		ld	a, #0
-		add	d
-		jr	z, only_collision_corner   					;; SI UNA DE LAS DOS ES 0, LAS DOS LO ERAN (D y E) y por tanto comprobar colisiones en las esquinas
-equals:	;; si no son iguales HA HABIDO COLISION SEGURO
+
 	ld	a, e_ai_st(ix)
 	cp	#e_ai_st_noAI
 	jr	z, continuar_saltando
@@ -149,10 +147,7 @@ continuar_saltando:
    jr no_mas_saltos
 
 
-only_collision_corner:
-   ;; COLISIONES CON LAS ESQUINAS DE LOS OBJETOS
-   call sys_check_collision_corner
-      jr no_mas_saltos
+
 parar_salto_vetical:
    call  end_of_jump
 no_mas_saltos:
@@ -310,34 +305,6 @@ no_colision_X:
 no_colision_Y:
    ret
 
-;;
-;; METODO QUE NOS CALCULA LAS COLISIONES EN LAS 4 ESQUINAS
-;; IMPUT   :  IX: entidad actual
-;; DESTROY :  AF, BC
-;;
-sys_check_collision_corner:
-   ;; si "PUEDE" collision
-   ;; HAGO EL SUPUESTO DE SUMAR LA VELOCIAD EN Y
-   ld a, e_y(ix)                 ;; guardo en A la posicion Y de la entidad
-   add   e_vy(ix)                ;; le sumo la VY
-   ld e_y(ix), a                                ;; se lo aplico a la variable/dato posicion Y de la entidad
-
-   call man_obstacle_getArray          ;; Apunto al primer obstaculo
-   call check_collisions_corner           ;; y al igual que en la colision normal los recorro con: UN EJE YA SUMADO, en este caso el Y
-
-   ld a, d                    ;; como la colision por las esquinas las DOS  se modifican (D y E) cojo una y compruebo si es 0 o no
-   add   #0                      ;; le anyado 0 para activar el FLAG Z
-   jr z, no_colision_X_corner          ;; COLLISION = 0 // NO COLLISION != 0
-      ;; COLISION EN X:
-            ld    a, e_x(ix)
-            sub    d
-            ld    e_x(ix), a              ;; Al aplicarselo en X siempre que entremos por UNA ESQUINA, nos dejara por debajo la cantidad de pixles que hemos entrado simulando la caida dela gravedad
-no_colision_X_corner:               
-   ld a, e_y(ix)                 ;; haya o no colision, vuelvo a dejar la VY como estaba ya que se modifica despues en sys_check_borderScreem
-   sub   e_vy(ix)
-   ld e_y(ix), a
-
-   ret
 
 ;;
 ;; PROCESS COLLISION ENEMY-ENEMY
@@ -346,14 +313,38 @@ no_colision_X_corner:
 ;;        IY - SECOND ENEMY
 ;;
 change_direcction_entity::
-   ;ld a, e_vx(ix)
-   ;neg
-   ;ld e_vx(ix), a
-   ;ld a, e_vx(iy)
-   ;neg
-   ;ld e_vx(iy), a
-
+   ld    a, e_y(ix)
+   cp    e_y(iy)
+   jr    z, change_direcction
+      ;; NO ESTAMOS A LA MISMA ALTURA -- BLOQUEAR A LA QUE ESTA MAS ARRIBA
+      jp    m, iy_on_ix
+         ld    a,  e_vy(iy)
+         neg
+         add   e_y(iy)
+         ld    e_y(iy), a
    ret
+iy_on_ix:
+         ld    a, e_vy(ix)
+         neg
+         add   e_y(ix)
+         ld    e_y(ix), a
+   ret
+change_direcction:
+   ld    a,  e_vx(ix)
+   neg
+   ld    e_vx(ix), a
+
+   ld    a, e_vx(iy)
+   add   e_vx(iy)
+   neg
+   add    e_x(iy)
+   ld    e_x(iy), a
+
+   ld    a, e_vx(iy)
+   neg
+   ld    e_vx(iy), a
+
+ ret
 
 
 ;=====================================================================

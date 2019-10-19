@@ -27,7 +27,9 @@ se_creara_obstaculo: .db #0
 direccion_movimiento: .db #0
 pos_memoria_tile_origen: .dw #0
 
-max_num_muro: .db #40 + 1 
+max_num_tile_muro_hero: .db #37
+max_num_tile_muro_enemigos: .db #39
+
 
 
 
@@ -185,6 +187,7 @@ calcular_combinacion_restos::
 
 
 
+
 ;  ___
 ; |   |
 ; | O |
@@ -204,9 +207,8 @@ get_d_ambos_cero::
    ld   a, (hl)                      ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
    jr z, d_ambos_cero_obst_1
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+   call get_max_num_tile_muro_segun_enemigo_o_hero
    ; si a es menor que d, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -221,9 +223,9 @@ get_d_ambos_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
    jr z, d_ambos_cero_obst_2
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+   call get_max_num_tile_muro_segun_enemigo_o_hero
    ; si a es menor que d, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -237,9 +239,9 @@ get_d_ambos_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
    jr z, d_ambos_cero_obst_3
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+   call get_max_num_tile_muro_segun_enemigo_o_hero
    ; si a es menor que d, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -255,9 +257,9 @@ get_d_ambos_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
    jr z, d_ambos_cero_obst_4
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+   call get_max_num_tile_muro_segun_enemigo_o_hero
    ; si a es menor que d, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -273,9 +275,9 @@ get_d_ambos_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
    jr z, d_ambos_cero_obst_5
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+   call get_max_num_tile_muro_segun_enemigo_o_hero
    ; si a es menor que d, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -291,9 +293,9 @@ get_d_ambos_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
    jr z, d_ambos_cero_obst_6
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+   call get_max_num_tile_muro_segun_enemigo_o_hero
    ; si a es menor que d, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -308,9 +310,9 @@ get_d_ambos_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
    jr z, d_ambos_cero_obst_7
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+   call get_max_num_tile_muro_segun_enemigo_o_hero
    ; si a es menor que d, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -325,9 +327,9 @@ get_d_ambos_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
    ret  z
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+   call get_max_num_tile_muro_segun_enemigo_o_hero
    ; si a es menor que d, significa que no hay obstáculo
    cp b
    ret  c
@@ -472,9 +474,9 @@ get_d_x_no_cero::
    ld   a, (hl)                      ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
    jr z, d_x_no_cero_obst_1
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+   call get_max_num_tile_muro_segun_enemigo_o_hero
    ; si a es menor que b, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -489,9 +491,9 @@ get_d_x_no_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
    jr z, d_x_no_cero_obst_2
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+    call get_max_num_tile_muro_segun_enemigo_o_hero ; a tiene  max_num_tile_muro
    ; si a es menor que b, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -506,9 +508,9 @@ get_d_x_no_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
    jr z, d_x_no_cero_obst_3
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+    call get_max_num_tile_muro_segun_enemigo_o_hero ; a tiene  max_num_tile_muro
    ; si a es menor que b, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -523,9 +525,9 @@ get_d_x_no_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
    jr z, d_x_no_cero_obst_4
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+    call get_max_num_tile_muro_segun_enemigo_o_hero ; a tiene  max_num_tile_muro
    ; si a es menor que b, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -541,9 +543,9 @@ get_d_x_no_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
    jr z, d_x_no_cero_obst_5
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+    call get_max_num_tile_muro_segun_enemigo_o_hero ; a tiene  max_num_tile_muro
    ; si a es menor que b, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -560,9 +562,9 @@ get_d_x_no_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
    jr z, d_x_no_cero_obst_6
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+    call get_max_num_tile_muro_segun_enemigo_o_hero ; a tiene  max_num_tile_muro
    ; si a es menor que b, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -578,9 +580,9 @@ get_d_x_no_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
    jr z, d_x_no_cero_obst_7
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+    call get_max_num_tile_muro_segun_enemigo_o_hero ; a tiene  max_num_tile_muro
    ; si a es menor que b, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -595,9 +597,9 @@ get_d_x_no_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
    jr z, d_x_no_cero_obst_8
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+    call get_max_num_tile_muro_segun_enemigo_o_hero ; a tiene  max_num_tile_muro
    ; si a es menor que b, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -612,9 +614,9 @@ get_d_x_no_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
    jr z, d_x_no_cero_obst_9
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+    call get_max_num_tile_muro_segun_enemigo_o_hero ; a tiene  max_num_tile_muro
    ; si a es menor que b, significa que no hay obstáculo
    cp b
    jr   c, . + 4
@@ -629,9 +631,9 @@ get_d_x_no_cero::
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
    ret z
-   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
    ld b, a ; ahora d tiene el valor del tile
-   ld a, (max_num_muro) ; a tiene max_num_muro
+    call get_max_num_tile_muro_segun_enemigo_o_hero ; a tiene  max_num_tile_muro
    ; si a es menor que b, significa que no hay obstáculo
    cp b
    ret c
@@ -1568,6 +1570,20 @@ get_pos_tile_memoria::
 
    ld bc, #0x4000 ; cargamos en bc la pos inicial en memoria de nuestro tilemap
    add hl, bc     ; y ya sumamos 4000 + x + 20y
+   ret
+
+
+get_max_num_tile_muro_segun_enemigo_o_hero::
+   ld a, e_ai_st(ix) ; obtenemos el tipo de ia, si es el personaje, 
+                     ; podrá salir por la puerta, si son enemigos, 
+                     ; la puerta es un obstáculo más
+   or a ; el tipo de ia del personaje es 0, las demás son de los enemigos, si a == 0, somos el hero, si no, enemigos
+   jr z, es_hero
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld a, (max_num_tile_muro_enemigos)
+   ret
+   es_hero:
+   ld a, (max_num_tile_muro_hero)
    ret
 
 

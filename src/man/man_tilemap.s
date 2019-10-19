@@ -8,7 +8,7 @@
 .globl _tileset_juego_pack_end
 
 decompress_buffer             = 0x4000
-tileset_max_size              = 0x600
+tileset_max_size              = 0x780
 level_max_size                = 0x1F4    ; hay que acordarse de poner en el buildconfig que nuestro código empezará a partir de tileset_max_size + level_max_size, que en este caso es 4F4
 total_max_size                = tileset_max_size + level_max_size
 decompress_buffer_tilemap_end = decompress_buffer + level_max_size - 1

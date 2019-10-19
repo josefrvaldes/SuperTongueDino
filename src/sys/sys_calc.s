@@ -208,3 +208,18 @@ resta_de_a_hl::
    and  a     
    sbc  hl, de
    ret
+
+; Inputs:
+;     a un valor
+;     d otro valor
+; Outputs:
+;     a = 0 si es menor
+;     a = 1 si es mayor o igual
+a_menor_que_d_positivos::
+   cp d
+   jp c, menor
+   mayor_o_igual:
+   ld a, #1
+   menor:
+   ld a, #0
+   ret

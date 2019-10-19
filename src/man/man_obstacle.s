@@ -27,6 +27,9 @@ se_creara_obstaculo: .db #0
 direccion_movimiento: .db #0
 pos_memoria_tile_origen: .dw #0
 
+max_num_muro: .db #40 + 1 
+
+
 
 ;;=======================================================================================
 ;; OBSTACLES
@@ -200,29 +203,49 @@ get_d_ambos_cero::
    ld   d, #0    ; ponemos d a cero porque será nuestro byte de booleanos
    ld   a, (hl)                      ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
-   jr   z, . + 4
+   jr z, d_ambos_cero_obst_1
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que d, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  0, d      ; con esto decimos que queremos CREAR el primer tile
-   
+   d_ambos_cero_obst_1:
+
    ;  ___
    ; | X |
    ; | O |
    ; |___|
    inc  hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
-   or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   or   a        ; si el contenido es cero, no hay obstáculo
+   jr z, d_ambos_cero_obst_2
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que d, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  1, d      ; con esto decimos que queremos CREAR el segundo til
-   
+   d_ambos_cero_obst_2:
    ;  ___
    ; |  X|
    ; | O |
    ; |___|
    inc  hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
-   or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   or   a        ; si el contenido es cero, no hay obstáculo
+   jr z, d_ambos_cero_obst_3
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que d, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  2, d      ; con esto decimos que queremos CREAR el segundo tile   
-   
+   d_ambos_cero_obst_3:
+
    ;  ___
    ; |   |
    ; |XO |
@@ -230,9 +253,16 @@ get_d_ambos_cero::
    ld bc, #18
    add hl, bc
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
-   or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   or   a        ; si el contenido es cero, no hay obstáculo
+   jr z, d_ambos_cero_obst_4
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que d, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  3, d      ; con esto decimos que queremos CREAR el segundo tile   
+   d_ambos_cero_obst_4:
    
    ;  ___
    ; |   |
@@ -241,9 +271,16 @@ get_d_ambos_cero::
    inc hl
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
-   or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   or   a        ; si el contenido es cero, no hay obstáculo
+   jr z, d_ambos_cero_obst_5
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que d, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  4, d      ; con esto decimos que queremos CREAR el segundo tile   
+   d_ambos_cero_obst_5:
    
    ;  ___
    ; |   |
@@ -252,9 +289,16 @@ get_d_ambos_cero::
    ld bc, #18
    add hl, bc
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
-   or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   or   a        ; si el contenido es cero, no hay obstáculo
+   jr z, d_ambos_cero_obst_6
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que d, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  5, d      ; con esto decimos que queremos CREAR el segundo tile   
+   d_ambos_cero_obst_6:
 
    ;  ___
    ; |   |
@@ -262,9 +306,16 @@ get_d_ambos_cero::
    ; |_X_|
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
-   or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   or   a        ; si el contenido es cero, no hay obstáculo
+   jr z, d_ambos_cero_obst_7
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que d, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  6, d      ; con esto decimos que queremos CREAR el segundo tile  
+   d_ambos_cero_obst_7:
 
    ;  ___
    ; |   |
@@ -272,8 +323,14 @@ get_d_ambos_cero::
    ; |__X|
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
-   or   a               ; si el contenido es cero, no hay obstáculo, salimos
+   or   a        ; si el contenido es cero, no hay obstáculo
    ret  z
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que d, significa que no hay obstáculo
+   cp b
+   ret  c
    set  7, d      ; con esto decimos que queremos CREAR el segundo tile  
    ret
 
@@ -414,9 +471,16 @@ get_d_x_no_cero::
    ld   de, #0    ; ponemos d a cero porque será nuestro byte de booleanos
    ld   a, (hl)                      ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
-   jr   z, . + 4
+   jr z, d_x_no_cero_obst_1
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  0, d      ; con esto decimos que queremos CREAR el primer tile
-   
+   d_x_no_cero_obst_1:
+
    ;  ____
    ; | X  |
    ; | O  |
@@ -424,9 +488,16 @@ get_d_x_no_cero::
    inc  hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_x_no_cero_obst_2
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  1, d      ; con esto decimos que queremos CREAR el segundo til
-   
+   d_x_no_cero_obst_2:
+
    ;  ____
    ; |  X |
    ; | O  |
@@ -434,8 +505,15 @@ get_d_x_no_cero::
    inc  hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_x_no_cero_obst_3
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  2, d      ; con esto decimos que queremos CREAR el segundo til
+   d_x_no_cero_obst_3:
    
    ;  ____
    ; |   X|
@@ -444,8 +522,15 @@ get_d_x_no_cero::
    inc  hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_x_no_cero_obst_4
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  3, d      ; con esto decimos que queremos CREAR el segundo til
+   d_x_no_cero_obst_4:
    
    ;  ____
    ; |    |
@@ -455,8 +540,15 @@ get_d_x_no_cero::
    add hl, bc
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_x_no_cero_obst_5
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  4, d      ; con esto decimos que queremos CREAR el segundo tile   
+   d_x_no_cero_obst_5:
    
    ;  ____
    ; |    |
@@ -467,8 +559,15 @@ get_d_x_no_cero::
    inc  hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_x_no_cero_obst_6
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  5, d      ; con esto decimos que queremos CREAR el segundo til  
+   d_x_no_cero_obst_6:
 
    ;  ____
    ; |    |
@@ -478,8 +577,15 @@ get_d_x_no_cero::
    add hl, bc
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_x_no_cero_obst_7
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  6, d      ; con esto decimos que queremos CREAR el segundo tile
+   d_x_no_cero_obst_7:
 
    ;  ____
    ; |    |
@@ -488,8 +594,15 @@ get_d_x_no_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_x_no_cero_obst_8
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  7, e      ; con esto decimos que queremos CREAR el segundo tile
+   d_x_no_cero_obst_8:
 
    ;  ____
    ; |    |
@@ -498,8 +611,15 @@ get_d_x_no_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_x_no_cero_obst_9
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  0, e      ; con esto decimos que queremos CREAR el segundo tile
+   d_x_no_cero_obst_9:
 
    ;  ____
    ; |    |
@@ -508,7 +628,13 @@ get_d_x_no_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   ret z
+   ; si el contenido es mayor que max_num_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   ld a, (max_num_muro) ; a tiene max_num_muro
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   ret c
    set  1, e      ; con esto decimos que queremos CREAR el segundo tile
    ret
 
@@ -1358,7 +1484,9 @@ crear_obstaculos::
    
 
 
-
+get_tipo_tiles_pisados::
+   ld a, (pos_memoria_tile_origen)
+   ret
 
 
 
@@ -1389,7 +1517,6 @@ get_pos_tile_memoria_by_tile::
 
    ld bc, #0x4000 ; cargamos en bc la pos inicial en memoria de nuestro tilemap
    add hl, bc     ; y ya sumamos 4000 + x + 20y
-
    ret
    
 
@@ -1441,5 +1568,18 @@ get_pos_tile_memoria::
 
    ld bc, #0x4000 ; cargamos en bc la pos inicial en memoria de nuestro tilemap
    add hl, bc     ; y ya sumamos 4000 + x + 20y
+   ret
 
+
+
+; Recibe una x y una y del mapa (en tiles) y devuelve la posición de memoria
+; donde se encuentra ese tile en el tilemap en memoria.
+; Input 
+;     pos_memoria_tile_origen cargada
+; Output
+;     a: valor del tile
+; Destroys
+;     a
+get_valor_tile_por_pos_memoria_cargada::
+   ld a, (pos_memoria_tile_origen)
    ret

@@ -156,3 +156,48 @@ sys_eren_clearScreen::
       ld   l, e
       ld  bc, #0x4000  
       jp cpct_memset_f64_asm
+
+
+
+
+
+
+
+;; Draw easter egg plant
+;; Input: IY -> pointer to dirt Sprite, A -> initialHeight , B-> initialPositionY
+;; Destroy: DE, BC, HL, A
+sys_eren_drawPlant::
+      ;; Calcular puntero a memoria de video
+      ex    af, af'
+      ld    de, #screen_start
+      ld    c, #28
+      call  cpct_getScreenPtr_asm
+      ; Drae Entity Sprite
+      ex    af, af'  ;; para evitar borrar A en el call
+      ex    de, hl
+      ld    l, 0(iy)
+      ld    h, 1(iy)
+      ld    c, #24
+      ld    b, a
+      call cpct_drawSprite_asm
+      ret
+
+
+;; Draw the dirt of easter egg plant
+;; Input: IY -> pointer to dirt Sprite
+;; Destroy: DE, BC, HL, A
+sys_eren_DrawDirtOfPlant::
+      ld    de, #screen_start
+      ld    c, #25
+      ld    a, #137
+      ld    b, a
+      call  cpct_getScreenPtr_asm
+      ; Drae Entity Sprite
+      ex    de, hl
+      ld    l, 0(iy)
+      ld    h, 1(iy)
+      ld    c, #30
+      ld    a, #8
+      ld    b, a
+      call cpct_drawSprite_asm
+      ret

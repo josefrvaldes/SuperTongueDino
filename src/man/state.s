@@ -13,7 +13,7 @@ ent_input_ESC_pressed:: .db 0
 
 
 
-estado: .db #0   ; 0 -> Game,  1 -> main menu, 2 -> muerte guinyo
+estado: .db #0   ; 1 -> Game,  0 -> main menu, 2 -> muerte guinyo
 estado_anterior: .db #0
 
 

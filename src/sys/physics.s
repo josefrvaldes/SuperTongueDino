@@ -615,20 +615,15 @@ physics_IA_enemigos:
 	ld 	a, (#col_hay_colision_top)
 	dec 	a
 	jr 	nz, comprobar_vel_Y
-	;jr	nz, no_mas_saltos  ;; se comprueba si el enemigo rebota
-	;ld a, d
-	;or a
-	;jr z, comprobar_vel_Y   ;; se comprueba si colisiona en X, en caso afirmativo se le niega la vx
 	ld  	a, e_vx(ix)
 	neg
 	ld  	e_vx(ix), a
+
 	comprobar_vel_Y:
 	ld 	a, (#col_hay_colision_left)
 	dec 	a
 	ret	nz
-	;ld a, c
-	;or a
-	;jr z, no_mas_saltos	;; se comprueba si colisiona en Y, en caso afirmativo se le niega la vy
+
 	ld  	a, e_vy(ix)
 	neg
 	ld  	e_vy(ix), a
@@ -636,16 +631,15 @@ physics_IA_enemigos:
 
 	; IA PATRULLAR
 	enemigo_patrullar_physic:
-	ld	a, e_ai_st(ix)
-	cp	#e_ai_st_patrullar
+	ld	  a, e_ai_st(ix)
+	cp	  #e_ai_st_patrullar
 	ret	nz
 	ld 	a, (#col_hay_colision_top)
 	dec 	a
-	jr 	nz, patrullar_comprobar_vel_Y
+	ret   nz
 	ld  	a, e_vx(ix)
 	neg
 	ld  	e_vx(ix), a
-	patrullar_comprobar_vel_Y: ; -> no puede ser ya que si entra a este call hay colision con algo
 	ret
 
 
@@ -664,7 +658,7 @@ sys_check_borderScreem_patrullar:
 	ld  a, #10
 	ld  e_ai_pausaVel(ix), a
 
-	ld 	a, (#col_hay_colision_left)
+	ld 	a, (#col_hay_colision_left) ;; comprobar si estas en el aire para moverte
 	dec 	a
 	ret 	nz
 
@@ -678,43 +672,19 @@ patrullar_reiniciarPausa:
 	ret
 
 
+
 ;; UPDATE Y
 sys_check_borderScreem_patrullar_Y:
 	;; UPDATE Y
-	ld	a, #screen_height + 1
-	sub	e_h(ix)
-	ld	c, a
-	ld	a, e_y(ix)
-	add	e_vy(ix)
-	cp	c
-	jr	nc, invalid_y_patrullar
-valid_y_patrullar:
-	ld	e_y(ix), a
-	jr endif_y_patrullar
-invalid_y_patrullar:
-	ld 	a, #1
-	ld 	(#col_hay_colision_left), a
-endif_y_patrullar:
+	ld	  a, e_y(ix)
+	add  e_vy(ix)
+	ld	  e_y(ix), a
 	ret
 
 ;; UPDATE X
 sys_check_borderScreem_patrullar_X:
-	;; UPDATE X
-	ld	a, #screen_width + 1
-	sub	e_w(ix)
-	ld	c, a
-
-	ld	a, e_x(ix)
-	add	e_vx(ix)
-	cp	c
-	jr	nc, invalid_x_patrullar
-valid_x_patrullar:
-	ld	e_x(ix), a
-	jr endif_x_patrullar
-invalid_x_patrullar:
-	ld	a, e_vx(ix)
-	neg				;; para cambiar a negativo
-	ld	e_vx(ix), a
-endif_x_patrullar:
+	ld	  a, e_x(ix)
+	add  e_vx(ix)
+	ld	  e_x(ix), a
 	ret
 	

@@ -582,8 +582,8 @@ sys_ai_patrullar:
 	call sys_ai_detectarJugador
 	dec	a
 	jr	nz, patrullar_noAvisar
-	ld	a, #1
-	ld	(patrullar_llamaPerseguir), a
+	;ld	a, #1						;; descomentar para que las patrullas llamen a perseguir 
+	;ld	(patrullar_llamaPerseguir), a
 	ret
 	patrullar_noAvisar:
 	ld	a, #0

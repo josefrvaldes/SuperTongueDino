@@ -9,6 +9,7 @@
 .include "man/entity.h.s"
 .include "ent/entity.h.s"
 
+.globl _hero_sp_1
 .globl _planta_sp_0
 .globl _planta_sp_1
 .globl _planta_sp_2
@@ -40,6 +41,12 @@ man_deadAnimation_init::
 	ld	(ent_input_ESC_pressed), a
 	ld	a, #137
 	ld	(initialPositionY), a  
+
+	call man_entity_getArray
+	ld	hl, #_hero_sp_1
+	ld	e_pspr_l(ix), l
+	ld	e_pspr_h(ix), h
+
 
 
 	ld	a, (nivel)
@@ -90,7 +97,7 @@ man_deadAnimation_render::
 	dec	a
 	jr	z, EasterEgg_render
 	; algo
-	jr 	deadAnimation_continue_render
+	jr 	NoEasterEgg_render
 EasterEgg_render:
 	;; DIBUJAE PLANTA
 	ld  	iy, #spritePtrPlanta
@@ -107,14 +114,13 @@ EasterEgg_render:
 
       ld	a, (animationPlantScene)
       cp	#2
-      jr	z, deadAnimation_continue_render
+      ret	z
       ;; DIBUJAR ENTIDADES
       call man_entity_getArray
       ld	a, #1
 	call sys_eren_update ;; pinta tambien los enemigos
 
-deadAnimation_continue_render:
-
+NoEasterEgg_render:
 	ret
 
 
@@ -193,7 +199,8 @@ man_deadAnimation_EGG:
 
 
 man_deadAnimation_NoEGG:
-	;; llamar animacion de explosion jugador
+	ld	a, #1
+	ld	(endAnimation), a
 
 	;; descontar vidas
 	

@@ -66,8 +66,7 @@ _next_iy:
 _hero:
 		;call process_dead_hero
 		cpctm_setBorder_asm HW_RED
-		;ld	a, #2
-		;call man_state_setEstado  ;; cambia el estado
+		;;ld	e_dead(ix), #1			-> DESCOMENTAR PARA MORIR EL JUGADOR
 
 		jr	__no_collision
 _no_hero:

@@ -22,13 +22,10 @@ check_collisions_VX::
     ld  (#col_hay_colision_left), a
 _update_loopVX:
     ;; COLISIONES EJE X
-    ld  a, e_x(ix)                                      ;; A = E_X
-    add e_vx(ix)                                            
-    ld  c, a                                            ;; Guardamos en C el valor de E_X + E_VX
-    ld  a, e_vx(ix)             
-    sub c                                               ;; E_VX - (E_X + E_VX)
+    ld  a, e_vx(ix)                                      ;; A = E_X  
+    cp  #0                                           ;; E_VX - (E_X + E_VX)
     jr  z, no_collision_VX                              ;; SI 0 = NO COLLISION 
-    jr  c, check_collision_left                         ;; SI MAYOR 0 = COLLISION LEFT
+    jp  p, check_collision_left                         ;; SI MAYOR 0 = COLLISION LEFT
         ;;velocidad negativa
         call sys_colision_right                         ;; CALL COLLISION RIGHT
         jr no_collision_VX
@@ -64,13 +61,10 @@ check_collisions_VY::
     ;ld  (#col_hay_colision_left), a
 _update_loopVY:
     ;; COLISIONES EJE Y
-    ld  a, e_y(ix)
-    add e_vy(ix)
-    ld  c, a
-    ld  a, e_vy(ix)
-    sub c                                               ;; E_VY- (E_Y + E_VY)
+    ld  a, e_vy(ix)                                             ;; E_VY- (E_Y + E_VY)
+    cp  #0
     jr  z, no_collision_VY  
-    jr  c, check_collision_top                          ;; velocidad positiva
+    jp  p, check_collision_top                          ;; velocidad positiva
         ;;velocidad negativa
         call sys_colision_bottom
         jr no_collision_VY
@@ -298,17 +292,6 @@ no_collision_EY:
 
 no_collision_EY_EW:
     ret
-
-
-
-
-
-check_collisions_entity::
-
-
-
-    ret
-
 
 
 

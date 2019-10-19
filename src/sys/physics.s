@@ -139,21 +139,10 @@ equals:	;; si no son iguales HA HABIDO COLISION SEGURO
 
 
 continuar_saltando:
-    		ld  a, e_y(ix)
-    		add e_vy(ix)
-    		ld  c, a
     		ld  a, e_vy(ix)
-    		sub c
+         cp   #0
     		jr	z, no_mas_saltos
-    		jr  nc, parar_salto_vetical  						;; velocidad positiva
-
-         ld  a, e_y(ix)
-         add e_vy(ix)
-         ld  c, a
-         ld  a, e_vy(ix)
-         sub c
-         jr z, no_mas_saltos
-         jr  nc, parar_salto_vetical                  ;; velocidad positiva
+    		jp  m, parar_salto_vetical  						;; velocidad positiva
 
       call check_jump_table_update
 
@@ -388,12 +377,12 @@ no_colision_X_corner:
 ;;        IY - SECOND ENEMY
 ;;
 change_direcction_entity::
-   ld a, e_vx(ix)
-   neg
-   ld e_vx(ix), a
-   ld a, e_vx(iy)
-   neg
-   ld e_vx(iy), a
+   ;ld a, e_vx(ix)
+   ;neg
+   ;ld e_vx(ix), a
+   ;ld a, e_vx(iy)
+   ;neg
+   ;ld e_vx(iy), a
 
    ret
 

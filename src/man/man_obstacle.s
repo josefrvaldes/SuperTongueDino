@@ -809,9 +809,16 @@ get_d_y_no_cero::
    ld   de, #0    ; ponemos d a cero porque será nuestro byte de booleanos
    ld   a, (hl)                      ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
-   jr   z, . + 4
+   jr z, d_y_no_cero_obst_1
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  0, d      ; con esto decimos que queremos CREAR el primer tile
-   
+   d_y_no_cero_obst_1:
+
    ;  ___
    ; | X |
    ; | O |
@@ -820,8 +827,15 @@ get_d_y_no_cero::
    inc  hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_y_no_cero_obst_2
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  1, d      ; con esto decimos que queremos CREAR el segundo til
+   d_y_no_cero_obst_2:
    
    ;  ___
    ; |  X|
@@ -831,8 +845,15 @@ get_d_y_no_cero::
    inc  hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_y_no_cero_obst_3
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  2, d      ; con esto decimos que queremos CREAR el segundo til
+   d_y_no_cero_obst_3:
    
    ;  ___
    ; |   |
@@ -843,8 +864,15 @@ get_d_y_no_cero::
    add hl, bc
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_y_no_cero_obst_4
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  3, d      ; con esto decimos que queremos CREAR el segundo tile
+   d_y_no_cero_obst_4:
    
    ;  ___
    ; |   |
@@ -855,8 +883,15 @@ get_d_y_no_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_y_no_cero_obst_5
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  4, d      ; con esto decimos que queremos CREAR el segundo tile
+   d_y_no_cero_obst_5:
    
    ;  ___
    ; |   |
@@ -867,8 +902,15 @@ get_d_y_no_cero::
    add hl, bc
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_y_no_cero_obst_6
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  5, d      ; con esto decimos que queremos CREAR el segundo tile
+   d_y_no_cero_obst_6:
    
    ;  ___
    ; |   |
@@ -879,8 +921,15 @@ get_d_y_no_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_y_no_cero_obst_7
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  6, d      ; con esto decimos que queremos CREAR el segundo tile  
+   d_y_no_cero_obst_7:
    
    ;  ___
    ; |   |
@@ -891,8 +940,15 @@ get_d_y_no_cero::
    add hl, bc
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_y_no_cero_obst_8
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  7, d      ; con esto decimos que queremos CREAR el segundo tile 
+   d_y_no_cero_obst_8:
    
    ;  ___
    ; |   |
@@ -902,8 +958,15 @@ get_d_y_no_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_y_no_cero_obst_9
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  0, e      ; con esto decimos que queremos CREAR el segundo tile
+   d_y_no_cero_obst_9:
    
    ;  ___
    ; |   |
@@ -913,7 +976,13 @@ get_d_y_no_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   ret z
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   ret  c
    set  1, e      ; con esto decimos que queremos CREAR el segundo tile
    ret
 
@@ -1101,8 +1170,15 @@ get_d_ninguno_cero::
    ld   de, #0    ; ponemos d a cero porque será nuestro byte de booleanos
    ld   a, (hl)                      ; cargamos en a el contenido del tile destino
    or   a        ; si el contenido es cero, no hay obstáculo
-   jr   z, . + 4
+   jr z, d_ninguno_cero_obst_1
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  0, d      ; con esto decimos que queremos CREAR el primer tile
+   d_ninguno_cero_obst_1:
    
    ;  ____
    ; | X  |
@@ -1112,8 +1188,15 @@ get_d_ninguno_cero::
    inc  hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_ninguno_cero_obst_2
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  1, d      ; con esto decimos que queremos CREAR el segundo tile
+   d_ninguno_cero_obst_2:
    
    ;  ____
    ; |  X |
@@ -1123,8 +1206,15 @@ get_d_ninguno_cero::
    inc  hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_ninguno_cero_obst_3
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  2, d      ; con esto decimos que queremos CREAR el segundo tile
+   d_ninguno_cero_obst_3:
    
    ;  ____
    ; |   X|
@@ -1134,8 +1224,15 @@ get_d_ninguno_cero::
    inc  hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_ninguno_cero_obst_4
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  3, d      ; con esto decimos que queremos CREAR el segundo tile
+   d_ninguno_cero_obst_4:
    
    ;  ____
    ; |    |
@@ -1146,8 +1243,15 @@ get_d_ninguno_cero::
    add hl, bc
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_ninguno_cero_obst_5
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  4, d      ; con esto decimos que queremos CREAR el segundo tile
+   d_ninguno_cero_obst_5:
    
    ;  ____
    ; |    |
@@ -1159,8 +1263,15 @@ get_d_ninguno_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_ninguno_cero_obst_6
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  5, d      ; con esto decimos que queremos CREAR el segundo tile
+   d_ninguno_cero_obst_6:
    
    ;  ____
    ; |    |
@@ -1171,8 +1282,15 @@ get_d_ninguno_cero::
    add hl, bc
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_ninguno_cero_obst_7
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  6, d      ; con esto decimos que queremos CREAR el segundo tile
+   d_ninguno_cero_obst_7:
    
    ;  ____
    ; |    |
@@ -1184,8 +1302,15 @@ get_d_ninguno_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_ninguno_cero_obst_8
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  7, d      ; con esto decimos que queremos CREAR el segundo tile  
+   d_ninguno_cero_obst_8:
    
    ;  ____
    ; |    |
@@ -1196,8 +1321,15 @@ get_d_ninguno_cero::
    add hl, bc
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_ninguno_cero_obst_9
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  0, e      ; con esto decimos que queremos CREAR el segundo tile
+   d_ninguno_cero_obst_9:
 
    
    ;  ____
@@ -1208,8 +1340,15 @@ get_d_ninguno_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_ninguno_cero_obst_10
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  1, e      ; con esto decimos que queremos CREAR el segundo tile  
+   d_ninguno_cero_obst_10:
 
    
    ;  ____
@@ -1220,8 +1359,15 @@ get_d_ninguno_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   jr z, d_ninguno_cero_obst_11
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   jr   c, . + 4
    set  2, e      ; con esto decimos que queremos CREAR el segundo tile  
+   d_ninguno_cero_obst_11:
 
    
    ;  ____
@@ -1232,7 +1378,13 @@ get_d_ninguno_cero::
    inc hl
    ld   a, (hl)         ; cargamos en a el contenido del tile destino
    or   a               ; si el contenido es cero, no hay obstáculo, salimos
-   jr   z, . + 4
+   ret z
+   ; si el contenido es mayor que  max_num_tile_muro no hay obstáculo
+   ld b, a ; ahora d tiene el valor del tile
+   call get_max_num_tile_muro_segun_enemigo_o_hero
+   ; si a es menor que b, significa que no hay obstáculo
+   cp b
+   ret c
    set  3, e      ; con esto decimos que queremos CREAR el segundo tile  
    ret
 

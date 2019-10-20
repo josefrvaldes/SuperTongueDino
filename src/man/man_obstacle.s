@@ -23,10 +23,11 @@ nueva_x: .db #0
 nueva_y: .db #0
 x_tile:  .db #0
 y_tile:  .db #0
-se_creara_obstaculo: .db #0
-direccion_movimiento: .db #0
-pos_memoria_tile_origen: .dw #0
 
+pos_memoria_tile_origen:: .dw #0
+
+valor_puerta_1 = 39 - 1 ; el valor del tile en el tmx no corresponde con el de la memoria, es 1 menos
+valor_puerta_2 = 40 - 1 
 max_num_tile_muro_hero: .db #37
 max_num_tile_muro_enemigos: .db #39
 
@@ -1638,11 +1639,6 @@ crear_obstaculos::
    
 
 
-get_tipo_tiles_pisados::
-   ld a, (pos_memoria_tile_origen)
-   ret
-
-
 
 ; Recibe una x y una y del mapa (en tiles) y devuelve la posición de memoria
 ; donde se encuentra ese tile en el tilemap en memoria.
@@ -1739,15 +1735,170 @@ get_max_num_tile_muro_segun_enemigo_o_hero::
    ret
 
 
+man_obstacle_get_valor_tile_x_no_cero:
+   ld hl, (#pos_memoria_tile_origen)
+   ld  a, (hl)
+   or a  ; comprobamos si era fondo
+   jr nz, x_no_cero_no_era_fondo ; el primer tile no es fondo
+   inc hl ; pasamos al tile de al lado
+   ld  a, (hl)
+   or a
+   ret z         ; si llegamos aquí significa que los dos primeros tiles eran fondo, nos salimos pq a ya vale cero
+                 ; si llegamos aquí significa que ninguno de los dos primeros tiles era fondo, así que hay que decrementar hl
+   dec hl        ; esto de incrementar para luego decrementar es porque la mayoría de las veces ambos serán fondo, así que es
+   ld  a, (hl)   ; conveniente descartar esto primero que además tiene muy poco coste computacional, antes que analizar primero el primer tile entero y luego el segundo entero
+
+
+   x_no_cero_no_era_fondo:
+      ld b, #valor_puerta_1
+      cp b 
+      jr z, x_no_cero_era_puerta
+
+      ; no era la puerta 1
+      ld b, #valor_puerta_2
+      cp b 
+      jr z, x_no_cero_era_puerta
+
+      inc hl
+      ld a, (hl)
+      ld b, #valor_puerta_1
+      cp b 
+      jr z, x_no_cero_era_puerta
+
+      ; no era la puerta 1
+      ld b, #valor_puerta_2
+      cp b 
+      jr z, x_no_cero_era_puerta
+      jr x_no_cero_era_pincho
+   x_no_cero_era_pincho:
+   ld a, #1
+   ret
+   x_no_cero_era_puerta:
+   ld a, #2
+   ret
+
+
+man_obstacle_get_valor_tile_y_no_cero:
+
+   ld hl, (#pos_memoria_tile_origen)
+   ld  a, (hl)
+   or a  ; comprobamos si era fondo
+   jr nz, y_no_cero_no_era_fondo ; el primer tile no es fondo
+   ld bc, #20
+   add hl, bc ; pasamos al tile de abajo
+   ld  a, (hl)
+   or a
+   ret z         ; si llegamos aquí significa que los dos primeros tiles eran fondo, nos salimos pq a ya vale cero
+                 ; si llegamos aquí significa que ninguno de los dos primeros tiles era fondo, así que hay que decrementar hl
+   ld hl, (#pos_memoria_tile_origen) ; esto de incrementar para luego decrementar es porque la mayoría de las veces ambos serán fondo, así que es
+   ld  a, (hl)   ; conveniente descartar esto primero que además tiene muy poco coste computacional, antes que analizar primero el primer tile entero y luego el segundo entero
+
+
+   y_no_cero_no_era_fondo:
+      ld b, #valor_puerta_1
+      cp b 
+      jr z, y_no_cero_era_puerta
+
+      ; no era la puerta 1
+      ld b, #valor_puerta_2
+      cp b 
+      jr z, y_no_cero_era_puerta
+
+      ld bc, #20
+      add hl, bc
+      ld a, (hl)
+      ld b, #valor_puerta_1
+      cp b 
+      jr z, y_no_cero_era_puerta
+
+      ; no era la puerta 1
+      ld b, #valor_puerta_2
+      cp b 
+      jr z, y_no_cero_era_puerta
+      jr y_no_cero_era_pincho
+   y_no_cero_era_pincho:
+   ld a, #1
+   ret
+   y_no_cero_era_puerta:
+   ld a, #2
+   ret
+
+
+
 
 ; Recibe una x y una y del mapa (en tiles) y devuelve la posición de memoria
 ; donde se encuentra ese tile en el tilemap en memoria.
 ; Input 
 ;     pos_memoria_tile_origen cargada
 ; Output
-;     a: valor del tile
+;     a devolverá:
+;        0 si fondo
+;        1 si pincho
+;        2 si puerta
 ; Destroys
 ;     a
-get_valor_tile_por_pos_memoria_cargada::
-   ld a, (pos_memoria_tile_origen)
+man_obstacle_get_valor_tile_por_pos_memoria_cargada::
+   call calcular_combinacion_restos ; en a, cargamos la combinación de restos
+   or a
+   jr z, get_valor_tile_ambos_cero
+   dec a
+   jr z, get_valor_tile_x_no_cero
+   dec a
+   jr z, get_valor_tile_y_no_cero
+   dec a
+   jr z, get_valor_tile_ninguno_cero
+
+   get_valor_tile_ambos_cero:
+      ld hl, (#pos_memoria_tile_origen)
+      ld  a, (hl)
+      or a  ; comprobamos si era fondo
+      ret z ; sí era fondo nos salimos porque a ya vale 0
+
+      ld b, #valor_puerta_1
+      cp b 
+      jr z, era_puerta
+
+      ; no era la puerta 1
+      ld b, #valor_puerta_2
+      cp b 
+      jr z, era_puerta
+      jr era_pincho
+
+
+   get_valor_tile_x_no_cero:
+   call man_obstacle_get_valor_tile_x_no_cero
    ret
+
+   get_valor_tile_y_no_cero:
+   call man_obstacle_get_valor_tile_y_no_cero
+   ret
+
+   get_valor_tile_ninguno_cero:
+   call man_obstacle_get_valor_tile_x_no_cero  ; obtenemos el valor del eje x
+   or a        ; si ha sido cero, todavía no podemos saber si hemos pisado puerta o pinchos
+   call z, man_obstacle_get_valor_tile_y_no_cero ; si era fondo, miramos el eje y
+   ret  ; volvemos
+
+
+   era_pincho:
+      ld a, #1
+      ret
+
+   era_puerta:
+      ld a, #2
+      ret
+
+
+; Input
+;     a, valor de un tile en memoria
+; Output
+;     a vale 1 si es puerta o 0 si no
+; get_es_puerta::
+;    ld b, #valor_puerta_1
+;    cp b
+;    jr z,    ; sí es puerta
+;    ld a, #0
+;    ret
+
+;    ld a, #1
+;    ret

@@ -8,6 +8,8 @@
 .include "man/man_obstacle.h.s"
 .include "sys/collisions.h.s"
 .include "man/sprite.h.s"
+.include "man/man_level.h.s"
+.include "man/man_tilemap.h.s"
 .include "sys/sys_calc.h.s"
 .include "man/game.h.s" ; cambiar por man_obstacles
 
@@ -104,6 +106,8 @@ _update_loop:
    cp    #1                            
    jr    z, continuar_actualizar_pos   ;; lo que implica que pasaremos a la siguiente entidad
 
+   cpctm_setBorder_asm HW_GREEN
+
    push ix
    call man_obstacle_re_rellenar_array
    call man_obstacle_getArray ; como en la llamada anterior hemos consultado los arrays, nos posicionamos de nuevo en la primera posición
@@ -113,7 +117,24 @@ _update_loop:
    ;; COLISIONES CON LOS OBJETOS
    call sys_check_collision
 
+   call man_obstacle_get_valor_tile_por_pos_memoria_cargada
+   or a
+   jr z, todo_fondo
+   dec a
+   jr z, morir
+   dec a
+   jr z, pasar_nivel
 
+   pasar_nivel:
+   call man_level_load_next
+   call man_tilemap_descomprimir_nuevo_nivel
+   call man_tilemap_render
+   jr todo_fondo
+
+   morir:
+   ld e_dead(ix), #1
+
+   todo_fondo:
    ld a, d
    add   e
    cp    #0
@@ -164,7 +185,7 @@ no_mas_saltos:
 
 
 
-   cpctm_setBorder_asm HW_GREEN
+   ;cpctm_setBorder_asm HW_GREEN
 
 
 	_ent_counter = . + 1

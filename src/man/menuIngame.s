@@ -9,7 +9,7 @@
 
 string_menuIngame_info: .asciz "MENU INGAME / PAUSE"
 string_menuIngame_continuar: .asciz "Press M to continue"
-string_menuIngame_salir: .asciz "Press ESC to exit"
+string_menuIngame_salir: .asciz "Press ESC/Fire2 to exit"
 
 
 ;//////////// INTI
@@ -106,6 +106,10 @@ M_NotPressed_menuIngame:
 M_Holded_OrPressed_menuIngame:
 
 
+	ld	hl, #Joy0_Fire2		;; JoyStick
+	call cpct_isKeyPressed_asm
+	jr	nz, Esc_Pressed_menuIngame
+Joy0_Fire2_NotPressed_menuIngame:
 
 	ld	hl, #Key_Esc
 	call cpct_isKeyPressed_asm

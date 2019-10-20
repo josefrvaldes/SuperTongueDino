@@ -79,23 +79,28 @@ man_mainMenu_render::
 mainMenu_input:
 	call cpct_scanKeyboard_f_asm
 
+	ld	hl, #Joy0_Fire1
+	call cpct_isKeyPressed_asm
+	jr	nz, Q_Pressed_mainMenu
+Joy0_Fire1_NotPressed_mainMenu:
+
 	ld	hl, #Key_Q
 	call cpct_isKeyPressed_asm
 	jr	z, Q_NotPressed_mainMenu
 Q_Pressed_mainMenu:
 	ld 	a, (ent_input_Q_pressed)  ;; se comprueba si estaba pulsada anteriormente
 	dec	a
-	jr	z, M_Holded_OrPressed_mainMenu
+	jr	z, Q_Holded_OrPressed_mainMenu
 
 	ld	a, #1
 	call man_state_setEstado  ;; cambia el estado
 
 	ld	(ent_input_Q_pressed), a
-	jr	M_Holded_OrPressed_mainMenu
+	jr	Q_Holded_OrPressed_mainMenu
 Q_NotPressed_mainMenu:
 	ld	a, #0
 	ld	(ent_input_Q_pressed), a
-M_Holded_OrPressed_mainMenu:
+Q_Holded_OrPressed_mainMenu:
 
 
 	ret

@@ -40,6 +40,11 @@ no_guardar_VX:
 	call cpct_scanKeyboard_f_asm
 
 
+	ld	hl, #Joy0_Left		;; JoyStick
+	call cpct_isKeyPressed_asm
+	jr	nz, O_Pressed
+Joy0_Left_NotPressed:
+
 	ld	hl, #Key_O
 	call cpct_isKeyPressed_asm
 	jr	z, O_NotPressed
@@ -50,6 +55,12 @@ O_Pressed:
 		jr	z, O_NotPressed   ;; si da 0, estamos haciendo el salto lateral con la jump talbr
 			ld	e_vx(ix), #-1
 O_NotPressed:
+
+
+	ld	hl, #Joy0_Right		;; JoyStick
+	call cpct_isKeyPressed_asm
+	jr	nz, P_Presed
+Joy0_Right_NotPressed:
 
 	ld	hl, #Key_P
 	call cpct_isKeyPressed_asm
@@ -83,7 +94,11 @@ L_NotPressed:
 ;Space_NotPressed:
 
 
-	
+	ld	hl, #Joy0_Fire1		;; JoyStick
+	call cpct_isKeyPressed_asm
+	jr	nz, Q_Pressed
+Joy0_Fire1_NotPressed:
+
 	ld	hl, #Key_Q
 	call cpct_isKeyPressed_asm
 	jr	z, Q_NotPressed
@@ -127,6 +142,11 @@ M_Holded_OrPressed:
 
 
 
+
+	ld	hl, #Joy0_Fire2		;; JoyStick
+	call cpct_isKeyPressed_asm
+	jr	nz, A_Pressed
+Joy0_Fire2_NotPressed:
 
 	ld	hl, #Key_A
 	call cpct_isKeyPressed_asm

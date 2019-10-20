@@ -117,24 +117,11 @@ _update_loop:
    ;; COLISIONES CON LOS OBJETOS
    call sys_check_collision
 
-   call man_obstacle_get_valor_tile_por_pos_memoria_cargada
-   or a
-   jr z, todo_fondo
-   dec a
-   jr z, morir
-   dec a
-   jr z, pasar_nivel
+;================================================================================
+;; ESTO ES LO TUYO VALDES !!!!!!!!!!!!!!!!!!!!!!!!!1
+   call check_diferent_obstacles
+;=================================================================================
 
-   pasar_nivel:
-   call man_level_load_next
-   call man_tilemap_descomprimir_nuevo_nivel
-   call man_tilemap_render
-   jr todo_fondo
-
-   morir:
-   ld e_dead(ix), #1
-
-   todo_fondo:
    ld a, d
    add   e
    jr nz, equals        ; !=0 hay colisiones en las esquinas 
@@ -204,6 +191,32 @@ no_mas_saltos:
    jr _update_loop
 ;; FIN  -- sys_physics_update --
 ;; ---------------------------------------------------------------------------------------------------------------------------------------------------- ;;
+
+
+
+;;
+;;
+;;
+check_diferent_obstacles:
+   call man_obstacle_get_valor_tile_por_pos_memoria_cargada
+   or a
+   jr z, todo_fondo
+   dec a
+   jr z, morir
+   dec a
+   jr z, pasar_nivel
+
+   pasar_nivel:
+   call man_level_load_next
+   call man_tilemap_descomprimir_nuevo_nivel
+   call man_tilemap_render
+   jr todo_fondo
+
+   morir:
+   ld e_dead(ix), #1
+
+   todo_fondo:
+ ret
 
 
 

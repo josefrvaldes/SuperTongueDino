@@ -16,6 +16,7 @@
 .include "man_invisibility.h.s"
 .include "sys/sys_collision_entity.h.s"
 .include "man/sprite.h.s"
+.include "sys/sys_deleteEntity.h.s"
 ;.include "man/sprite.h.s"
 
 .module game_manager
@@ -106,22 +107,6 @@ man_game_init::
 ;; Destroy: -
 man_game_update::				;; MEJORAR!!! esto ya que estoy pasando IX al update y se puede pasar en el Init
 
-	;ld	a, e_x(ix)
-	;add	e_vx(ix)
-	;ld	c, a
-	;ld	a, e_vx(ix)
-	;sub	c
-	;jr	z, continuar
-	;jr	c, sprite_1
-	;	ld	hl, #_hero_sp_1
-	;	ld	e_pspr_l(ix), l
-	;	ld	e_pspr_h(ix), h
-	;	jr continuar
-;sprite_1:
-;	ld	hl, #_hero_sp_0
-;	ld	e_pspr_l(ix), l
-;	ld	e_pspr_h(ix), h
-;continuar:
 
 	ld a, (#bool_mostrar_menu) ;; comprobacion menu ingame abierto
 	dec a
@@ -154,6 +139,10 @@ man_game_update::				;; MEJORAR!!! esto ya que estoy pasando IX al update y se p
 	cpctm_setBorder_asm HW_ORANGE
 	call man_entity_getArray
 	call sys_collision_entity_update
+
+	cpctm_setBorder_asm HW_BLACK
+	call man_entity_getArray
+	call sys_delete_entity
 	cpctm_setBorder_asm HW_WHITE
 
 	ret

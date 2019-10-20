@@ -76,3 +76,11 @@ man_entity_create::
 	ldir
 
 	ret
+
+
+man_entity_delete::
+	ld	a, (_entity_num)
+	dec	a
+	ld 	(_entity_num), a
+
+	ret

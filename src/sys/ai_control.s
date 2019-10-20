@@ -141,6 +141,13 @@ _ent_array_ptr = . + 2
 	
 
 _loop:
+
+   ld    a, e_dead(ix)                 ;; se crean con valor = 0 (vivos), con el valor =1 (muertas)
+   cp    #0                            
+   jr    nz, _no_AI_ent   ;; lo que implica que pasaremos a la siguiente entidad
+
+
+
 	ld	a, e_ai_st(ix)
 	cp	#e_ai_st_noAI
 	jr	z, _no_AI_ent

@@ -148,4 +148,48 @@ A_NotPressed:
 A_Holded_OrPressed:
 
 
+
+
+
+
+;	ld	hl, #Key_W
+;	call cpct_isKeyPressed_asm
+;	jr	z, W_NotPressed
+;W_Pressed:
+;
+;			ld	e_vy(ix), #-1
+;W_NotPressed:
+;
+;	ld	hl, #Key_S
+;	call cpct_isKeyPressed_asm
+;	jr	z, S_NotPressed
+;S_Presed:
+;			ld	e_vy(ix), #1
+;S_NotPressed:
+
+
+;; COMPROBCION DE LAS MUERTES DE LOS ENEMIGOS
+;	ld	hl, #Key_D
+;	call cpct_isKeyPressed_asm
+;	jr	z, D_NotPressed
+;D_Pressed:
+
+;	   	ld bc, #sizeof_e
+;   		add   ix, bc
+
+;			ld	a, #1
+;			ld	e_dead(ix), a
+
+
+;	   	ld bc, #sizeof_e
+;   		add   ix, bc
+
+;			ld	a, #1
+;			ld	e_dead(ix), a
+
+;D_NotPressed:
+
+
+
+
 	ret

@@ -33,6 +33,7 @@
 .globl _explosion_sp_0
 .globl _explosion_sp_1
 .globl _explosion_sp_2
+.globl _explosion_sp_3
 
 vx_actual:     .db #0
 
@@ -99,33 +100,46 @@ procesar_cambios_dead:
         ;; ELIMINAR ENTIDAD DEL ARRAY DE ENTIDADES
     ld  a, e_timeDead(ix)
     cp  #12
-    jp  m, explosion2
+    jp  m, explosion1        
         ld  hl,  #_explosion_sp_0
+    jr  finish_sprite_dead
+explosion1:
+    ld  a, e_timeDead(ix)
+    cp  #6
+    jp  m, explosion2
+        ld  hl,  #_explosion_sp_1
     jr  finish_sprite_dead
 explosion2:
     ld  a, e_timeDead(ix)
-    cp  #6
+    cp  #2
     jp  m, explosion3
-        ld  hl,  #_explosion_sp_1
+        ld  hl,  #_explosion_sp_2
     jr  finish_sprite_dead
 explosion3:
     ld  a, e_timeDead(ix)
     cp  #1
-    jp  m, no_more_explosion
-        ld  hl,  #_explosion_sp_2
+    jp  m, no_more_explosion   
+        ld  hl,  #_explosion_sp_3
     jr  finish_sprite_dead
 no_more_explosion:
-    ;=========================================================================================================================
-    ;;
-    ;;           VERDADERA MUERTE AQUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    ;; 2 OPCIONES : QUE SEA EL HERO O QUE SEA UN ENEMIGO NORMAL
-        ;; HERO
-            ;ld  a, #2
-            ;call man_state_setEstado  ;; cambia el estado
-        ;; ENEMIGO
-            ;; SE DEBE DE LLAMAR A UN METODO QUE ELIMINE LA ENTIDAD
-    ;;
+    ld  a, e_ai_st(ix)
+    cp  #e_ai_st_noAI
+    jr  nz, __enemy
+    ;=========================================================================================================================
+    ;; SOMOS EL HERO
+        ;ld  a, #2
+        ;call man_state_setEstado ;; cambio de estado
+
+        ret
+    ;=========================================================================================================================
+__enemy:
+    ;; SOMOS UN ENEMIGO
+    ;; e_dead(ix) == 0  --  VIVO
+    ;; e_dead(ix) == 1  --  MURIENDO 
+    ;; e_dead(ix) == 2  --  MUERTO
+        ld  a, #2
+        ld  e_dead(ix), a
     ;=========================================================================================================================
         ret
 
@@ -465,29 +479,13 @@ sprite_enemy1_paso1:
     or  a
     jp  m, movIz_paso1_enemy1
         ;; MOVIMINETO HACIA LA DERECHA
-   ;     ld  a, e_vy(ix)
-  ;      or  a
- ;       jp  m, movDer_grav_paso1_enemy1
-            ;; NORMAL - GRAVEDAD INVENTIDA
             ld  hl, #_enemigo1_sp_0
         ret
-;movDer_grav_paso1_enemy1:
-            ;; NORMAL - GRAVEDAD INVENTIDA
-        ;    ld  hl, #_enemigo1_sp_4
-       ; ret
 
 movIz_paso1_enemy1:
     ;; MOVIMIENTO HACIA LA IZQUIERDA
-  ;      ld  a, e_vy(ix)
-  ;      or  a
-  ;      jp  m, movIz_grav_paso1_enemy1
-            ;; NORMAL - GRAVEDAD INVENTIDA
             ld  hl, #_enemigo1_sp_1
         ret
-;movIz_grav_paso1_enemy2:
-;            ld  hl, #_enemigo1_sp_5
-;        ret
-
 ;;
 ;; METODO QUE MODIFICA EL SPRITE SEGUN LA DIRECCION A LA QUEMIRA
 ;; INPUT: B - PASO 1 O PASO 2 (EFECTO DE ANDAR)
@@ -498,28 +496,13 @@ sprite_enemy1_paso2:
     or  a
     jp  m, movIz_paso2_enemy1
         ;; MOVIMINETO HACIA LA DERECHA
- ;       ld  a, e_vy(ix)
- ;       or  a
- ;       jp  m, movDer_grav_paso2_enemy1
-            ;; NORMAL - GRAVEDAD INVENTIDA
             ld  hl, #_enemigo1_sp_2
         ret
-;movDer_grav_paso2_enemy1:
-;            ;; NORMAL - GRAVEDAD INVENTIDA
-;            ld  hl, #_enemigo1_sp_6
-;        ret
 
 movIz_paso2_enemy1:
     ;; MOVIMIENTO HACIA LA IZQUIERDA
- ;       ld  a, e_vy(ix)
-  ;      or  a
-   ;     jp  m, movIz_grav_paso2_enemy1
-            ;; NORMAL - GRAVEDAD INVENTIDA
             ld  hl, #_enemigo1_sp_3
         ret
-;movIz_grav_paso2_enemy1:
- ;           ld  hl, #_enemigo1_sp_7
-  ;      ret
 
 
 

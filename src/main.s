@@ -31,7 +31,11 @@ _main::
    ;; Loop forever
 loop:
    call man_state_update
-
+   
    call cpct_waitVSYNC_asm
+
    call man_state_render
    jr    loop
+
+
+

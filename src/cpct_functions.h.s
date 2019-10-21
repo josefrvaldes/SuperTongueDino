@@ -20,3 +20,9 @@
 
 .globl cpct_etm_setDrawTilemap4x8_ag_asm
 .globl cpct_etm_drawTilemap4x8_ag_asm
+
+.globl cpct_akp_musicInit_asm
+.globl cpct_akp_musicPlay_asm
+.globl cpct_setInterruptHandler_asm
+.globl cpct_removeInterruptHandler_asm
+.globl cpct_akp_stop_asm

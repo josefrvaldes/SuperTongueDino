@@ -14,6 +14,7 @@
 
 .include "man/man_level.h.s"
 .include "man/man_tilemap.h.s"
+.include "sys/sys_music.h.s"
 
 ;; //////////////////
 ;; SYS_Input Init
@@ -109,6 +110,7 @@ Q_Pressed:
 	jr	z, jumping
 
 	call start_jump
+	call sys_music_sonar_Salto
 
 	ld	a, #1
 	ld	(ent_input_Q_pressed), a

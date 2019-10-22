@@ -1,3 +1,4 @@
+.globl man_tilemap_init
 .globl man_tilemap_load
 .globl man_tilemap_render
 .globl man_tilemap_descomprimir_nuevo_nivel

@@ -20,11 +20,16 @@ ancho_tilemap                 = #20
 
 
 
-man_tilemap_load::
+man_tilemap_init::
    call man_level_getArray 
+   jp man_tilemap_load
+
+
+man_tilemap_load::
+   call man_level_get_current 
    ; descomprimimos tilemap del nivel que toque a continuación del tileset
-;    ld h, lev_pack_end_h(iy)
-;    ld l, lev_pack_end_l(iy)
+   ld h, lev_pack_end_h(iy)
+   ld l, lev_pack_end_l(iy)
    call man_tilemap_descomprimir_nuevo_nivel
 
    ; descomprimimos el tileset

@@ -74,16 +74,16 @@ P_Presed:
 P_NotPressed:
 
 
-	ld	hl, #Key_L
-	call cpct_isKeyPressed_asm
-	jr	z, L_NotPressed
-L_Presed:
-	; TEMPORAL!! SOLO PARA COMPROBAR QUE FUNCIONA EL CAMBIO DE NIVEL
-	call man_level_load_next
-	call man_tilemap_descomprimir_nuevo_nivel
-	call man_tilemap_render
-	; FIN TEMPORAL
-L_NotPressed:
+; 	ld	hl, #Key_L
+; 	call cpct_isKeyPressed_asm
+; 	jr	z, L_NotPressed
+; L_Presed:
+; 	; TEMPORAL!! SOLO PARA COMPROBAR QUE FUNCIONA EL CAMBIO DE NIVEL
+; 	call man_level_load_next
+; 	call man_tilemap_descomprimir_nuevo_nivel
+; 	call man_tilemap_render
+; 	; FIN TEMPORAL
+; L_NotPressed:
 
 ;	ld 	e_ai_aim_x(ix), #0		;; comprueba si se ha pulsado el espacio para cambiar la IA
 ;	ld	hl, #Key_Space

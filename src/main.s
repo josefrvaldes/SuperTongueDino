@@ -3,6 +3,8 @@
 .include "cpctelera.h.s"
 .include "cpct_functions.h.s"
 .include "man/state.h.s"
+.include "man/man_level.h.s"
+.include "man/man_tilemap.h.s"
 
 ;;
 ;; Start of _DATA area 
@@ -27,6 +29,10 @@ _main::
    call cpct_disableFirmware_asm
 
    call man_state_init
+
+   call man_level_init
+   call man_level_insertar_niveles
+   call man_tilemap_init
 
    ;; Loop forever
 loop:

@@ -10,6 +10,7 @@
 .globl man_level_create
 .globl man_level_insertar_niveles
 .globl man_level_load_next
+.globl man_level_get_current
 
 .globl _level00_pack_end
 .globl _level01_pack_end

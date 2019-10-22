@@ -136,9 +136,79 @@ man_tilemap_crear_entidad_por_spawn:
 
 
 man_tilemap_cargar_spawns::
+   call man_tilemap_cargar_spawn_hero
+   call man_tilemap_cargar_spawn_enemigos
+   call man_entity_getArray
+   ret
 
+man_tilemap_cargar_spawn_hero:
    call man_entity_init
    call man_entity_getArray
+   ; bc será nuestro contador
+   ; d  será 20, que corresponde con el ancho del tilemap en tiles
+   ; hl será la pos de memoria que iremos incrementando en cada iteración
+   ; e será x
+   ; d será y
+   ; a al principio será el valor del tile, 
+   ;           y al final será level_max_size - 1 que lo necesitamos para comparar con el contador para saber si hemso terminado el bucle
+
+   ld hl, #decompress_buffer; nos posicionamos al principio del tilemap en memoria
+   ld bc, #0                  ; contador que se incrementará y parará al llegar a level_max_size - 1
+   ld d, #20                 ; es el ancho del tilemap
+
+   ; al ser la primera iteración, el contador vale 0 y no podemos dividir entre cero
+   ;  así que cargamos en a directamente el valor de 4000, y lanzamos directamente la comparación
+   ;  con la nueva_x y nueva_y cargados de antemano, porque sabemos los valores
+   ld a, (hl)
+   push bc
+   push hl
+   jr comparaciones_hero
+
+   cargar_spawns_loop_hero:
+      inc hl
+      
+      ld a, (hl)             ; tenemos el valor del byte actual del tilemap en a
+      
+      push bc                 ; guardamos el valor de bc y hl porque la división los va a romper
+      push hl  
+
+      comparaciones_hero:
+         ld e, #tile_player     ; en e guardamos el tile que corresponde con enemigos, hero, etc
+         cp e
+         jr z, era_player
+         jr continuar_hero
+
+      
+      era_player:
+         ld (hl), #0
+         ld ix, #hero
+         call man_tilemap_crear_entidad_por_spawn
+         pop hl
+         pop bc
+         ret
+      
+
+      continuar_hero:
+         pop hl
+         pop bc
+         inc bc
+         ld de, #level_max_size - 1 ; cargamos en a el level_max_size - 1
+         ld a, d
+         cp b     ; si hemos llegado al final, salimos
+         jr z, b_es_igual_hero
+         jr cargar_spawns_loop_hero
+         b_es_igual_hero:
+            ld a, e
+            cp c
+            jr z, salir_hero
+         jr cargar_spawns_loop_hero
+
+      salir_hero:
+      ret
+
+
+
+man_tilemap_cargar_spawn_enemigos:
    ; bc será nuestro contador
    ; d  será 20, que corresponde con el ancho del tilemap en tiles
    ; hl será la pos de memoria que iremos incrementando en cada iteración
@@ -158,9 +228,9 @@ man_tilemap_cargar_spawns::
    ld a, (hl)
    push bc
    push hl
-   jr comparaciones
+   jr comparaciones_enemigos
 
-   cargar_spawns_loop:
+   cargar_spawns_loop_enemigos:
       inc hl
       
       ld a, (hl)             ; tenemos el valor del byte actual del tilemap en a
@@ -168,11 +238,8 @@ man_tilemap_cargar_spawns::
       push bc                 ; guardamos el valor de bc y hl porque la división los va a romper
       push hl  
 
-      comparaciones:
-      ld e, #tile_player     ; en e guardamos el tile que corresponde con enemigos, hero, etc
-      cp e
-      jr z, era_player
-
+      comparaciones_enemigos:
+      ; en e guardamos el tile que corresponde con enemigos, hero, etc
       ld e, #tile_e1
       cp e
       jr z, era_enemigo1
@@ -188,56 +255,48 @@ man_tilemap_cargar_spawns::
       ld e, #tile_e4
       cp e
       jr z, era_enemigo4
-      jr continuar
-
-      
-
-      era_player:
-         ld (hl), #0
-         ld ix, #hero
-         call man_tilemap_crear_entidad_por_spawn
-         jr continuar
+      jr continuar_enemigos
 
 
       era_enemigo1:
          ld (hl), #0
          ld ix, #ene1
          call man_tilemap_crear_entidad_por_spawn
-         jr continuar
+         jr continuar_enemigos
 
       era_enemigo2:
          ld (hl), #0
          ld ix, #ene2
          call man_tilemap_crear_entidad_por_spawn
-         jr continuar
+         jr continuar_enemigos
 
       era_enemigo3:
          ld (hl), #0
          ld ix, #ene2
          call man_tilemap_crear_entidad_por_spawn
-         jr continuar
+         jr continuar_enemigos
 
       era_enemigo4:
          ld (hl), #0
          ld ix, #ene2
          call man_tilemap_crear_entidad_por_spawn
-         jr continuar
+         jr continuar_enemigos
       
 
-      continuar:
+      continuar_enemigos:
          pop hl
          pop bc
          inc bc
          ld de, #level_max_size - 1 ; cargamos en a el level_max_size - 1
          ld a, d
          cp b     ; si hemos llegado al final, salimos
-         jr z, b_es_igual
-         jr cargar_spawns_loop
-         b_es_igual:
+         jr z, b_es_igual_enemigo
+         jr cargar_spawns_loop_enemigos
+         b_es_igual_enemigo:
             ld a, e
             cp c
-            jr z, salir
-         jr cargar_spawns_loop
+            jr z, salir_enemigos
+         jr cargar_spawns_loop_enemigos
 
-      salir:
+      salir_enemigos:
       ret

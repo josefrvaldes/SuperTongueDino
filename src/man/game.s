@@ -62,7 +62,7 @@ man_game_init::
 	;; Entity manager
 ; 	call man_entity_init
 ; 	call man_entity_getArray
-	call man_tilemap_cargar_spawns
+; 	call man_tilemap_cargar_spawns
 
 
 	;; Obstacle manager

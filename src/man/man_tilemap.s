@@ -48,8 +48,9 @@ man_tilemap_load::
    ; descomprimimos el tileset
    ld hl, #_tileset_juego_pack_end
    ld de, #decompress_buffer_tileset_end
-   jp cpct_zx7b_decrunch_s_asm
-   
+   call cpct_zx7b_decrunch_s_asm
+   call man_tilemap_cargar_spawns
+   ret
 
 
 man_tilemap_render::
@@ -97,7 +98,7 @@ man_tilemap_descomprimir_nuevo_nivel::
 ;    ld e, #tile_e4
 ;    cp e
 ;    jr z, era_enemigo1
-;    jr era_otra_cosa
+;    jr continuar
 
 
 man_tilemap_calcular_nueva_x_y:
@@ -112,8 +113,30 @@ man_tilemap_calcular_nueva_x_y:
    ret
 
 
+; Input
+;     nueva_x y nueva_y cargadas
+;     ix la entidad que toque
+; Destroy
+;     hl, bc, a, ix
+man_tilemap_crear_entidad_por_spawn:
+   call man_tilemap_calcular_nueva_x_y
+   ;ld ix, #hero
+   ld a, (nueva_x_entity)
+   ld e_x(ix), a
+   ld a, (nueva_y_entity)
+   ld e_y(ix), a
+   ;ld hl, ix
+
+   ld__b_ixh  ;; carga d en el registro alto de ix
+   ld__c_ixl
+   ld h, b
+   ld l, c
+   call man_entity_create
+   ret
+
+
 man_tilemap_cargar_spawns::
-   
+
    call man_entity_init
    call man_entity_getArray
    ; bc será nuestro contador
@@ -126,7 +149,6 @@ man_tilemap_cargar_spawns::
 
 
    ld hl, #decompress_buffer; nos posicionamos al principio del tilemap en memoria
-   ;ld d, #level_max_size - 1     ; nos guardamos una variable que hará de bucle para recorrer todos los bytes del tilemap
    ld bc, #0                  ; contador que se incrementará y parará al llegar a level_max_size - 1
    ld d, #20                 ; es el ancho del tilemap
 
@@ -150,56 +172,72 @@ man_tilemap_cargar_spawns::
       ld e, #tile_player     ; en e guardamos el tile que corresponde con enemigos, hero, etc
       cp e
       jr z, era_player
+
       ld e, #tile_e1
       cp e
       jr z, era_enemigo1
+
       ld e, #tile_e2
       cp e
       jr z, era_enemigo2
+
       ld e, #tile_e3
       cp e
       jr z, era_enemigo3
+
       ld e, #tile_e4
       cp e
       jr z, era_enemigo4
-      jr era_otra_cosa
+      jr continuar
 
       
 
       era_player:
-      ld (hl), #0
-      call man_tilemap_calcular_nueva_x_y
-      ld ix, #hero
-      ld a, (nueva_x_entity)
-      ld e_x(ix), a
-      ld a, (nueva_y_entity)
-      ld e_y(ix), a
-      ld hl, #hero
-      call man_entity_create
-      jr era_otra_cosa
+         ld (hl), #0
+         ld ix, #hero
+         call man_tilemap_crear_entidad_por_spawn
+         jr continuar
 
 
       era_enemigo1:
+         ld (hl), #0
+         ld ix, #ene1
+         call man_tilemap_crear_entidad_por_spawn
+         jr continuar
+
       era_enemigo2:
+         ld (hl), #0
+         ld ix, #ene2
+         call man_tilemap_crear_entidad_por_spawn
+         jr continuar
+
       era_enemigo3:
+         ld (hl), #0
+         ld ix, #ene2
+         call man_tilemap_crear_entidad_por_spawn
+         jr continuar
+
       era_enemigo4:
+         ld (hl), #0
+         ld ix, #ene2
+         call man_tilemap_crear_entidad_por_spawn
+         jr continuar
       
 
-      era_otra_cosa:
-
-      pop hl
-      pop bc
-      inc bc
-      ld de, #level_max_size - 1 ; cargamos en a el level_max_size - 1
-      ld a, d
-      cp b     ; si hemos llegado al final, salimos
-      jr z, b_es_igual
-      jr cargar_spawns_loop
-      b_es_igual:
-         ld a, e
-         cp c
-         jr z, salir
-      jr cargar_spawns_loop
+      continuar:
+         pop hl
+         pop bc
+         inc bc
+         ld de, #level_max_size - 1 ; cargamos en a el level_max_size - 1
+         ld a, d
+         cp b     ; si hemos llegado al final, salimos
+         jr z, b_es_igual
+         jr cargar_spawns_loop
+         b_es_igual:
+            ld a, e
+            cp c
+            jr z, salir
+         jr cargar_spawns_loop
 
       salir:
       ret

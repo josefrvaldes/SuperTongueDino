@@ -479,12 +479,23 @@ sprite_enemy1_paso1:
     or  a
     jp  m, movIz_paso1_enemy1
         ;; MOVIMINETO HACIA LA DERECHA
+        ld  a, e_ai_st(ix)
+        cp  #e_ai_st_perseguir
+        jr  z, movDer_paso1_follow
             ld  hl, #_enemigo1_sp_0
         ret
-
+movDer_paso1_follow:
+            ld  hl, #_enemigo1_sp_4
+        ret
 movIz_paso1_enemy1:
     ;; MOVIMIENTO HACIA LA IZQUIERDA
+        ld  a, e_ai_st(ix)
+        cp  #e_ai_st_perseguir
+        jr  z, movIz_paso1_follow
             ld  hl, #_enemigo1_sp_1
+        ret
+movIz_paso1_follow:
+            ld  hl, #_enemigo1_sp_5
         ret
 ;;
 ;; METODO QUE MODIFICA EL SPRITE SEGUN LA DIRECCION A LA QUEMIRA
@@ -496,12 +507,24 @@ sprite_enemy1_paso2:
     or  a
     jp  m, movIz_paso2_enemy1
         ;; MOVIMINETO HACIA LA DERECHA
+        ld  a, e_ai_st(ix)
+        cp  #e_ai_st_perseguir
+        jr  z, movDer_paso2_follow
             ld  hl, #_enemigo1_sp_2
+        ret
+movDer_paso2_follow:
+            ld  hl, #_enemigo1_sp_6
         ret
 
 movIz_paso2_enemy1:
     ;; MOVIMIENTO HACIA LA IZQUIERDA
+        ld  a, e_ai_st(ix)
+        cp  #e_ai_st_perseguir
+        jr  z, movIz_paso2_follow
             ld  hl, #_enemigo1_sp_3
+        ret
+movIz_paso2_follow:
+            ld  hl, #_enemigo1_sp_7
         ret
 
 

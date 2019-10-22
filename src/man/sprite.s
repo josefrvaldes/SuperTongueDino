@@ -4,6 +4,7 @@
 .include "ent/entity.h.s"
 .include "man/entity.h.s"
 .include "man/state.h.s"
+.include "man/man_tilemap.h.s"
 
 
 .globl _hero_sp_0
@@ -128,6 +129,7 @@ no_more_explosion:
     jr  nz, __enemy
     ;=========================================================================================================================
     ;; SOMOS EL HERO
+        call man_tilemap_render
         ld  a, #2
         call man_state_setEstado ;; cambio de estado
 
@@ -140,6 +142,7 @@ __enemy:
     ;; e_dead(ix) == 2  --  MUERTO
         ld  a, #2
         ld  e_dead(ix), a
+        call man_tilemap_render
     ;=========================================================================================================================
         ret
 

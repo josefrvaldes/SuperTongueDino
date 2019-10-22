@@ -22,6 +22,7 @@ max_entities == 6
 	.db	_dead
 	.db	_stepActual
 	.db	_timeAnimat
+	.db   _timeDead
 .endm
 
 e_x		  = 0
@@ -30,7 +31,7 @@ e_vx		  = 2
 e_vy		  = 3
 e_w		  = 4
 e_h		  = 5
-e_invisi = 6
+e_invisi      = 6
 e_pspr_l	  = 7
 e_pspr_h	  = 8
 e_ai_aim_x	  = 9

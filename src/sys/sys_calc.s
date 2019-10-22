@@ -21,6 +21,29 @@ dividir_d_e::
       djnz .-8
    ret
 
+
+;Inputs:
+;     bc es el numerador
+;     d es el denominador
+;Outputs:
+;     a es el resto
+;     bc es el resultado
+;Destroy:
+;     a, bc, d
+dividir_bc_entre_d::
+   ld h, b
+   ld l, c
+   ld b, #16
+   xor a
+      add hl,hl
+      rla
+      cp d
+      jr c,.+4
+         inc l
+         sub d
+      djnz .-7
+   ret
+
 ;Inputs:
 ;     d es el numerador
 ;Outputs:
@@ -222,4 +245,24 @@ a_menor_que_d_positivos::
    ld a, #1
    menor:
    ld a, #0
+   ret
+
+
+; Input 
+;     a num a multiplicar
+; Output
+;     a multiplicado por 4
+multiplicar_a_por_4::
+   sla a
+   sla a
+   ret
+
+; Input 
+;     a num a multiplicar
+; Output
+;     a multiplicado por 8
+multiplicar_a_por_8::
+   sla a
+   sla a
+   sla a
    ret

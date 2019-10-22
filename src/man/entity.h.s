@@ -7,3 +7,7 @@
 .globl man_entity_new
 .globl man_entity_create
 .globl man_entity_delete
+
+.globl hero
+.globl ene1
+.globl ene2

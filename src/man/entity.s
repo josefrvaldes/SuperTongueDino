@@ -6,12 +6,21 @@
 .include "ent/entity.h.s"
 .include "man/entity.h.s"
 
+.globl _hero_sp_0
+; .globl _hero_sp_1
+; .globl _hero_sp_2
+.globl _enemigo1_sp_0
+.globl _enemigo2_sp_0
 
 .module entity_manager
 
 
 DefineComponentArrayStructure _entity, max_entities, DefineCmp_Entity_default ;; ....
 
+
+hero:: DefineCmp_Entity 0,  0,  0,  0, 4, 8, 0, _hero_sp_0,     e_tipo_jugador,  e_ai_st_noAI,      0,    0,    0, 0, 0, 0, 0x05, 18
+ene1:: DefineCmp_Entity 0,  0,  1,  1, 4, 8, 0, _enemigo1_sp_0, e_tipo_enemigo1, e_ai_st_rebotar,   0,    0,    0, 0, 0, 0, 0x09, 18
+ene2:: DefineCmp_Entity 0,  0, -1,  3, 4, 8, 0, _enemigo2_sp_0, e_tipo_enemigo2, e_ai_st_patrullar, 0, 0x20, 0x20, 0, 0, 0, 0x1F, 18
 
 
 ;; //////////////////

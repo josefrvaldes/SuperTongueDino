@@ -208,7 +208,8 @@ check_diferent_obstacles:
 
    pasar_nivel:
    call man_level_load_next
-   call man_tilemap_descomprimir_nuevo_nivel
+;    call man_tilemap_descomprimir_nuevo_nivel
+   call man_tilemap_load
    call man_tilemap_render
    jr todo_fondo
 

@@ -59,21 +59,12 @@ ent3: DefineCmp_Entity 60,  20, -1, 3, 4,  8, 0, _enemigo2_sp_0, e_tipo_enemigo2
 man_game_init::
 
 
-	;; Entity manager
-; 	call man_entity_init
-; 	call man_entity_getArray
-; 	call man_tilemap_cargar_spawns
-
-
 	;; Obstacle manager
 	call man_obstacle_init
 	;; nos da el puntero al array de obstaculos
 	call man_obstacle_getArray
 
-
 ;======================================================0
-
-
 	
 	;; Init Systems
 	call man_entity_getArray
@@ -82,21 +73,6 @@ man_game_init::
 	call sys_physics_init
 	call sys_input_init
 	call sys_collision_entity_init
-
-	;; Init 3 entities
-; 	ld hl, #ent1
-; 	call man_entity_create
-; 	ld hl, #ent1
-; 	call man_entity_create
-; 	ld hl, #ent2
-; 	call man_entity_create
-; 	ld hl, #ent3
-; 	call man_entity_create
-	;ld hl, #ent4
-	;call man_entity_create
-	;ld hl, #ent5
-	;call man_entity_create
-
 	ret
 
 

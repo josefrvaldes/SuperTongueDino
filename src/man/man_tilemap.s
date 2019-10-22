@@ -141,6 +141,8 @@ man_tilemap_cargar_spawns::
    call man_entity_getArray
    ret
 
+
+
 man_tilemap_cargar_spawn_hero:
    call man_entity_init
    call man_entity_getArray
@@ -296,7 +298,7 @@ man_tilemap_cargar_spawn_enemigos:
             ld a, e
             cp c
             jr z, salir_enemigos
-         jr cargar_spawns_loop_enemigos
+            jr cargar_spawns_loop_enemigos
 
       salir_enemigos:
       ret

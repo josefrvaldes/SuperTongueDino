@@ -68,7 +68,8 @@ menuIngame_init::
 	ld	a, #1
 	ld	(ent_input_ESC_pressed), a   ;; se utiliza para evitar que al abrir el menu se vaya al menu principal al tener pulsada la tecla
 
-	call sys_music_pararMusica
+	
+	call sys_music_pausarReanudarMusica
 	ret
 
 
@@ -98,6 +99,7 @@ M_Pressed_menuIngame:
 	jr	z, M_Holded_OrPressed_menuIngame
 
 	call abrir_cerrar_menuIngame
+	call sys_music_pausarReanudarMusica
 
 	ld	a, #1
 	ld	(ent_input_M_pressed), a

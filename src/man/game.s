@@ -19,6 +19,7 @@
 .include "sys/sys_deleteEntity.h.s"
 ;.include "man/sprite.h.s"
 .include "sys/sys_music.h.s"
+.include "man/man_tilemap.h.s"
 
 .module game_manager
 
@@ -98,7 +99,7 @@ man_game_init::
 	;ld hl, #ent5
 	;call man_entity_create
 
-	ld	a, #2
+	ld	a, #cancion2
 	call sys_music_ponerMusica ;; Inicializar una cancion
 	ret
 
@@ -194,11 +195,8 @@ abrir_cerrar_menuIngame::
 	ld (#bool_mostrar_menu), a
 	call sys_eren_clearScreen
 
-	ld	a, #2
-	call sys_music_ponerMusica ;; Inicializar una cancion
-
-	;; TEMPORANEO !!! Para dibujar el tileset pero descomprime y todo
-	call sys_eren_init
+	;; TRepintar actual tilemap
+	call man_tilemap_render
 
 	ret
 

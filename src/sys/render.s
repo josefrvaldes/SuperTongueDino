@@ -5,6 +5,8 @@
 .include "man/entity.h.s"
 .include "cpct_functions.h.s"
 .include "ent/entity.h.s"
+.include "ent/ent_level.h.s"
+.include "man/man_level.h.s"
 .include "ent/ent_obstacle.h.s"
 .include "man/man_obstacle.h.s"
 .include "man/man_tilemap.h.s"
@@ -47,7 +49,7 @@ sys_eren_load_tilemap::
 
 sys_eren_update::
 	call sys_eren_render_entities
-	jp man_obstacle_getArray
+   jp sys_eren_drawLevel
 
 
 
@@ -57,60 +59,52 @@ sys_eren_update::
 ;; Destroy: AF, BC, DE, HL, IX
 ;; Stack Use: 2 bytes
 sys_eren_render_entities::
-      ld    (_ent_counter), a
+   ld    (_ent_counter), a
 
 _update_loop:
-      ;; Erase Previous Instance
+   ;; Erase Previous Instance
 
-      ;cpctm_setBorder_asm HW_RED
+   ;cpctm_setBorder_asm HW_RED
+   ld    e, e_lastVP_l(ix)
+   ld    d, e_lastVP_h(ix)
+   xor   a
+   ld    c, e_w(ix)
+   ld    b, e_h(ix)
+   push  bc
+   call  cpct_drawSolidBox_asm
 
+   ;; Calcular puntero a memoria de video
+   ld    de, #screen_start
+   ld    c, e_x(ix)
+   ld    b, e_y(ix)
+   call  cpct_getScreenPtr_asm
 
-      ld    e, e_lastVP_l(ix)
-      ld    d, e_lastVP_h(ix)
-      xor   a
-      ld    c, e_w(ix)
-      ld    b, e_h(ix)
-      push  bc
-      call  cpct_drawSolidBox_asm
+   ;; Almacena el puntero de memoria de video al final
+   ld    e_lastVP_l(ix), l
+   ld    e_lastVP_h(ix), h
 
-      ;; Calcular puntero a memoria de video
-      ld    de, #screen_start
-      ld    c, e_x(ix)
-      ld    b, e_y(ix)
-      call  cpct_getScreenPtr_asm
+   ;; Drae Entity Sprite
+   ex    de, hl
+   ld    l, e_pspr_l(ix)
+   ld    h, e_pspr_h(ix)
+   pop   bc
+   call cpct_drawSprite_asm
 
-      ;; Almacena el puntero de memoria de video al final
-      ld    e_lastVP_l(ix), l
-      ld    e_lastVP_h(ix), h
+   ;cpctm_setBorder_asm HW_WHITE
 
-      ;; Drae Entity Sprite
-      ex    de, hl
-      ld    l, e_pspr_l(ix)
-      ld    h, e_pspr_h(ix)
-      pop   bc
-      call cpct_drawSprite_asm
+   _ent_counter = . + 1
+      ld    a, #0
+      dec   a
+      ret   z
 
-      ;cpctm_setBorder_asm HW_WHITE
-
-      _ent_counter = . + 1
-            ld    a, #0
-            dec   a
-            ret   z
-
-            ld    (_ent_counter), a
-            ld    bc, #sizeof_e
-            add   ix, bc
-            jr    _update_loop
+      ld    (_ent_counter), a
+      ld    bc, #sizeof_e
+      add   ix, bc
+      jr    _update_loop
 
 
 
 
-
-
-sys_eren_update_obstacle::
-      call sys_eren_render_obstacles
-
-      ret
 
 ;; //////////////////
 ;; Sys Render Update Obstacles
@@ -118,35 +112,36 @@ sys_eren_update_obstacle::
 ;; Destroy: AF, BC, DE, HL, IY
 ;; Stack Use: 2 bytes
 sys_eren_render_obstacles::
-      ld    (_obs_counter), a
+   ld    (_obs_counter), a
+
 
 _update_loop_obstacles:
-      ;; Calcular puntero a memoria de video
-      ld    de, #screen_start
-      ld    c, obs_x(iy)
-      ld    b, obs_y(iy)
-      call  cpct_getScreenPtr_asm
+   ;; Calcular puntero a memoria de video
+   ld    de, #screen_start
+   ld    c, obs_x(iy)
+   ld    b, obs_y(iy)
+   call  cpct_getScreenPtr_asm
 
-      ;; Almacena el puntero de memoria de video al final
-      ld    obs_lastVP_l(iy), l
-      ld    obs_lastVP_h(iy), h
+   ;; Almacena el puntero de memoria de video al final
+   ld    obs_lastVP_l(iy), l
+   ld    obs_lastVP_h(iy), h
 
-      ;; Drae Entity Sprite
-      ex    de, hl
-      ld    a, obs_color(iy)
-      ld    c, obs_w(iy)
-      ld    b, obs_h(iy)
-      call cpct_drawSolidBox_asm
+   ;; Drae Entity Sprite
+   ex    de, hl
+   ld    a, obs_color(iy)
+   ld    c, obs_w(iy)
+   ld    b, obs_h(iy)
+   call cpct_drawSolidBox_asm
 
-      _obs_counter = . + 1
-            ld    a, #0
-            dec   a
-            ret   z
+   _obs_counter = . + 1
+         ld    a, #0
+         dec   a
+         ret   z
 
-            ld    (_obs_counter), a
-            ld    bc, #sizeof_obs
-            add   iy, bc
-            jr    _update_loop_obstacles
+         ld    (_obs_counter), a
+         ld    bc, #sizeof_obs
+         add   iy, bc
+         jr    _update_loop_obstacles
 
 
 sys_eren_clearScreen::
@@ -201,3 +196,21 @@ sys_eren_DrawDirtOfPlant::
       ld    b, a
       call cpct_drawSprite_asm
       ret
+
+sys_eren_drawLevel::
+   ld hl, #0x2602
+   call cpct_setDrawCharM0_asm
+
+   call man_level_get_current
+
+   ld b, lev_str_h(iy) 
+   ld c, lev_str_l(iy) 
+   ld__iyh_b
+   ld__iyl_c
+
+   ld   de, #CPCT_VMEM_START_ASM ;; DE = Pointer to start of the screen
+   ld    b, #16                  ;; B = y coordinate (24 = 0x18)
+   ld    c, #8                   ;; C = x coordinate (16 = 0x10)
+   call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
+   call cpct_drawStringM0_asm
+   ret

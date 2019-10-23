@@ -90,6 +90,11 @@ not_more_animation:
 
 animation_explosion:
 
+
+    ld  a, e_dead(ix)
+    cp  #2
+    ret z
+
     ld  a, e_timeDead(ix)
     dec  a
     ld  e_timeDead(ix), a
@@ -128,10 +133,11 @@ no_more_explosion:
     cp  #e_ai_st_noAI
     jr  nz, __enemy
     ;=========================================================================================================================
-    ;; SOMOS EL HERO
-        call man_tilemap_render
+    ;; SOMOS EL HER
         ld  a, #2
         call man_state_setEstado ;; cambio de estado
+
+        call man_tilemap_render
 
         ret
     ;=========================================================================================================================

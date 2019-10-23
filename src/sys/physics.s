@@ -148,7 +148,8 @@ continuar_saltando:
     		ld  a, e_vy(ix)
          cp   #0
     		jr	z, no_mas_saltos
-    		jp  m, parar_salto_vetical  						;; velocidad positiva
+    		;jp  m, parar_salto_vetical  						;; velocidad positiva
+         jp m, no_mas_saltos
 
       call check_jump_table_update
 
@@ -160,8 +161,8 @@ only_collision_corner:
    call sys_check_collision_corner
       jr no_mas_saltos
 
-parar_salto_vetical:
-   call  end_of_jump
+;parar_salto_vetical:
+   ;call  end_of_jump
 
 no_mas_saltos:
 	ld	a, e_ai_st(ix)
@@ -208,7 +209,8 @@ check_diferent_obstacles:
 
    pasar_nivel:
    call man_level_load_next
-   call man_tilemap_descomprimir_nuevo_nivel
+;    call man_tilemap_descomprimir_nuevo_nivel
+   call man_tilemap_load
    call man_tilemap_render
    jr todo_fondo
 
@@ -395,10 +397,23 @@ no_colision_X_corner:
 ;;        IY - SECOND ENEMY
 ;;
 change_direcction_entity::
+
+
+   ld    a, e_ai_st(ix)
+   cp    #e_ai_st_patrullar
+   jr    nz, change_direcction       ;; con aereo siempre camiar velocidades
+
+   ld    a, e_ai_st(iy)
+   cp    #e_ai_st_patrullar
+   jr    nz, change_direcction       ;; con aereo siempre cambiar velocidades
+
    ld    a, e_y(ix)
    cp    e_y(iy)
    jr    z, change_direcction
       ;; NO ESTAMOS A LA MISMA ALTURA -- BLOQUEAR A LA QUE ESTA MAS ARRIBA
+      ;     x       
+      ;  ----------------------
+      ;               x
       jp    m, iy_on_ix
          ld    a,  e_vy(iy)
          neg
@@ -411,20 +426,68 @@ iy_on_ix:
          add   e_y(ix)
          ld    e_y(ix), a
    ret
+
 change_direcction:
+   ;; ESTAMOS EN LA MISMTA ALTURA
+   ;     x       x
+   ;  ----------------------
+   ;
+;; Hay que comprbar si estamos en modo perseguir o en modo defensa, en caso contrario nos cargamos la otra entidad
+   ld    a, e_ai_st(ix)
+   cp    #e_ai_st_perseguir
+   jr    nz, aplicate_normal       ;; con aereo siempre camiar velocidades
+         ld    a, e_dead(iy)
+         cp    #0
+         ret nz
+         ld    a, #1
+         ld    e_dead(iy), a
+      ret
+
+   ld    a, e_ai_st(ix)
+   cp    #e_ai_st_defender
+   jr    nz, aplicate_normal       ;; con aereo siempre cambiar velocidades
+         ld    a, e_dead(iy)
+         cp    #0
+         ret nz
+         ld    a, #1
+         ld    e_dead(iy), a
+      ret
+;; Hay que comprbar si estamos en modo perseguir o en modo defensa, en caso contrario nos cargamos la otra entidad
+   ld    a, e_ai_st(iy)
+   cp    #e_ai_st_perseguir
+   jr    nz, aplicate_normal       ;; con aereo siempre camiar velocidades
+         ld    a, e_dead(ix)
+         cp    #0
+         ret nz
+         ld    a, #1
+         ld    e_dead(ix), a
+         ret
+   ld    a, e_ai_st(iy)
+   cp    #e_ai_st_defender
+   jr    nz, aplicate_normal       ;; con aereo siempre cambiar velocidades
+         ld    a, e_dead(ix)
+         cp    #0
+         ret nz
+         ld    a, #1
+         ld    e_dead(ix), a
+      ret
+
+aplicate_normal:
+
+;; QUEDA REFACTORIZAR SEGUN LA ENRADA DE LAS ENTIDADES -- 
    ld    a,  e_vx(ix)
    neg
-   ld    e_vx(ix), a
+   ld    e_vx(ix), a         ;; negamos la velocidad en el eje X
+
+   ld    a, e_vx(iy)         ;; cogemos la velocidad en vx
+   add   e_vx(iy)            ;; la multiplicamos por dos
+   neg                       ;; la negamos
+   add    e_x(iy)            ;; se lo anyadimos a la posicion
+   ld    e_x(iy), a          ;; aplicamos posicion final 
 
    ld    a, e_vx(iy)
-   add   e_vx(iy)
    neg
-   add    e_x(iy)
-   ld    e_x(iy), a
-
-   ld    a, e_vx(iy)
-   neg
-   ld    e_vx(iy), a
+   ld    e_vx(iy), a        ;; negamos la velocidad en el eje Y
 
  ret
 

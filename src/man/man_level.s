@@ -10,26 +10,48 @@
 DefineComponentArrayStructure _level, max_levels, DefineCmp_Level_default ;; ....  
 
 
-level00: DefineCmp_Level #_level00_pack_end
-level01: DefineCmp_Level #_level01_pack_end
-level02: DefineCmp_Level #_level02_pack_end
-level03: DefineCmp_Level #_level03_pack_end
-level04: DefineCmp_Level #_level04_pack_end
-level05: DefineCmp_Level #_level05_pack_end
-level06: DefineCmp_Level #_level06_pack_end
-level07: DefineCmp_Level #_level07_pack_end
-level08: DefineCmp_Level #_level08_pack_end
-level09: DefineCmp_Level #_level09_pack_end
-level10: DefineCmp_Level #_level10_pack_end
-level11: DefineCmp_Level #_level11_pack_end
-level12: DefineCmp_Level #_level12_pack_end
-level13: DefineCmp_Level #_level13_pack_end
-level14: DefineCmp_Level #_level14_pack_end
-level15: DefineCmp_Level #_level15_pack_end
-level16: DefineCmp_Level #_level16_pack_end
-level17: DefineCmp_Level #_level17_pack_end
-level18: DefineCmp_Level #_level18_pack_end
-level19: DefineCmp_Level #_level19_pack_end
+str00:: .asciz "Level 01"
+str01:: .asciz "Level 02"
+str02: .asciz "Level 03"
+str03: .asciz "Level 03"
+str04: .asciz "Level 04"
+str05: .asciz "Level 05"
+str06: .asciz "Level 06"
+str07: .asciz "Level 07"
+str08: .asciz "Level 08"
+str09: .asciz "Level 09"
+str10: .asciz "Level 10"
+str11: .asciz "Level 11"
+str12: .asciz "Level 12"
+str13: .asciz "Level 13"
+str14: .asciz "Level 14"
+str15: .asciz "Level 15"
+str16: .asciz "Level 16"
+str17: .asciz "Level 17"
+str18: .asciz "Level 18"
+str19: .asciz "Level 19"
+
+
+level00: DefineCmp_Level #_level00_pack_end, #str00
+level01: DefineCmp_Level #_level01_pack_end, #str01
+level02: DefineCmp_Level #_level02_pack_end, #str02
+level03: DefineCmp_Level #_level03_pack_end, #str03
+level04: DefineCmp_Level #_level04_pack_end, #str04
+level05: DefineCmp_Level #_level05_pack_end, #str05
+level06: DefineCmp_Level #_level06_pack_end, #str06
+level07: DefineCmp_Level #_level07_pack_end, #str07
+level08: DefineCmp_Level #_level08_pack_end, #str08
+level09: DefineCmp_Level #_level09_pack_end, #str09
+level10: DefineCmp_Level #_level10_pack_end, #str10
+level11: DefineCmp_Level #_level11_pack_end, #str11
+level12: DefineCmp_Level #_level12_pack_end, #str12
+level13: DefineCmp_Level #_level13_pack_end, #str13
+level14: DefineCmp_Level #_level14_pack_end, #str14
+level15: DefineCmp_Level #_level15_pack_end, #str15
+level16: DefineCmp_Level #_level16_pack_end, #str16
+level17: DefineCmp_Level #_level17_pack_end, #str17
+level18: DefineCmp_Level #_level18_pack_end, #str18
+level19: DefineCmp_Level #_level19_pack_end, #str19
 
 
 

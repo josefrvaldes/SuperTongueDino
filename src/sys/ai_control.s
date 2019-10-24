@@ -7,13 +7,14 @@
 .include "man/entity.h.s"
 .include "cpct_functions.h.s"
 .include "man/game.h.s"
+.include "man/man_level.h.s"
 
 .module sys_ai_control
  
 
-dificultadRango_1 = 10			;; para cambiar la dificultad de los enemigos dependiendo del nivel
-dificultadRango_2 = 15
-dificultadRango_3 = 20
+dificultadRango_1 = 20			;; para cambiar la dificultad de los enemigos dependiendo del nivel
+dificultadRango_2 = 40
+dificultadRango_3 = 60
 dificultad_0 = 0
 dificultad_1 = 1
 dificultad_2 = 2
@@ -632,7 +633,7 @@ salto_tempo_patrullar:
 
 ;; Destroy: A, B
 setDificultadEnemigos:
-	ld	a, (nivel)
+	ld	a, (num_current_level)
 	ld	b, a
 
 	ld	a, #dificultadRango_1

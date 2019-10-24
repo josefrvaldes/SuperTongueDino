@@ -3,6 +3,7 @@
 ;;
 
 .globl iy_current_level
+.globl num_current_level
 
 .globl man_level_getArray
 .globl man_level_init

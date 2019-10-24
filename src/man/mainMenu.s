@@ -5,6 +5,7 @@
 .include "cpct_functions.h.s"
 .include "sys/render.h.s"
 .include "man/state.h.s"
+.include "man/man_level.h.s"
 
 .globl _hero_pal
 string_menuIngame_info: .asciz "MAIN MENU"
@@ -59,6 +60,10 @@ man_mainMenu_init::
 
 	ld	a, #1
 	ld	(ent_input_Q_pressed), a   ;; se utiliza para evitar que al iniciar el juego se entre al juego al tener pulsada la tecla y no se vea el menu
+
+
+	ld	a, #0
+	ld	(num_current_level), a
 
 	ret
 

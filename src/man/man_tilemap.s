@@ -127,6 +127,14 @@ man_tilemap_crear_entidad_por_spawn:
    ld e_y(ix), a
    ;ld hl, ix
 
+ld    de, #0xC000
+   ld    c, e_x(ix)
+   ld    b, e_y(ix)
+   call  cpct_getScreenPtr_asm
+   ld    e_lastVP_l(ix), l
+   ld    e_lastVP_h(ix), h
+   
+
    ld__b_ixh  ;; carga d en el registro alto de ix
    ld__c_ixl
    ld h, b

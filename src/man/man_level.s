@@ -57,8 +57,8 @@ level19: DefineCmp_Level #_level19_pack_end, #str19
 
 
 
-iy_current_level:: .dw #0
-
+iy_current_level::  .dw #0
+num_current_level:: .db #0
 
 
 ;; //////////////////
@@ -177,6 +177,11 @@ man_level_load_next::
    ld  de, #sizeof_level
    add iy, de
    ld (iy_current_level), iy
+
+   ld    a, (num_current_level)
+   inc   a
+   ld    (num_current_level), a
+
    ret
 
 

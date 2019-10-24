@@ -74,12 +74,12 @@ dividir_d_entre_4::
 
 dividir_d_entre_4_f::
    xor a       ; nos aseguramos que a vale cero
-   sra d    ; desplazamos los bits hacia la dch
-   res 7, d
+   srl d    ; desplazamos los bits hacia la dch
+   ;res 7, d
    jr nc, . + 4
    set 0, a
-   sra d    ; desplazamos los bits hacia la dch
-   res 6, d
+   srl d    ; desplazamos los bits hacia la dch
+   ;res 6, d
    jr nc, . + 4
    set 1, a
    ret
@@ -87,16 +87,16 @@ dividir_d_entre_4_f::
 
 dividir_d_entre_8_f::
    xor a       ; nos aseguramos que a vale cero
-   sra d    ; desplazamos los bits hacia la dch
-   res 7, d
+   srl d    ; desplazamos los bits hacia la dch
+   ;res 7, d
    jr nc, . + 4
    set 0, a
-   sra d    ; desplazamos los bits hacia la dch
-   res 6, d
+   srl d    ; desplazamos los bits hacia la dch
+   ;res 6, d
    jr nc, . + 4
    set 1, a
-   sra d    ; desplazamos los bits hacia la dch
-   res 5, d
+   srl d    ; desplazamos los bits hacia la dch
+   ;res 5, d
    jr nc, . + 4
    set 2, a
    ret
@@ -184,8 +184,8 @@ multiplicar_d_c_16bits::
 ;    a, hl
 multiplicar_d_por_20_no_safe::
    ld hl, #0  ; nos aseguramos de que hl vale 0
-   ld bc, #0  ; nos aseguramos de que hl vale 0
-   ld  c, d   ;  guardamos en a el valor de d, porque luego lo necesitaremos
+   ld bc, #0  ; nos aseguramos de que bc vale 0
+   ld  c, d   ; guardamos en bc el valor de d, porque luego lo necesitaremos
    ld  l, c   ; guardamos en l el valor de d, porque es con el que vamos a operar
    sla l      ; x2
    sla l      ; x4
@@ -193,10 +193,10 @@ multiplicar_d_por_20_no_safe::
    sla l      ; x16
    jr nc, . + 4  ; esto lo hacemos porque al multiplicar por 16 es bastante probable que haya carry y haya que poner a 1 el primer bit de h
    set 0, h
-   add hl, bc
-   add hl, bc
-   add hl, bc
-   add hl, bc
+   add hl, bc ; x17
+   add hl, bc ; x18
+   add hl, bc ; x19
+   add hl, bc ; x20
 
    ret
 

@@ -750,6 +750,8 @@ physics_IA_enemigos:
 	jr	nz, enemigo_patrullar_physic
 	ld 	a, (#col_hay_colision_top)
 	dec 	a
+   ;ld    a, d
+   ;cp    #0
 	jr 	nz, comprobar_vel_Y
 	ld  	a, e_vx(ix)
 	neg
@@ -758,6 +760,8 @@ physics_IA_enemigos:
 	comprobar_vel_Y:
 	ld 	a, (#col_hay_colision_left)
 	dec 	a
+   ;ld    a, c
+   ;cp    #0
 	ret	nz
 
 	ld  	a, e_vy(ix)
@@ -769,13 +773,36 @@ physics_IA_enemigos:
 	enemigo_patrullar_physic:
 	ld	  a, e_ai_st(ix)
 	cp	  #e_ai_st_patrullar
-	ret	nz
+	jr   nz, enemigo_perseguir_physic
 	ld 	a, (#col_hay_colision_top)
 	dec 	a
+   ;ld    a, d
+   ;cp    #0
 	ret   nz
 	ld  	a, e_vx(ix)
 	neg
 	ld  	e_vx(ix), a
+    ret
+
+    ; IA PERSEGUIR
+   enemigo_perseguir_physic:
+   ld    a, e_ai_st(ix)
+   cp    #e_ai_st_perseguir
+   ret   nz
+   ld    a, (#col_hay_colision_top)
+   dec   a
+   jr    nz, comprobar_PhysicsIA_left
+   ld    a, #e_ai_st_rebotar
+   ld    e_ai_st(ix), a
+   ld    e_ai_rebotar_chocar(ix), #1
+   ret
+   comprobar_PhysicsIA_left:
+   ld    a, (#col_hay_colision_left)
+   dec   a
+   ret   nz
+   ld    a, #e_ai_st_rebotar
+   ld    e_ai_st(ix), a
+   ld    e_ai_rebotar_chocar(ix), #1
 	ret
 
 

@@ -5,7 +5,7 @@
 max_entities == 6
 
 ;; Defines a new entity component
-.macro DefineCmp_Entity _x, _y, _vx, _vy, _w, _h, _invisibility, _pspr, _tipoEntidad, _aist, _pausaVel, _clock1, _clock2, _cambioDirec, _dead, _stepActual, _timeAnimat, _timeDead
+.macro DefineCmp_Entity _x, _y, _vx, _vy, _w, _h, _invisibility, _pspr, _tipoEntidad, _aist, _pausaVel, _clock1, _clock2, _cambioDirec, _dead, _stepActual, _timeAnimat, _timeDead, _IARebotar_chocar
 	.db 	_x, _y	
 	.db	_vx, _vy
 	.db	_w, _h
@@ -23,6 +23,7 @@ max_entities == 6
 	.db	_stepActual
 	.db	_timeAnimat
 	.db   _timeDead
+	.db   _IARebotar_chocar  ;; contador para la IA de persecucion cuando choca contra una pared
 .endm
 
 e_x		  = 0
@@ -48,7 +49,8 @@ e_dead        = 19
 e_stepActual  = 20
 e_timeAnimat  = 21
 e_timeDead    = 22
-sizeof_e	  = 23
+e_ai_rebotar_chocar = 23
+sizeof_e	  = 24
 
 
 ;; Enumeracion de tipos de Entidad
@@ -69,7 +71,7 @@ e_ai_st_saltar    = 7
 
 ;; Default constructor for entity components
 .macro DefineCmp_Entity_default
-	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0, 0x0000, e_tipo_enemigo1, e_ai_st_noAI, 0, 0x20, 0x20, 0, 0, 0, 0x1F, 0x12  ;; reserva el espacio de una entidad, NO!! crea una entidad
+	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0, 0x0000, e_tipo_enemigo1, e_ai_st_noAI, 0, 0x20, 0x20, 0, 0, 0, 0x1F, 0x12, 0  ;; reserva el espacio de una entidad, NO!! crea una entidad
 .endm
 
 ;; Defines entity array for components

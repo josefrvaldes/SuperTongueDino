@@ -20,6 +20,8 @@ dificultad_2 = 2
 dificultad_3 = 3
 dificultadEnemigos: .db #0		;; selector dificultad
 
+detectarCambioIA_rebotar: .db #0
+
 
 patrullar_llamaPerseguir: 	.db #0
 
@@ -204,6 +206,9 @@ sys_ai_rebotar:
 	ld	a, (dificultadEnemigos)
 	cp	#dificultad_1
 	ret	z
+	ld	a, e_ai_rebotar_chocar(ix)	; puede cambiar estado
+	cp	#0
+	ret	nz
 	call rebotar_elegirCambioEstado
 	
  ret
@@ -350,6 +355,8 @@ movimiento_aleatorio:
 
 	ld	a, #50
 	ld	e_ai_cambioDirecccion(ix), a
+	ld	a, #0
+	ld	e_ai_rebotar_chocar(ix), a
  ret
 espera_actualizar_velocidad:
 	dec   a

@@ -14,7 +14,7 @@
 
 DefineComponentArrayStructure _obstacle, max_obstacles, DefineCmp_Obstacle_default ;; ....
 
-obst_fake: DefineCmp_Obstacle  0, 0, 1, 1, 0xBB
+obst_fake: DefineCmp_Obstacle  0, 0, 4, 8, 0xBB
 
 
 resto_x: .db #0
@@ -131,15 +131,11 @@ man_obstacle_re_rellenar_array::
 ;     nueva_x y nueva_y tienen que estar calculadas previamente
 ; Output
 crear_obstaculo_por_nueva_xy:
-   ld a, (nueva_y)
-   ld l, a ; nueva_y
-   ld a, (nueva_x)
-   ld h, a
    ld iy, #obst_fake
-   ld obs_x(iy), h
-   ld obs_y(iy), l
-   ld obs_w(iy), #4
-   ld obs_h(iy), #8
+   ld a, (nueva_x)
+   ld obs_x(iy), a
+   ld a, (nueva_y)
+   ld obs_y(iy), a
    ld hl, #obst_fake
    jp man_obstacle_create
 
@@ -156,15 +152,11 @@ calcular_combinacion_restos::
    ; si SÍ son, miro si uno de ellos es cero, si lo es, ambos son 0, si no, ambos son 1
    ; si NO son, miro si uno de ellos es cero, si lo es, ese es cero 0, y el otro 1, sino, al revés
    ld a, (resto_x)
-   ld h, a  ; x
-   ld a, (resto_y)
-   ld b, a  ; y
-   ld a, #0 ; comparador
-
-   cp h
+   or a
    jr z, x_es_cero
    x_no_es_cero:
-      cp b
+      ld a, (resto_y)
+      or a
       jr z, y_es_cero
       y_no_es_cero:
       ld a, #3
@@ -176,7 +168,8 @@ calcular_combinacion_restos::
 
 
    x_es_cero:
-      cp b
+      ld a, (resto_y)
+      or a
       jr z, ambos_son_cero
       ; y no es cero
       ld a, #2
@@ -185,7 +178,6 @@ calcular_combinacion_restos::
       ambos_son_cero:
       ld a, #0
       ret
-
 
 
 
@@ -1721,6 +1713,8 @@ get_pos_tile_memoria::
    ret
 
 
+; Devuelve el número de tile máximo que representa un muro dentro del tileset.
+; Esto es necesario porque no es el mismo número para enemigo que para hero
 get_max_num_tile_muro_segun_enemigo_o_hero::
    ld a, e_ai_st(ix) ; obtenemos el tipo de ia, si es el personaje, 
                      ; podrá salir por la puerta, si son enemigos, 

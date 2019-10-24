@@ -126,6 +126,7 @@ Esc_Pressed_menuIngame:
 	ld a, #0
 	call man_state_setEstado
 	call man_game_cerrarMenuIngame ;; modificar
+	call sys_music_pausarReanudarMusica
 
 	ld	a, #1
 	ld	(ent_input_ESC_pressed), a

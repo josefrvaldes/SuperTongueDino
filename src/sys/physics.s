@@ -12,6 +12,7 @@
 .include "man/man_tilemap.h.s"
 .include "sys/sys_calc.h.s"
 .include "man/game.h.s" ; cambiar por man_obstacles
+.include "sys/sys_music.h.s"
 
 
 .module sys_entity_physics
@@ -601,6 +602,7 @@ start_jump::
 
       ld a, #0
       ld (press_now_W), a
+      
 ; Limpiar la variable hero_jump ya que si pulsamos en el aire y NO estamos colisionando se queda activa
 continue_start_jump:
 

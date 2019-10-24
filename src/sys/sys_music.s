@@ -1,13 +1,19 @@
 .include "cpctelera.h.s"
 .include "cpct_functions.h.s"
 
+.globl _sfx_instrumentos
 .globl _song_ingame1
 .globl _song_ingame2
 
 contadorVelocidadMusica: .db #12
 velocidadMusica:	.db #12			;; suena 1 vez cada 12 interrupciones
 
-pulsadoSaltoSonar: .db #0
+
+
+; Sonidos sfx
+sfx_Salto: .db #0
+sfx_explosion: .db #0
+
 
 pausarMusica: .db #0
 ;ArrayCanciones:
@@ -40,7 +46,7 @@ sys_music_ponerMusica::
 sys_music_selectSong:
 	dec	a
 	jr	nz, comprobarCancion2	
-	ld	a, #12
+	ld	a, #9
 	ld	(contadorVelocidadMusica), a
 	ld	(velocidadMusica), a 
 	ld	de, #_song_ingame1
@@ -63,14 +69,14 @@ sys_music_selectSong:
 	ret
 
 ; Destroy: DE, HL
-sys_music_init::
+;sys_music_init::
 ;	call sys_music_pararMusica
 ;	ld 		de, #_song_ingame
 ;	call	cpct_akp_musicInit_asm	;; Inicializa la cancion
 ;
 ;	ld		hl, #isr
 ;	call 	cpct_setInterruptHandler_asm   ; Coloca un interruptor
-	ret
+;	ret
 
 
 
@@ -180,10 +186,27 @@ sys_music_init_sfx:
 
 ; Destruye: AF, BC, DE, HL
 detectarSonido_Sfx:
-
-	ld	a, (pulsadoSaltoSonar)
+	ld	a, (sfx_Salto)
 	cp	#1
-	jr	nz, try_salto2_sfx
+	jr	nz, try_explotar1_sfx
+
+	ld	l, #01				; sfx_num		 Number of the instrument in the SFX Song (>0), same as the number given to the instrument in Arkos Tracker.
+	ld	h, #14				; volume		 Volume [0-15], 0 = off, 15 = maximum volume.
+	ld	e, #52				; note		 Note to be played with the given instrument [0-143]
+	ld	d, #0					; speed		 Speed (0 = As original, [1-255] = new Speed (1 is fastest))
+	ld	bc, #0x28			; inverted_pitch	 Inverted Pitch (-0xFFFF -> 0xFFFF).  0 is no pitch.  The higher the pitch, the lower the sound.
+	ld	a, #0x04  ; -> binario 010    ; channel_bitmask	 Bitmask representing channels to use for reproducing the sound (Ch.A = 001 (1), Ch.B = 010 (2), Ch.C = 100 (4))
+	call cpct_akp_SFXPlay_asm
+	ld	a, #0
+	ld	(sfx_Salto), a
+	jr 	return_salir_sfx
+
+
+
+	try_explotar1_sfx:
+	ld	a, (sfx_explosion)
+	cp	#1
+	jr	nz, try_explotar2_sfx
 
 	ld	l, #1					; sfx_num		 Number of the instrument in the SFX Song (>0), same as the number given to the instrument in Arkos Tracker.
 	ld	h, #14				; volume		 Volume [0-15], 0 = off, 15 = maximum volume.
@@ -193,11 +216,11 @@ detectarSonido_Sfx:
 	ld	a, #0x04  ; -> binario 010    ; channel_bitmask	 Bitmask representing channels to use for reproducing the sound (Ch.A = 001 (1), Ch.B = 010 (2), Ch.C = 100 (4))
 	call cpct_akp_SFXPlay_asm
 	ld	a, #2
-	ld	(pulsadoSaltoSonar), a
+	ld	(sfx_explosion), a
 	jr 	return_salir_sfx
 
-	try_salto2_sfx:
-	ld	a, (pulsadoSaltoSonar)
+	try_explotar2_sfx:
+	ld	a, (sfx_explosion)
 	cp	#2
 	jr	nz, return_salir_sfx
 
@@ -209,11 +232,11 @@ detectarSonido_Sfx:
 	ld	a, #0x04  ; -> binario 010    
 	call cpct_akp_SFXPlay_asm
 	ld	a, #0
-	ld	(pulsadoSaltoSonar), a
+	ld	(sfx_explosion), a
 	jr 	return_salir_sfx
 
-	return_salir_sfx:
 
+	return_salir_sfx:
 	ret
 
 
@@ -222,9 +245,14 @@ detectarSonido_Sfx:
 ; Destruye: A
 sys_music_sonar_Salto::
 	ld	a, #1
-	ld	(pulsadoSaltoSonar), a
+	ld	(sfx_Salto), a
 	ret
 
+; Destruye: A
+sys_music_sonar_Explosion::
+	ld	a, #1
+	ld	(sfx_explosion), a
+	ret
 
 
 

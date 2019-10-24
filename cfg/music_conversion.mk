@@ -35,8 +35,9 @@
 # Conversion
 #$(eval $(call AKS2DATA, CONVERT      , music.aks , array , mem_address ))
 $(eval $(call AKS2DATA, SET_FOLDER   , src/music/ ))
-$(eval $(call AKS2DATA, CONVERT      , img/music/molusk.aks , song_ingame1 , 0x0040 ))
-$(eval $(call AKS2DATA, CONVERT      , img/music/prueba1.aks , song_ingame2 , 0x22f3 ))
+$(eval $(call AKS2DATA, CONVERT      , img/music/instrumentos.aks , sfx_instrumentos , 0x0040 )) # ocupa 55 bytes
+$(eval $(call AKS2DATA, CONVERT      , img/music/mainMenuSong.aks , song_ingame1 , 0x0077 ))     # ocupa 291  bytes
+$(eval $(call AKS2DATA, CONVERT      , img/music/ingameSong_1.aks , song_ingame2 , 0x019A ))	 # ocupa 162  bytes a la 0x023B
 
 
 ##

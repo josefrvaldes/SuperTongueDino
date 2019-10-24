@@ -208,17 +208,17 @@ check_diferent_obstacles:
    jr z, pasar_nivel
 
    pasar_nivel:
-   call man_level_load_next
-;    call man_tilemap_descomprimir_nuevo_nivel
-   call man_tilemap_load
-   call man_tilemap_render
-   jr todo_fondo
+      call man_level_load_next
+      call man_tilemap_load
+      call man_tilemap_render
+      call man_level_render
+      jr   todo_fondo
 
    morir:
-   ld e_dead(ix), #1
+      ld e_dead(ix), #1
 
    todo_fondo:
- ret
+   ret
 
 
 

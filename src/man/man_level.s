@@ -1,7 +1,9 @@
 .include "cpctelera.h.s"
 .include "ent/array_structure.h.s"
 .include "man/man_level.h.s"
+.include "man/man_tilemap.h.s"
 .include "ent/ent_level.h.s"
+.include "cpct_functions.h.s"
 
 
 .module level_manager
@@ -56,7 +58,6 @@ level19: DefineCmp_Level #_level19_pack_end, #str19
 
 
 iy_current_level:: .dw #0
-
 
 
 
@@ -177,3 +178,56 @@ man_level_load_next::
    add iy, de
    ld (iy_current_level), iy
    ret
+
+
+man_level_render::
+   ld hl, #0x2602
+   call cpct_setDrawCharM0_asm
+
+   call man_level_get_current
+
+   ld b, lev_str_h(iy) 
+   ld c, lev_str_l(iy) 
+   ld__iyh_b
+   ld__iyl_c
+
+   ld   de, #CPCT_VMEM_START_ASM ;; DE = Pointer to start of the screen
+   ld    b, #16                  ;; B = y coordinate (24 = 0x18)
+   ld    c, #8                   ;; C = x coordinate (16 = 0x10)
+   call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
+   call cpct_drawStringM0_asm
+   call man_level_borrar_letras_con_retraso
+   ret
+;    ld a, #0xFF
+;    loop_tiempo:
+;       dec a
+;       jr z, fuera_de_loop
+;       jr loop_tiempo
+
+;    fuera_de_loop:
+;       ld (#bool_dibujar_level), a ; aquí a vale 0, así que pues desactivamos el dibujar level
+;       ret
+
+
+man_level_borrar_letras_con_retraso:
+   ld a, #0
+   ld d, #2
+   ld hl, #0xFFFF
+   loop_tiempo:
+      dec hl
+      cp h
+      jr z, h_era_cero
+      jr loop_tiempo
+
+      h_era_cero:
+      cp l
+      jr z, l_era_cero
+      jr loop_tiempo
+
+      l_era_cero:
+      dec d
+      jr z, fuera_de_loop
+      jr loop_tiempo
+
+   fuera_de_loop:
+      jp man_tilemap_render

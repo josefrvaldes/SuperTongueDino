@@ -38,7 +38,11 @@ sys_eren_init::
 	ld    de, #16
 	call cpct_setPalette_asm
 	cpctm_setBorder_asm HW_WHITE
-	jp sys_eren_load_tilemap
+	call sys_eren_load_tilemap
+   call sys_eren_drawLevel
+   ret
+
+
 
 
 sys_eren_load_tilemap::
@@ -49,7 +53,7 @@ sys_eren_load_tilemap::
 
 sys_eren_update::
 	call sys_eren_render_entities
-   jp sys_eren_drawLevel
+   ret;jp sys_eren_drawLevel
 
 
 
@@ -198,19 +202,4 @@ sys_eren_DrawDirtOfPlant::
       ret
 
 sys_eren_drawLevel::
-   ld hl, #0x2602
-   call cpct_setDrawCharM0_asm
-
-   call man_level_get_current
-
-   ld b, lev_str_h(iy) 
-   ld c, lev_str_l(iy) 
-   ld__iyh_b
-   ld__iyl_c
-
-   ld   de, #CPCT_VMEM_START_ASM ;; DE = Pointer to start of the screen
-   ld    b, #16                  ;; B = y coordinate (24 = 0x18)
-   ld    c, #8                   ;; C = x coordinate (16 = 0x10)
-   call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
-   call cpct_drawStringM0_asm
-   ret
+   jp man_level_render

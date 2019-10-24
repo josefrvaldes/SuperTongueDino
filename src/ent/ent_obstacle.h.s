@@ -1,7 +1,7 @@
 ;;
 ;; Entity OBSTACLE
 ;;
-max_obstacles == 6
+max_obstacles == 12
 
 ;; Defines a new entity component
 .macro DefineCmp_Obstacle _x, _y, _w, _h, _color

@@ -113,14 +113,15 @@ _update_loop:
    call man_obstacle_getArray ; como en la llamada anterior hemos consultado los arrays, nos posicionamos de nuevo en la primera posición
    pop ix
 
-   cpctm_setBorder_asm HW_RED
-   ;; COLISIONES CON LOS OBJETOS
-   call sys_check_collision
-
 ;================================================================================
 ;; ESTO ES LO TUYO VALDES !!!!!!!!!!!!!!!!!!!!!!!!!1
    call check_diferent_obstacles
 ;=================================================================================
+
+   cpctm_setBorder_asm HW_RED
+   ;; COLISIONES CON LOS OBJETOS
+   call sys_check_collision
+
 
    ld a, d
    add   e

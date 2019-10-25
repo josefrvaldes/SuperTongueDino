@@ -6,6 +6,7 @@
 .include "sys/render.h.s"
 .include "man/state.h.s"
 .include "man/man_level.h.s"
+.include "sys/sys_music.h.s"
 
 .globl _hero_pal
 .globl _menu_principal_pack_end
@@ -35,7 +36,11 @@ man_mainMenu_init::
    ld a, #0
    ld (num_current_level), a
 
+
+   ld a, #cancion1
+	call sys_music_ponerMusica ;; Inicializar una cancion
    ret
+
 
 
 

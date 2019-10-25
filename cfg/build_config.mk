@@ -49,8 +49,8 @@
 # Name of the project (without spaces, as it will be used as filename)
 #   and Z80 memory location where code will start in the generated binary
 PROJNAME   := SuperTongueBoy
-Z80CODELOC := 0x0974 # empezamos en esta posición para reservar tamaño para el tilemap descomprimido
-
+#Z80CODELOC := 0x0974 # empezamos en esta posición para reservar tamaño para el tilemap descomprimido
+Z80CODELOC := 0x0C5C  # empezamos en esta posición para reservar tamaño para la musica
 ##
 ## Folders 
 ##

@@ -18,6 +18,8 @@
 .include "man/sprite.h.s"
 .include "sys/sys_deleteEntity.h.s"
 ;.include "man/sprite.h.s"
+.include "sys/sys_music.h.s"
+.include "man/man_tilemap.h.s"
 
 .module game_manager
 
@@ -73,6 +75,10 @@ man_game_init::
 	call sys_physics_init
 	call sys_input_init
 	call sys_collision_entity_init
+    
+    
+    	ld	a, #cancion2
+	call sys_music_ponerMusica ;; Inicializar una cancion
 	ret
 
 
@@ -155,7 +161,7 @@ render_menuIngame:
 abrir_cerrar_menuIngame::
 	ld a, (#bool_mostrar_menu) ;; comprobacion menu ingame abierto
 	dec a
-	jr z, #salir_menuIngame
+	jr z, salir_menuIngame
 	abrir_menuIngame:
 	ld a, #1
 	ld (#bool_mostrar_menu), a
@@ -167,9 +173,8 @@ abrir_cerrar_menuIngame::
 	ld (#bool_mostrar_menu), a
 	call sys_eren_clearScreen
 
-
-	;; TEMPORANEO !!! Para dibujar el tileset pero descomprime y todo
-	call sys_eren_init
+	;; TRepintar actual tilemap
+	call man_tilemap_render
 
 	ret
 
@@ -177,4 +182,5 @@ abrir_cerrar_menuIngame::
 man_game_cerrarMenuIngame::
 	ld a, #0
 	ld (#bool_mostrar_menu), a
+
 	ret

@@ -5,6 +5,7 @@
 .include "cpct_functions.h.s"
 .include "man/game.h.s"
 .include "sys/render.h.s"
+.include "sys/sys_music.h.s"
 .include "man/state.h.s"
 
 string_menuIngame_info: .asciz "MENU INGAME / PAUSE"
@@ -26,10 +27,12 @@ menuIngame_init::
    ld a, #1
    ld (ent_input_ESC_pressed), a   ;; se utiliza para evitar que al abrir el menu se vaya al menu principal al tener pulsada la tecla
 
+    call sys_music_pausarReanudarMusica
    ret
 
 
 
+	
 menuIngame_update::
    ret
 
@@ -55,6 +58,7 @@ M_Pressed_menuIngame:
    jr z, M_Holded_OrPressed_menuIngame
 
    call abrir_cerrar_menuIngame
+	call sys_music_pausarReanudarMusica
 
    ld a, #1
    ld (ent_input_M_pressed), a
@@ -81,6 +85,7 @@ Esc_Pressed_menuIngame:
    ld a, #0
    call man_state_setEstado
    call man_game_cerrarMenuIngame ;; modificar
+	call sys_music_pausarReanudarMusica
 
    ld a, #1
    ld (ent_input_ESC_pressed), a

@@ -5,6 +5,7 @@
 .include "ent/array_structure.h.s"
 .include "ent/ent_obstacle.h.s"
 .include "man/man_obstacle.h.s"
+.include "man/man_tilemap.h.s"
 .include "entity.h.s"
 .include "ent/entity.h.s"
 .include "sys/sys_calc.h.s"
@@ -1673,7 +1674,7 @@ get_pos_tile_memoria_by_tile::
    ld  e, a           ; y ponemos en e el valor de x/4
    add hl, de         ; sumamos 20y + x
 
-   ld bc, #0x4000 ; cargamos en bc la pos inicial en memoria de nuestro tilemap
+   ld bc, #decompress_buffer ; cargamos en bc la pos inicial en memoria de nuestro tilemap
    add hl, bc     ; y ya sumamos 4000 + x + 20y
    ld (pos_memoria_tile_origen), hl
    ret

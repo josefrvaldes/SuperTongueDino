@@ -61,6 +61,9 @@ $(eval $(call ADD2PACK,level18_pack,src/tilesets/level18.bin)) # este es el tile
 $(eval $(call ADD2PACK,level19_pack,src/tilesets/level19.bin)) # este es el tilemap, es decir, el tmx importado de tiled
 $(eval $(call ADD2PACK,tileset_juego_pack,src/tilesets/tileset_juego.bin)) # este es el tileset, es decir, el png con los tiles base
 
+$(eval $(call ADD2PACK,menu_principal_pack,src/tilesets/menu_principal.bin)) # este es el tileset, es decir, el png con los tiles base
+$(eval $(call ADD2PACK,menu_you_win_pack,src/tilesets/menu_you_win.bin)) # este es el tileset, es decir, el png con los tiles base
+
 # comprimimos
 $(eval $(call PACKZX7B,level00_pack,src/tilesets/compressed))
 $(eval $(call PACKZX7B,level01_pack,src/tilesets/compressed))
@@ -83,6 +86,9 @@ $(eval $(call PACKZX7B,level17_pack,src/tilesets/compressed))
 $(eval $(call PACKZX7B,level18_pack,src/tilesets/compressed))
 $(eval $(call PACKZX7B,level19_pack,src/tilesets/compressed))
 $(eval $(call PACKZX7B,tileset_juego_pack,src/tilesets/compressed))
+
+$(eval $(call PACKZX7B,menu_principal_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,menu_you_win_pack,src/tilesets/compressed))
 
 
 

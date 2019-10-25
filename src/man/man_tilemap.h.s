@@ -3,3 +3,4 @@
 .globl man_tilemap_render
 .globl man_tilemap_descomprimir_nuevo_nivel
 .globl man_tilemap_cargar_spawns
+.globl decompress_buffer

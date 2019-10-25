@@ -172,13 +172,21 @@ no_mas_saltos:
 	ld	a, e_ai_st(ix)
 	cp	#e_ai_st_patrullar
 	jr	z, no_mas_saltos_patrullar
+
+
+   ld a, e_ai_st(ix)
+   cp #e_ai_st_perseguir
+   jr z, no_mas_saltos_perseguir
 	;; COLISIONES CON LOS BORDES DE LA PANTALLA y actualizar pos
-	call sys_check_borderScreem
+	  call sys_check_borderScreem
 	jr continuar_actualizar_pos
 
-	no_mas_saltos_patrullar:
+no_mas_saltos_patrullar:
 	call sys_check_borderScreem_patrullar ;; COLISIONES CON LOS BORDES DE LA PANTALLA y actualizar pos para la IA patrullar
-	continuar_actualizar_pos:
+   jr continuar_actualizar_pos
+no_mas_saltos_perseguir:
+   call sys_check_borderScreem_patrullar2 ;; COLISIONES CON LOS BORDES DE LA PANTALLA y actualizar pos para la IA patrullar
+continuar_actualizar_pos:
 
 
 
@@ -968,3 +976,48 @@ sys_check_borderScreem_patrullar_X:
 	ld	  e_x(ix), a
 	ret
 	
+
+
+
+
+
+
+;; CHOQUES CON LOS BORDES DE LA PANTALLA
+sys_check_borderScreem_patrullar2:
+
+   ;; TEMPORIZADOR
+   ld  a, e_ai_pausaVel(ix)
+   cp  #0
+   jr  nz, patrullar_reiniciarPausa2
+   ld  a, #3
+   ld  e_ai_pausaVel(ix), a
+
+
+   ;; UPDATE Y
+   call sys_check_borderScreem_patrullar_Y2
+   ;; UPDATE X
+   call sys_check_borderScreem_patrullar_X2
+   ret
+patrullar_reiniciarPausa2:
+   ld  a, e_ai_pausaVel(ix)
+   dec   a
+   ld  e_ai_pausaVel(ix), a
+   ret
+
+
+
+;; UPDATE Y
+sys_check_borderScreem_patrullar_Y2:
+   ;; UPDATE Y
+   ld   a, e_y(ix)
+   add  e_vy(ix)
+   ld   e_y(ix), a
+   ret
+
+;; UPDATE X
+sys_check_borderScreem_patrullar_X2:
+   ld   a, e_x(ix)
+   add  e_vx(ix)
+   ld   e_x(ix), a
+   ret
+   

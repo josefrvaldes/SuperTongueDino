@@ -322,8 +322,7 @@ v_iz:
 ;;
 guardar_VX:
     ld  (vx_actual), a
-
-    ret
+ ret
 
 
 

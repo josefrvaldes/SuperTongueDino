@@ -24,7 +24,12 @@
 ############################################################################
 
 ## Set the name of your main game file in the CDT here
-$(eval $(call CDTMAN, SET_FILENAME, SuperTongueBoy))
+
+
+SCR_PAL=14 26 0 2 3 4 6 7 8 9 11 13 15 17 18 24
+$(eval $(call CDTMAN, SET_FILENAME, SuperTongueBoy))                  
+$(eval $(call CDTMAN, SET_MINILOAD_PALETTE_FW , 14, $(SCR_PAL)   ))
+$(eval $(call CDTMAN, GEN_MINILOADER , img/ventanaCargaCinta.png))
 
 ###############################################################################
 ##                    CASSETE FILE MANAGER HELP INDEX                        ##

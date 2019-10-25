@@ -8,12 +8,14 @@
 .include "man/game.h.s"
 .include "man/entity.h.s"
 .include "ent/entity.h.s"
+.include "man/man_level.h.s"
 
 .globl _hero_sp_1
 .globl _planta_sp_0
 .globl _planta_sp_1
 .globl _planta_sp_2
 .globl _tierraPlanta_sp
+	
 easterEgg: .db #0
 endAnimation: .db #0
 cont_Animation: .db #0
@@ -49,7 +51,7 @@ man_deadAnimation_init::
 
 
 
-	ld	a, (nivel)
+	ld	a, (num_current_level)
 	cp	#10
 	jr	z, yes_easterEgg
 	cp	#15

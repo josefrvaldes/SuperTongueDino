@@ -26,8 +26,6 @@
 
 bool_mostrar_menu: .db #0
 
-nivel:: .db #21
-
 
 .globl _hero_sp_1
 .globl _hero_sp_0

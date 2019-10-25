@@ -171,8 +171,9 @@ abrir_cerrar_menuIngame::
 	ld (#bool_mostrar_menu), a
 	call sys_eren_clearScreen
 
-	;; TRepintar actual tilemap
-	call man_tilemap_render
+	;; Repintar actual tilemap
+	;call man_tilemap_load
+      call man_tilemap_render
 
 	ret
 

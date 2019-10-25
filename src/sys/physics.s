@@ -220,6 +220,9 @@ check_diferent_obstacles:
    jr z, pasar_nivel
 
    pasar_nivel:                  ;; pasa al siguiente nivel
+      call comprobarFinalJuego
+      dec   a
+      jr    z, todo_fondo
       call man_level_load_next
       call man_tilemap_load
       call man_tilemap_render

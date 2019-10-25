@@ -4,6 +4,7 @@
 .include "man/man_tilemap.h.s"
 .include "ent/ent_level.h.s"
 .include "cpct_functions.h.s"
+.include "man/state.h.s"
 
 
 .module level_manager
@@ -58,7 +59,9 @@ level19: DefineCmp_Level #_level19_pack_end, #str19
 
 
 iy_current_level::  .dw #0
+memory_firstLevel:: .dw #_level_array
 num_current_level:: .db #0
+
 
 
 ;; //////////////////
@@ -236,3 +239,23 @@ man_level_borrar_letras_con_retraso:
 
    fuera_de_loop:
       jp man_tilemap_render
+
+
+
+
+comprobarFinalJuego::
+   ld    a, (num_current_level)
+   ld    b, a
+   ld    a, #final_Level
+   cp    b
+   jr    c, ultimoNivel_pasado
+   jr    z, ultimoNivel_pasado
+   ld    a, #0
+   ret
+
+   ultimoNivel_pasado:
+   ld    a, #3
+   call man_state_setEstado ; salir menu principal
+   ld    a, #1
+
+   ret

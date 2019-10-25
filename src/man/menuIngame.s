@@ -8,10 +8,6 @@
 .include "sys/sys_music.h.s"
 .include "man/state.h.s"
 
-string_menuIngame_info: .asciz "MENU INGAME / PAUSE"
-string_menuIngame_continuar: .asciz "Press M to continue"
-string_menuIngame_salir: .asciz "Press ESC/Fire2 to exit"
-
 .globl _menu_ingame_pack_end
 ;//////////// INTI
 ; Elimina: HL, DE, BC, IY

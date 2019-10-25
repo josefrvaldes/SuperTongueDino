@@ -8,7 +8,7 @@
 .globl sys_music_detenerSonidos
 
 .globl sys_music_sonar_Salto
-
+.globl sys_music_sonar_Explosion
 
 
 

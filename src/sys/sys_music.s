@@ -177,7 +177,7 @@ sys_music_detenerSonidos::
 ;; Cancion con la que se realicen los efectos de sonido
 sys_music_init_sfx:
 	push 	de
-	ld	de, #_song_ingame2			;; solo coge la cancion con el conjunto de instrumentos, las notas se hacen luego
+	ld	de, #_sfx_instrumentos			;; solo coge la cancion con el conjunto de instrumentos, las notas se hacen luego
 	call cpct_akp_SFXInit_asm
 	pop 	de
 	ret
@@ -192,9 +192,9 @@ detectarSonido_Sfx:
 
 	ld	l, #01				; sfx_num		 Number of the instrument in the SFX Song (>0), same as the number given to the instrument in Arkos Tracker.
 	ld	h, #14				; volume		 Volume [0-15], 0 = off, 15 = maximum volume.
-	ld	e, #52				; note		 Note to be played with the given instrument [0-143]
+	ld	e, #40				; note		 Note to be played with the given instrument [0-143]
 	ld	d, #0					; speed		 Speed (0 = As original, [1-255] = new Speed (1 is fastest))
-	ld	bc, #0x28			; inverted_pitch	 Inverted Pitch (-0xFFFF -> 0xFFFF).  0 is no pitch.  The higher the pitch, the lower the sound.
+	ld	bc, #0			; inverted_pitch	 Inverted Pitch (-0xFFFF -> 0xFFFF).  0 is no pitch.  The higher the pitch, the lower the sound.
 	ld	a, #0x04  ; -> binario 010    ; channel_bitmask	 Bitmask representing channels to use for reproducing the sound (Ch.A = 001 (1), Ch.B = 010 (2), Ch.C = 100 (4))
 	call cpct_akp_SFXPlay_asm
 	ld	a, #0
@@ -208,9 +208,9 @@ detectarSonido_Sfx:
 	cp	#1
 	jr	nz, try_explotar2_sfx
 
-	ld	l, #1					; sfx_num		 Number of the instrument in the SFX Song (>0), same as the number given to the instrument in Arkos Tracker.
+	ld	l, #07					; sfx_num		 Number of the instrument in the SFX Song (>0), same as the number given to the instrument in Arkos Tracker.
 	ld	h, #14				; volume		 Volume [0-15], 0 = off, 15 = maximum volume.
-	ld	e, #40				; note		 Note to be played with the given instrument [0-143]
+	ld	e, #24				; note		 Note to be played with the given instrument [0-143]
 	ld	d, #0					; speed		 Speed (0 = As original, [1-255] = new Speed (1 is fastest))
 	ld	bc, #0				; inverted_pitch	 Inverted Pitch (-0xFFFF -> 0xFFFF).  0 is no pitch.  The higher the pitch, the lower the sound.
 	ld	a, #0x04  ; -> binario 010    ; channel_bitmask	 Bitmask representing channels to use for reproducing the sound (Ch.A = 001 (1), Ch.B = 010 (2), Ch.C = 100 (4))
@@ -226,7 +226,7 @@ detectarSonido_Sfx:
 
 	ld	l, #1				
 	ld	h, #14					
-	ld	e, #60				
+	ld	e, #12				
 	ld	d, #0					
 	ld	bc, #0				
 	ld	a, #0x04  ; -> binario 010    
@@ -256,18 +256,6 @@ sys_music_sonar_Explosion::
 
 
 
-;sys_music_init_sfx::
-;	push 	de
-;	ld	de, #_song_ingame1			;; solo coge el instrumento, las notas se hacen luego
-;	call cpct_akp_SFXInit_asm
-;	pop 	de
-;
-;	ld	a, #12
-;	ld	(contadorVelocidadMusica), a
-;	ld	(velocidadMusica), a 
-;	ld	hl, #sys_music_jump
-;	call 	cpct_setInterruptHandler_asm   ; Coloca un interruptor
-;	ret
 
 
 

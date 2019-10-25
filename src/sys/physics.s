@@ -218,7 +218,7 @@ check_diferent_obstacles:
 
    morir:
       ld e_dead(ix), #1
-
+      call sys_music_sonar_Explosion
    todo_fondo:
    ret
 

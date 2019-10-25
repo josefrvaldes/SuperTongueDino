@@ -110,7 +110,7 @@ Q_Pressed:
 	jr	z, jumping
 
 	call start_jump
-	call sys_music_sonar_Salto
+	;call sys_music_sonar_Salto
 	
 
 	ld	a, #1

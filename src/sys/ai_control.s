@@ -12,9 +12,9 @@
 .module sys_ai_control
  
 
-dificultadRango_1 = 20			;; para cambiar la dificultad de los enemigos dependiendo del nivel
-dificultadRango_2 = 40
-dificultadRango_3 = 60
+dificultadRango_1 = 0			;; para cambiar la dificultad de los enemigos dependiendo del nivel
+dificultadRango_2 = 3
+dificultadRango_3 = 6
 dificultad_0 = 0
 dificultad_1 = 1
 dificultad_2 = 2
@@ -632,7 +632,7 @@ salto_tempo_patrullar:
 
 
 ;; Destroy: A, B
-setDificultadEnemigos:
+setDificultadEnemigos::
 	ld	a, (num_current_level)
 	ld	b, a
 

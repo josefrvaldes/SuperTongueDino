@@ -13,6 +13,7 @@
 .include "sys/sys_calc.h.s"
 .include "man/game.h.s" ; cambiar por man_obstacles
 .include "sys/sys_music.h.s"
+.include "sys/ai_control.h.s"
 
 
 .module sys_entity_physics
@@ -210,11 +211,12 @@ check_diferent_obstacles:
    dec a
    jr z, pasar_nivel
 
-   pasar_nivel:
+   pasar_nivel:                  ;; pasa al siguiente nivel
       call man_level_load_next
       call man_tilemap_load
       call man_tilemap_render
       call man_level_render
+      call setDificultadEnemigos
       jr   todo_fondo
 
    morir:

@@ -63,6 +63,7 @@ $(eval $(call ADD2PACK,tileset_juego_pack,src/tilesets/tileset_juego.bin)) # est
 
 $(eval $(call ADD2PACK,menu_principal_pack,src/tilesets/menu_principal.bin)) # este es el tileset, es decir, el png con los tiles base
 $(eval $(call ADD2PACK,menu_you_win_pack,src/tilesets/menu_you_win.bin)) # este es el tileset, es decir, el png con los tiles base
+$(eval $(call ADD2PACK,menu_ingame_pack,src/tilesets/menu_ingame.bin)) # este es el tileset, es decir, el png con los tiles base
 
 # comprimimos
 $(eval $(call PACKZX7B,level00_pack,src/tilesets/compressed))
@@ -89,6 +90,7 @@ $(eval $(call PACKZX7B,tileset_juego_pack,src/tilesets/compressed))
 
 $(eval $(call PACKZX7B,menu_principal_pack,src/tilesets/compressed))
 $(eval $(call PACKZX7B,menu_you_win_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,menu_ingame_pack,src/tilesets/compressed))
 
 
 

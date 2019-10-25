@@ -52,8 +52,10 @@ $(eval $(call IMG2SP, CONVERT, img/planta.png , 48, 52, planta_sp, planta_pal ))
 $(eval $(call IMG2SP, CONVERT, img/tierraPlanta.png , 60, 8, tierraPlanta_sp, tierraPlanta_pal ))
 
 $(eval $(call IMG2SP, SET_OUTPUT, bin))
+$(eval $(call IMG2SP, SET_IMG_FORMAT, screen))
 $(eval $(call IMG2SP, CONVERT, img/menu_principal.png , 160, 200, menu_principal_sp, ))
 $(eval $(call IMG2SP, CONVERT, img/menu_you_win.png , 160, 200, menu_you_win_sp, ))
+$(eval $(call IMG2SP, CONVERT, img/menu_ingame.png , 160, 200, menu_ingame_sp, ))
 
 $(eval $(call IMG2SP, SET_FOLDER, src/tilesets/ ))
 $(eval $(call IMG2SP, SET_IMG_FORMAT, zgtiles))

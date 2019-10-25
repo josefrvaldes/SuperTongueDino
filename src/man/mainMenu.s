@@ -8,104 +8,74 @@
 .include "man/man_level.h.s"
 
 .globl _hero_pal
-string_menuIngame_info: .asciz "MAIN MENU"
-string_menuIngame_jugar: .asciz "Press Q to play"
+.globl _menu_principal_pack_end
+;string_menuIngame_info: .asciz "MAIN MENU"
+;string_menuIngame_jugar: .asciz "Press Q to play"
 
 
 ;//////////// INTI
 ; Elimina: HL, DE, BC, IY
 man_mainMenu_init::
-	ld	c, #0
-	call cpct_setVideoMode_asm
-	ld	hl, #_hero_pal
-	ld	de, #16
-	call cpct_setPalette_asm
-	cpctm_setBorder_asm HW_WHITE
-	;call sys_eren_init	;; va a dibujar el mapa, CORREGIR!!!
-
-	call sys_eren_clearScreen
-
-	;; Set up draw char colours before calling draw string ;; Pone colores de fondo y letra
-	ld    l, #3         ;; D = Background PEN (0)
-	ld    h, #0         ;; E = Foreground PEN (3)
-	call cpct_setDrawCharM0_asm   ;; Set draw char colours
-
-	;///////// Texto 1
-	;; Calculate a video-memory location for printing a string
-	ld   de, #CPCT_VMEM_START_ASM ;; DE = Pointer to start of the screen
-	ld    b, #24                  ;; B = y coordinate (24 = 0x18)
-	ld    c, #2                  ;; C = x coordinate (16 = 0x10)
-	call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
-
-	;; Print the string in video memory
-	;; HL already points to video memory, as it is the return
-	;; value from cpct_getScreenPtr_asm
-	ld   IY, #string_menuIngame_info   ;; IY = Pointer to the string 
-	call cpct_drawStringM0_asm  ;; Draw the string
+   ld c, #0
+   call cpct_setVideoMode_asm
+   ld hl, #_hero_pal
+   ld de, #16
+   call cpct_setPalette_asm
+   cpctm_setBorder_asm HW_WHITE
+   
+   ;call sys_eren_init  ;; va a dibujar el mapa, CORREGIR!!!
+   ld hl, #_menu_principal_pack_end
+   ld de, #0xFFFF
+   call cpct_zx7b_decrunch_s_asm
+      
+   ld a, #1
+   ld (ent_input_Q_pressed), a   ;; se utiliza para evitar que al iniciar el juego se entre al juego al tener pulsada la tecla y no se vea el menu
 
 
-	;///////// Texto 2
-	;; Calculate a video-memory location for printing a string
-	ld   de, #CPCT_VMEM_START_ASM ;; DE = Pointer to start of the screen
-	ld    b, #48                ;; B = y coordinate (24 = 0x18)
-	ld    c, #2                  ;; C = x coordinate (16 = 0x10)
-	call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
+   ld a, #0
+   ld (num_current_level), a
 
-	;; Print the string in video memory
-	;; HL already points to video memory, as it is the return
-	;; value from cpct_getScreenPtr_asm
-	ld   IY, #string_menuIngame_jugar    ;; IY = Pointer to the string 
-	call cpct_drawStringM0_asm  ;; Draw the string
-
-
-	ld	a, #1
-	ld	(ent_input_Q_pressed), a   ;; se utiliza para evitar que al iniciar el juego se entre al juego al tener pulsada la tecla y no se vea el menu
-
-
-	ld	a, #0
-	ld	(num_current_level), a
-
-	ret
+   ret
 
 
 
 man_mainMenu_update::
-	call mainMenu_input
-	ret
+   call mainMenu_input
+   ret
 
 
 
 man_mainMenu_render::
-	ret
+   ret
 
 
 
 ; Elimina: HL, A
 mainMenu_input:
-	call cpct_scanKeyboard_f_asm
+   call cpct_scanKeyboard_f_asm
 
-	ld	hl, #Joy0_Fire1
-	call cpct_isKeyPressed_asm
-	jr	nz, Q_Pressed_mainMenu
+   ld hl, #Joy0_Fire1
+   call cpct_isKeyPressed_asm
+   jr nz, Q_Pressed_mainMenu
 Joy0_Fire1_NotPressed_mainMenu:
 
-	ld	hl, #Key_Q
-	call cpct_isKeyPressed_asm
-	jr	z, Q_NotPressed_mainMenu
+   ld hl, #Key_Q
+   call cpct_isKeyPressed_asm
+   jr z, Q_NotPressed_mainMenu
 Q_Pressed_mainMenu:
-	ld 	a, (ent_input_Q_pressed)  ;; se comprueba si estaba pulsada anteriormente
-	dec	a
-	jr	z, Q_Holded_OrPressed_mainMenu
+   ld    a, (ent_input_Q_pressed)  ;; se comprueba si estaba pulsada anteriormente
+   dec   a
+   jr z, Q_Holded_OrPressed_mainMenu
 
-	ld	a, #1
-	call man_state_setEstado  ;; cambia el estado
+   ld a, #1
+   call man_state_setEstado  ;; cambia el estado
 
-	ld	(ent_input_Q_pressed), a
-	jr	Q_Holded_OrPressed_mainMenu
+   ld (ent_input_Q_pressed), a
+   jr Q_Holded_OrPressed_mainMenu
 Q_NotPressed_mainMenu:
-	ld	a, #0
-	ld	(ent_input_Q_pressed), a
+   ld a, #0
+   ld (ent_input_Q_pressed), a
 Q_Holded_OrPressed_mainMenu:
 
 
-	ret
+   ret

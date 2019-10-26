@@ -59,6 +59,38 @@ $(eval $(call ADD2PACK,level16_pack,src/tilesets/level16.bin)) # este es el tile
 $(eval $(call ADD2PACK,level17_pack,src/tilesets/level17.bin)) # este es el tilemap, es decir, el tmx importado de tiled
 $(eval $(call ADD2PACK,level18_pack,src/tilesets/level18.bin)) # este es el tilemap, es decir, el tmx importado de tiled
 $(eval $(call ADD2PACK,level19_pack,src/tilesets/level19.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level20_pack,src/tilesets/level20.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level21_pack,src/tilesets/level21.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level22_pack,src/tilesets/level22.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level23_pack,src/tilesets/level23.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level24_pack,src/tilesets/level24.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level25_pack,src/tilesets/level25.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level26_pack,src/tilesets/level26.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level27_pack,src/tilesets/level27.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level28_pack,src/tilesets/level28.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level29_pack,src/tilesets/level29.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level30_pack,src/tilesets/level30.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level31_pack,src/tilesets/level31.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level32_pack,src/tilesets/level32.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level33_pack,src/tilesets/level33.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level34_pack,src/tilesets/level34.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level35_pack,src/tilesets/level35.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level36_pack,src/tilesets/level36.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level37_pack,src/tilesets/level37.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level38_pack,src/tilesets/level38.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level39_pack,src/tilesets/level39.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level40_pack,src/tilesets/level40.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level41_pack,src/tilesets/level41.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level42_pack,src/tilesets/level42.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level43_pack,src/tilesets/level43.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level44_pack,src/tilesets/level44.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level45_pack,src/tilesets/level45.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level46_pack,src/tilesets/level46.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level47_pack,src/tilesets/level47.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level48_pack,src/tilesets/level48.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level49_pack,src/tilesets/level49.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+$(eval $(call ADD2PACK,level50_pack,src/tilesets/level50.bin)) # este es el tilemap, es decir, el tmx importado de tiled
+
 $(eval $(call ADD2PACK,tileset_juego_pack,src/tilesets/tileset_juego.bin)) # este es el tileset, es decir, el png con los tiles base
 
 $(eval $(call ADD2PACK,menu_principal_pack,src/tilesets/menu_principal.bin)) # este es el tileset, es decir, el png con los tiles base
@@ -86,6 +118,37 @@ $(eval $(call PACKZX7B,level16_pack,src/tilesets/compressed))
 $(eval $(call PACKZX7B,level17_pack,src/tilesets/compressed))
 $(eval $(call PACKZX7B,level18_pack,src/tilesets/compressed))
 $(eval $(call PACKZX7B,level19_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level20_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level21_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level22_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level23_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level24_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level25_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level26_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level27_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level28_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level29_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level30_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level31_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level32_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level33_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level34_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level35_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level36_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level37_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level38_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level39_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level40_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level41_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level42_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level43_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level44_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level45_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level46_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level47_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level48_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level49_pack,src/tilesets/compressed))
+$(eval $(call PACKZX7B,level50_pack,src/tilesets/compressed))
 $(eval $(call PACKZX7B,tileset_juego_pack,src/tilesets/compressed))
 
 $(eval $(call PACKZX7B,menu_principal_pack,src/tilesets/compressed))

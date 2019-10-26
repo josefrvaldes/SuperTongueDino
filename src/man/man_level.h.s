@@ -3,6 +3,7 @@
 ;;
 
 .globl iy_current_level
+.globl memory_firstLevel
 .globl num_current_level
 
 .globl man_level_getArray
@@ -13,6 +14,7 @@
 .globl man_level_load_next
 .globl man_level_get_current
 .globl man_level_render
+.globl comprobarFinalJuego
 
 
 .globl _level00_pack_end

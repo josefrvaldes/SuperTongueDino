@@ -13,6 +13,7 @@
 .include "sys/sys_calc.h.s"
 .include "man/game.h.s" ; cambiar por man_obstacles
 .include "sys/sys_music.h.s"
+.include "sys/ai_control.h.s"
 
 
 .module sys_entity_physics
@@ -31,6 +32,7 @@ hero_jump_left:               .db #-1     ;; -1 NO SALTAMOS // != -1 SALTAMOS/SA
 hero_jump_right:              .db #-1     ;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
 hero_gravity:                 .db #0      ;; -1 NO SALTAMOS // != -1 SALTAMOS/SALTANDO
 press_now_W:                  .db #-1     ;; variable que nos indica si estamos saltando justo en ese momento
+gravity_babosa:               .db #1
 ;spittle:            .db #6         ;; el numero de saliva es lo que le restamos a la gravedad 
 ;;
 ;;TABLAS DE SALTO Y GRAVEDAD
@@ -170,13 +172,21 @@ no_mas_saltos:
 	ld	a, e_ai_st(ix)
 	cp	#e_ai_st_patrullar
 	jr	z, no_mas_saltos_patrullar
+
+
+   ld a, e_ai_st(ix)
+   cp #e_ai_st_perseguir
+   jr z, no_mas_saltos_perseguir
 	;; COLISIONES CON LOS BORDES DE LA PANTALLA y actualizar pos
-	call sys_check_borderScreem
+	  call sys_check_borderScreem
 	jr continuar_actualizar_pos
 
-	no_mas_saltos_patrullar:
+no_mas_saltos_patrullar:
 	call sys_check_borderScreem_patrullar ;; COLISIONES CON LOS BORDES DE LA PANTALLA y actualizar pos para la IA patrullar
-	continuar_actualizar_pos:
+   jr continuar_actualizar_pos
+no_mas_saltos_perseguir:
+   call sys_check_borderScreem_patrullar2 ;; COLISIONES CON LOS BORDES DE LA PANTALLA y actualizar pos para la IA patrullar
+continuar_actualizar_pos:
 
 
 
@@ -209,11 +219,15 @@ check_diferent_obstacles:
    dec a
    jr z, pasar_nivel
 
-   pasar_nivel:
+   pasar_nivel:                  ;; pasa al siguiente nivel
+      call comprobarFinalJuego
+      dec   a
+      jr    z, todo_fondo
       call man_level_load_next
       call man_tilemap_load
       call man_tilemap_render
       call man_level_render
+      call setDificultadEnemigos
       jr   todo_fondo
 
    morir:
@@ -399,16 +413,23 @@ no_colision_X_corner:
 ;;        IY - SECOND ENEMY
 ;;
 change_direcction_entity::
+   ;ld    a, e_ai_st(ix)
+   ;cp    #e_ai_st_patrullar
+   ;jr    nz, change_direcction       ;; con aereo siempre camiar velocidades
 
+   ;ld    a, e_ai_st(iy)
+   ;cp    #e_ai_st_patrullar
+   ;jr    nz, change_direcction       ;; con aereo siempre cambiar velocidades
 
    ld    a, e_ai_st(ix)
    cp    #e_ai_st_patrullar
-   jr    nz, change_direcction       ;; con aereo siempre camiar velocidades
+   jr    nz, change_direcction      ;; La primera NO es una babosa
 
    ld    a, e_ai_st(iy)
    cp    #e_ai_st_patrullar
-   jr    nz, change_direcction       ;; con aereo siempre cambiar velocidades
+   jr    nz, change_direcction       ;; La segunda NO es babosa
 
+   ;; Las dos son babosas
    ld    a, e_y(ix)
    cp    e_y(iy)
    jr    z, change_direcction
@@ -416,13 +437,37 @@ change_direcction_entity::
       ;     x       
       ;  ----------------------
       ;               x
-      jp    m, iy_on_ix
+   jp    m, iy_on_ix
+
+      ld    a, (gravity_babosa)
+      cp    #0
+      jp    m, gravity_negative1
+         ;; si gravedad hacia arriba
+         ld    a,  e_vy(ix)
+         neg
+         add   e_y(ix)
+         ld    e_y(ix), a
+   ret
+gravity_negative1:
+         ;; si gravedad hacia abajo
+         ld    a, e_vy(iy)
+         neg
+         add   e_y(iy)
+         ld    e_y(iy), a
+   ret
+
+iy_on_ix:
+      ld    a, (gravity_babosa)
+      cp    #0
+      jp    m, gravity_negative2
+         ;; si gravedad hacia arriba
          ld    a,  e_vy(iy)
          neg
          add   e_y(iy)
          ld    e_y(iy), a
    ret
-iy_on_ix:
+gravity_negative2:
+         ;; si gravedad hacia abajo
          ld    a, e_vy(ix)
          neg
          add   e_y(ix)
@@ -437,33 +482,35 @@ change_direcction:
 ;; Hay que comprbar si estamos en modo perseguir o en modo defensa, en caso contrario nos cargamos la otra entidad
    ld    a, e_ai_st(ix)
    cp    #e_ai_st_perseguir
-   jr    nz, aplicate_normal       ;; con aereo siempre camiar velocidades
+   jr    nz, next_ix_per       ;; con aereo siempre camiar velocidades
          ld    a, e_dead(iy)
          cp    #0
          ret nz
          ld    a, #1
          ld    e_dead(iy), a
       ret
-
+next_ix_per:
    ld    a, e_ai_st(ix)
    cp    #e_ai_st_defender
-   jr    nz, aplicate_normal       ;; con aereo siempre cambiar velocidades
+   jr    nz, next_iy_per       ;; con aereo siempre cambiar velocidades
          ld    a, e_dead(iy)
          cp    #0
          ret nz
          ld    a, #1
          ld    e_dead(iy), a
       ret
+next_iy_per:
 ;; Hay que comprbar si estamos en modo perseguir o en modo defensa, en caso contrario nos cargamos la otra entidad
    ld    a, e_ai_st(iy)
    cp    #e_ai_st_perseguir
-   jr    nz, aplicate_normal       ;; con aereo siempre camiar velocidades
+   jr    nz, next_iy_per2       ;; con aereo siempre camiar velocidades
          ld    a, e_dead(ix)
          cp    #0
          ret nz
          ld    a, #1
          ld    e_dead(ix), a
          ret
+next_iy_per2:
    ld    a, e_ai_st(iy)
    cp    #e_ai_st_defender
    jr    nz, aplicate_normal       ;; con aereo siempre cambiar velocidades
@@ -477,21 +524,98 @@ change_direcction:
 aplicate_normal:
 
 ;; QUEDA REFACTORIZAR SEGUN LA ENRADA DE LAS ENTIDADES -- 
+;; SI LA COLISION SE DIFERENCIA POR MAS DE 1 --
+
+   ld    a,  e_x(ix)
+   sub   e_x(iy)
+   cp    #-2
+   jp    m, not_dead
+   cp    #2
+   jp    p, not_dead
+
+      ld    a, e_dead(iy)
+      cp    #0
+      ret nz
+      ld    a, #1
+      ld    e_dead(iy), a
+   ret
+
+not_dead:
+
    ld    a,  e_vx(ix)
    neg
    ld    e_vx(ix), a         ;; negamos la velocidad en el eje X
+   add    e_x(ix)            ;; se lo anyadimos a la posicion
+   ld    e_x(ix), a          ;; aplicamos posicion final 
 
    ld    a, e_vx(iy)         ;; cogemos la velocidad en vx
-   add   e_vx(iy)            ;; la multiplicamos por dos
    neg                       ;; la negamos
+   ld    e_vx(iy), a        ;; negamos la velocidad en el eje Y
    add    e_x(iy)            ;; se lo anyadimos a la posicion
    ld    e_x(iy), a          ;; aplicamos posicion final 
 
-   ld    a, e_vx(iy)
-   neg
-   ld    e_vx(iy), a        ;; negamos la velocidad en el eje Y
-
  ret
+
+
+
+
+
+
+;   ld    a, e_x(ix)
+;   cp    e_x(iy)
+;   ret   z
+;   jp    m, ix_before_iy
+
+;iy_before_ix:
+;   ld    a, e_x(iy)
+;   add   e_w(iy)             ;; IX : pos + ancho
+;   sub   e_x(ix)             ;;  - IY:  pos
+;   cp    #1
+;   jr    nz, iy_probar_con_2
+;      ld    a, e_vx(ix)         ;; cogemos la velocidad en vx
+;      add    e_x(ix)            ;; se lo anyadimos a la posicion
+;      ld    e_x(ix), a          ;; aplicamos posicion final 
+;   ret
+;iy_probar_con_2:
+;   ld    a, e_x(iy)
+;   add   e_w(iy)             ;; IX : pos + ancho
+;   sub   e_x(ix)             ;;  - IY:  pos
+;   cp    #2
+;   ret    nz
+;      ld    a, e_vx(ix)         ;; cogemos la velocidad en vx
+;      add    e_x(ix)            ;; se lo anyadimos a la posicion
+;      ld    e_x(ix), a          ;; aplicamos posicion final 
+
+;      ld    a, e_vx(iy)         ;; cogemos la velocidad en vx
+;      add    e_x(iy)            ;; se lo anyadimos a la posicion
+;      ld    e_x(iy), a          ;; aplicamos posicion final 
+;   ret
+
+;ix_before_iy:
+;   ld    a, e_x(ix)
+;   add   e_w(ix)             ;; IX : pos + ancho
+;   sub   e_x(iy)             ;;  - IY:  pos
+;   cp    #1
+;   jr    nz, ix_probar_con_2
+;      ld    a, e_vx(iy)         ;; cogemos la velocidad en vx
+;      add    e_x(iy)            ;; se lo anyadimos a la posicion
+;      ld    e_x(iy), a          ;; aplicamos posicion final 
+;   ret
+;ix_probar_con_2:
+;   ld    a, e_x(ix)
+;   add   e_w(ix)             ;; IX : pos + ancho
+;   sub   e_x(iy)             ;;  - IY:  pos
+;   cp    #2
+;   ret    nz
+;      ld    a, e_vx(iy)         ;; cogemos la velocidad en vx
+;      add    e_x(iy)            ;; se lo anyadimos a la posicion
+;      ld    e_x(iy), a          ;; aplicamos posicion final 
+
+;      ld    a, e_vx(ix)         ;; cogemos la velocidad en vx
+;      add    e_x(ix)            ;; se lo anyadimos a la posicion
+;      ld    e_x(ix), a          ;; aplicamos posicion final 
+;   ret
+
 
 
 ;=====================================================================
@@ -785,6 +909,7 @@ physics_IA_enemigos:
 	ld  	a, e_vx(ix)
 	neg
 	ld  	e_vx(ix), a
+   ld    (gravity_babosa), a
     ret
 
     ; IA PERSEGUIR
@@ -854,3 +979,48 @@ sys_check_borderScreem_patrullar_X:
 	ld	  e_x(ix), a
 	ret
 	
+
+
+
+
+
+
+;; CHOQUES CON LOS BORDES DE LA PANTALLA
+sys_check_borderScreem_patrullar2:
+
+   ;; TEMPORIZADOR
+   ld  a, e_ai_pausaVel(ix)
+   cp  #0
+   jr  nz, patrullar_reiniciarPausa2
+   ld  a, #3
+   ld  e_ai_pausaVel(ix), a
+
+
+   ;; UPDATE Y
+   call sys_check_borderScreem_patrullar_Y2
+   ;; UPDATE X
+   call sys_check_borderScreem_patrullar_X2
+   ret
+patrullar_reiniciarPausa2:
+   ld  a, e_ai_pausaVel(ix)
+   dec   a
+   ld  e_ai_pausaVel(ix), a
+   ret
+
+
+
+;; UPDATE Y
+sys_check_borderScreem_patrullar_Y2:
+   ;; UPDATE Y
+   ld   a, e_y(ix)
+   add  e_vy(ix)
+   ld   e_y(ix), a
+   ret
+
+;; UPDATE X
+sys_check_borderScreem_patrullar_X2:
+   ld   a, e_x(ix)
+   add  e_vx(ix)
+   ld   e_x(ix), a
+   ret
+   

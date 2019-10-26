@@ -36,6 +36,8 @@ man_mainMenu_init::
    ld a, #0
    ld (num_current_level), a
 
+   ld iy, (memory_firstLevel)
+   ld  (iy_current_level), iy
 
    ld a, #cancion1
 	call sys_music_ponerMusica ;; Inicializar una cancion

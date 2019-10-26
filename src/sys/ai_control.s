@@ -445,14 +445,14 @@ sys_ai_perseguir:
 	ld	iy, #0x0000					;; se almacena el jugador
 
 	;; para simular una velocidad de 0,5 entraremos en el metodo la mitad de veces
-	ld	a, #0
-	ld	e_vx(ix), a
-	ld	e_vy(ix), a
-	ld	a, e_ai_pausaVel(ix)
-	cp	#0
-	jr	nz, espera_movimiento2
-	ld	a, #2
-	ld	e_ai_pausaVel(ix), a
+	;ld	a, #0
+	;ld	e_vx(ix), a
+	;ld	e_vy(ix), a
+	;ld	a, e_ai_pausaVel(ix)
+	;cp	#0
+	;jr	nz, espera_movimiento2
+	;ld	a, #2
+	;ld	e_ai_pausaVel(ix), a
 
 	call atacar_calcularVelocidad
 	ld  	a, d
@@ -469,11 +469,11 @@ sys_ai_perseguir:
 	ld	e_ai_st(ix), a
 
 	ret
-espera_movimiento2:
+;espera_movimiento2:
 	;; cotraposicion de la velocidad
-	dec   a
-	ld	e_ai_pausaVel(ix), a
- ret
+;	dec   a
+;	ld	e_ai_pausaVel(ix), a
+ ;ret
 
 
 
@@ -519,14 +519,14 @@ sys_ai_defender:
   _ent_array_ptr_temp_defender = . + 2
   ld   iy, #0x0000
 
-  ld	 a, #0
-  ld   e_vx(ix), a
-  ld   e_vy(ix), a
-  ld   a, e_ai_pausaVel(ix)
-  cp   #0
-  jr   nz, defender_reiniciarPausa
-  ld   a, #1
-  ld   e_ai_pausaVel(ix), a
+  ;ld	 a, #0
+  ;ld   e_vx(ix), a
+  ;ld   e_vy(ix), a
+  ;ld   a, e_ai_pausaVel(ix)
+  ;cp   #0
+  ;jr   nz, defender_reiniciarPausa
+  ;ld   a, #1
+  ;ld   e_ai_pausaVel(ix), a
 
   call defender_calcularVelocidad  ; Devuelve d -> velocidadX,  e -> velocidadY
   ld   a, d
@@ -542,10 +542,10 @@ sys_ai_defender:
   ld   e_ai_st(ix), a
   defender_seguirEjecutando:
   ret
-defender_reiniciarPausa:
-  dec   a
-  ld    e_ai_pausaVel(ix), a
-  ret
+;defender_reiniciarPausa:
+  ;dec   a
+  ;ld    e_ai_pausaVel(ix), a
+  ;ret
 
 
 ; Devuelve d -> velocidadX,  c -> velocidadY
@@ -632,7 +632,7 @@ salto_tempo_patrullar:
 
 
 ;; Destroy: A, B
-setDificultadEnemigos:
+setDificultadEnemigos::
 	ld	a, (num_current_level)
 	ld	b, a
 

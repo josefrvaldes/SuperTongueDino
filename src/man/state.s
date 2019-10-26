@@ -4,6 +4,7 @@
 .include "man/game.h.s"
 .include "man/mainMenu.h.s"
 .include "man/man_deadAnimation.h.s"
+.include "man/man_endGame.h.s"
 
 
 ent_input_M_pressed:: .db 0
@@ -13,7 +14,7 @@ ent_input_ESC_pressed:: .db 0
 
 
 
-estado: .db #0   ; 1 -> Game,  0 -> main menu, 2 -> muerte guinyo
+estado: .db #0   ; 0 -> main menu, 1 -> Game,  2 -> muerte guinyo,  3 ->  ganar partida
 estado_anterior: .db #0
 
 
@@ -39,6 +40,8 @@ man_state_init::
 	jr z, entrar_juego_init	 ;; en caso de ser 1
 	dec a
 	jr z, entrar_deadAnimation_init  ;; en caso de ser 2
+	dec a
+	jr z, entrar_endGame_init  ;; en caso de ser 2
 	;call finJuego_init -> en caso de ser 3
 	ret
 
@@ -50,7 +53,9 @@ entrar_juego_init:
 	ret
 entrar_deadAnimation_init:
 	call man_deadAnimation_init
-
+	ret
+entrar_endGame_init:
+	call man_endGame_init
 
 	ret
 
@@ -65,7 +70,9 @@ man_state_update::
 	dec a
 	jr z, entrar_juego_update
 	dec a
-	jr z, entrar_deadAnimation_update  ;; en caso de ser 2	
+	jr z, entrar_deadAnimation_update  ;; en caso de ser 2
+	dec a
+	jr z, entrar_endGame_update  ;; en caso de ser 2	
 	;call finJuego_update
 	ret
 entrar_menu_update:
@@ -76,6 +83,9 @@ entrar_juego_update:
 	ret
 entrar_deadAnimation_update:
 	call man_deadAnimation_update
+	ret
+entrar_endGame_update:
+	call man_endGame_update
 	
 	ret
 
@@ -92,7 +102,9 @@ man_state_render::
 	dec a
 	jr z, entrar_juego_render
 	dec a
-	jr z, entrar_deadAnimation_render  ;; en caso de ser 2		
+	jr z, entrar_deadAnimation_render  ;; en caso de ser 2
+	dec a
+	jr z, entrar_endGame_render  ;; en caso de ser 2		
 	;call finJuego_render
 	jr final_state_render
 entrar_menu_render:
@@ -103,6 +115,9 @@ entrar_juego_render:
 	jr final_state_render
 entrar_deadAnimation_render:
 	call man_deadAnimation_render
+	jr final_state_render
+entrar_endGame_render:
+	call man_endGame_render
 	jr final_state_render
 final_state_render:
 
@@ -128,7 +143,9 @@ administrarEstados:
 	dec a
 	jr z, cambio_a_game
 	dec a
-	jr z, cambio_a_deadAnimation  ;; en caso de ser 2		
+	jr z, cambio_a_deadAnimation  ;; en caso de ser 2
+	dec a
+	jr z, cambio_a_endGame  ;; en caso de ser 2		
 	;call finJuego_render
 	jr no_hayCambioEstado
 
@@ -140,6 +157,9 @@ cambio_a_game:
 	ret
 cambio_a_deadAnimation:
 	call man_deadAnimation_init
+	ret
+cambio_a_endGame:
+	call man_endGame_init
 	ret
 no_hayCambioEstado:
 

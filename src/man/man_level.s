@@ -13,8 +13,8 @@
 DefineComponentArrayStructure _level, max_levels, DefineCmp_Level_default ;; ....  
 
 
-str00:: .asciz "Level 01"
-str01:: .asciz "Level 02"
+str00: .asciz "Level 01"
+str01: .asciz "Level 02"
 str02: .asciz "Level 03"
 str03: .asciz "Level 03"
 str04: .asciz "Level 04"
@@ -33,6 +33,37 @@ str16: .asciz "Level 16"
 str17: .asciz "Level 17"
 str18: .asciz "Level 18"
 str19: .asciz "Level 19"
+str20: .asciz "Level 20"
+str21: .asciz "Level 21"
+str22: .asciz "Level 22"
+str23: .asciz "Level 23"
+str24: .asciz "Level 24"
+str25: .asciz "Level 25"
+str26: .asciz "Level 26"
+str27: .asciz "Level 27"
+str28: .asciz "Level 28"
+str29: .asciz "Level 29"
+str30: .asciz "Level 30"
+str31: .asciz "Level 31"
+str32: .asciz "Level 32"
+str33: .asciz "Level 33"
+str34: .asciz "Level 34"
+str35: .asciz "Level 35"
+str36: .asciz "Level 36"
+str37: .asciz "Level 37"
+str38: .asciz "Level 38"
+str39: .asciz "Level 39"
+str40: .asciz "Level 40"
+str41: .asciz "Level 41"
+str42: .asciz "Level 42"
+str43: .asciz "Level 43"
+str44: .asciz "Level 44"
+str45: .asciz "Level 45"
+str46: .asciz "Level 46"
+str47: .asciz "Level 47"
+str48: .asciz "Level 48"
+str49: .asciz "Level 49"
+str50: .asciz "Level 50"
 
 
 level00: DefineCmp_Level #_level00_pack_end, #str00
@@ -55,6 +86,37 @@ level16: DefineCmp_Level #_level16_pack_end, #str16
 level17: DefineCmp_Level #_level17_pack_end, #str17
 level18: DefineCmp_Level #_level18_pack_end, #str18
 level19: DefineCmp_Level #_level19_pack_end, #str19
+level20: DefineCmp_Level #_level20_pack_end, #str20
+level21: DefineCmp_Level #_level21_pack_end, #str21
+level22: DefineCmp_Level #_level22_pack_end, #str22
+level23: DefineCmp_Level #_level23_pack_end, #str23
+level24: DefineCmp_Level #_level24_pack_end, #str24
+level25: DefineCmp_Level #_level25_pack_end, #str25
+level26: DefineCmp_Level #_level26_pack_end, #str26
+level27: DefineCmp_Level #_level27_pack_end, #str27
+level28: DefineCmp_Level #_level28_pack_end, #str28
+level29: DefineCmp_Level #_level29_pack_end, #str29
+level30: DefineCmp_Level #_level30_pack_end, #str30
+level31: DefineCmp_Level #_level31_pack_end, #str31
+level32: DefineCmp_Level #_level32_pack_end, #str32
+level33: DefineCmp_Level #_level33_pack_end, #str33
+level34: DefineCmp_Level #_level34_pack_end, #str34
+level35: DefineCmp_Level #_level35_pack_end, #str35
+level36: DefineCmp_Level #_level36_pack_end, #str36
+level37: DefineCmp_Level #_level37_pack_end, #str37
+level38: DefineCmp_Level #_level38_pack_end, #str38
+level39: DefineCmp_Level #_level39_pack_end, #str39
+level40: DefineCmp_Level #_level40_pack_end, #str40
+level41: DefineCmp_Level #_level41_pack_end, #str41
+level42: DefineCmp_Level #_level42_pack_end, #str42
+level43: DefineCmp_Level #_level43_pack_end, #str43
+level44: DefineCmp_Level #_level44_pack_end, #str44
+level45: DefineCmp_Level #_level45_pack_end, #str45
+level46: DefineCmp_Level #_level46_pack_end, #str46
+level47: DefineCmp_Level #_level47_pack_end, #str47
+level48: DefineCmp_Level #_level48_pack_end, #str48
+level49: DefineCmp_Level #_level49_pack_end, #str49
+level50: DefineCmp_Level #_level50_pack_end, #str50
 
 
 
@@ -130,6 +192,68 @@ man_level_insertar_niveles::
    ld hl, #level18
    call man_level_create
    ld hl, #level19
+   call man_level_create
+   ld hl, #level20
+   call man_level_create
+   ld hl, #level21
+   call man_level_create
+   ld hl, #level22
+   call man_level_create
+   ld hl, #level23
+   call man_level_create
+   ld hl, #level24
+   call man_level_create
+   ld hl, #level25
+   call man_level_create
+   ld hl, #level26
+   call man_level_create
+   ld hl, #level27
+   call man_level_create
+   ld hl, #level28
+   call man_level_create
+   ld hl, #level29
+   call man_level_create
+   ld hl, #level30
+   call man_level_create
+   ld hl, #level31
+   call man_level_create
+   ld hl, #level32
+   call man_level_create
+   ld hl, #level33
+   call man_level_create
+   ld hl, #level34
+   call man_level_create
+   ld hl, #level35
+   call man_level_create
+   ld hl, #level36
+   call man_level_create
+   ld hl, #level37
+   call man_level_create
+   ld hl, #level38
+   call man_level_create
+   ld hl, #level39
+   call man_level_create
+   ld hl, #level40
+   call man_level_create
+   ld hl, #level41
+   call man_level_create
+   ld hl, #level42
+   call man_level_create
+   ld hl, #level43
+   call man_level_create
+   ld hl, #level44
+   call man_level_create
+   ld hl, #level45
+   call man_level_create
+   ld hl, #level46
+   call man_level_create
+   ld hl, #level47
+   call man_level_create
+   ld hl, #level48
+   call man_level_create
+   ld hl, #level49
+   call man_level_create
+   ld hl, #level50
    call man_level_create
    ret
 

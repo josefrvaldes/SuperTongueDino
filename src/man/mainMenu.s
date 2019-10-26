@@ -76,6 +76,8 @@ Q_Pressed_mainMenu:
 
    ld a, #1
    call man_state_setEstado  ;; cambia el estado
+   ld a, #cancion2
+   call sys_music_ponerMusica ;; Inicializar una cancion
 
    ld (ent_input_Q_pressed), a
    jr Q_Holded_OrPressed_mainMenu

@@ -75,8 +75,7 @@ man_game_init::
 	call sys_collision_entity_init
     
     
-    	ld	a, #cancion2
-	call sys_music_ponerMusica ;; Inicializar una cancion
+    	
 	ret
 
 

@@ -191,7 +191,7 @@ detectarSonido_Sfx:
 	jr	nz, try_explotar1_sfx
 
 	ld	l, #01				; sfx_num		 Number of the instrument in the SFX Song (>0), same as the number given to the instrument in Arkos Tracker.
-	ld	h, #14				; volume		 Volume [0-15], 0 = off, 15 = maximum volume.
+	ld	h, #12				; volume		 Volume [0-15], 0 = off, 15 = maximum volume.
 	ld	e, #40				; note		 Note to be played with the given instrument [0-143]
 	ld	d, #0					; speed		 Speed (0 = As original, [1-255] = new Speed (1 is fastest))
 	ld	bc, #0			; inverted_pitch	 Inverted Pitch (-0xFFFF -> 0xFFFF).  0 is no pitch.  The higher the pitch, the lower the sound.

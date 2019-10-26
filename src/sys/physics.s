@@ -94,7 +94,7 @@ sys_physics_update::
 	cp	#e_ai_st_noAI	;; comparamos si no tiene IA
 	jr	nz, _update_loop
 		;; SOMOS EL HEROE
-		call check_jump_tables_init
+		call check_jump_tables_init 
 
    ;call man_obstacle_re_rellenar_array
    ;call man_obstacle_getArray ; como en la llamada anterior hemos consultado los arrays, nos posicionamos de nuevo en la primera posición
@@ -156,6 +156,7 @@ continuar_saltando:
          jp m, no_mas_saltos
 
       call check_jump_table_update
+
 
    jr no_mas_saltos
 
@@ -232,7 +233,7 @@ check_diferent_obstacles:
 
    morir:
       ld e_dead(ix), #1
-      call sys_music_sonar_Explosion
+      call sys_music_sonar_Explosion  ;; jugador con pinchos
    todo_fondo:
    ret
 
@@ -488,6 +489,7 @@ change_direcction:
          ret nz
          ld    a, #1
          ld    e_dead(iy), a
+         call sys_music_sonar_Explosion  ; aereo perseguir mata baobsa
       ret
 next_ix_per:
    ld    a, e_ai_st(ix)
@@ -498,6 +500,7 @@ next_ix_per:
          ret nz
          ld    a, #1
          ld    e_dead(iy), a
+         call sys_music_sonar_Explosion    ; aereo defender mata baobsa
       ret
 next_iy_per:
 ;; Hay que comprbar si estamos en modo perseguir o en modo defensa, en caso contrario nos cargamos la otra entidad
@@ -509,6 +512,7 @@ next_iy_per:
          ret nz
          ld    a, #1
          ld    e_dead(ix), a
+         call sys_music_sonar_Explosion    ; aereo perseguir mata baobsa
          ret
 next_iy_per2:
    ld    a, e_ai_st(iy)
@@ -519,6 +523,7 @@ next_iy_per2:
          ret nz
          ld    a, #1
          ld    e_dead(ix), a
+         call sys_music_sonar_Explosion    ; aereo defender mata baobsa
       ret
 
 aplicate_normal:
@@ -538,6 +543,7 @@ aplicate_normal:
       ret nz
       ld    a, #1
       ld    e_dead(iy), a
+      call sys_music_sonar_Explosion
    ret
 
 not_dead:
@@ -740,9 +746,15 @@ end_of_jump_left:
 ;; Recorremos la tabla de salto normal
 jump_control:
    ld a, (hero_jump)
-   cp #-1
-   ret   z  
+   cp #0
+   jr nz, seguir_jumpControl
+   call sys_music_sonar_Salto  ; sonido de salto
+   seguir_jumpControl:  
 
+   ld a, (hero_jump)
+   cp #-1
+   ret   z 
+      
    ;; Get jump value
    ld hl, #jump_table 
    ld e, a
@@ -792,8 +804,7 @@ start_jump::
       ld (press_now_W), a
       
 ; Limpiar la variable hero_jump ya que si pulsamos en el aire y NO estamos colisionando se queda activa
-continue_start_jump:
-
+continue_start_jump: 
    ld a, (hero_jump)
    cp #-1
    ret   nz                      ;; ya se habia pulsado el salto, me voy

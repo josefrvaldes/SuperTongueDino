@@ -2,6 +2,7 @@
 .include "ent/entity.h.s"
 .include "sys/physics.h.s"
 .include "man/state.h.s"
+.include "sys/sys_music.h.s"
 
 ;;
 ;; IX: PUNTERO PRIMERA ENTIDAD
@@ -66,8 +67,12 @@ _next_iy:
 _hero:
 		;call process_dead_hero
 		cpctm_setBorder_asm HW_RED
+		ld    a, e_dead(ix)
+		cp    #0
+		jr	nz, __no_collision
 		ld	a, #1
 		ld	e_dead(ix), a
+		call sys_music_sonar_Explosion ;; jugador con enemigo
 		;-> DESCOMENTAR PARA MORIR EL JUGADOR
 
 		jr	__no_collision

@@ -15,7 +15,7 @@
 DefineComponentArrayStructure _level, max_levels, DefineCmp_Level_default ;; ....  
 
 
-; str00: .asciz "LEVEL 00"
+str00: .asciz "LEVEL 00"
 str01: .asciz "LEVEL 01"
 str02: .asciz "LEVEL 02"
 str03: .asciz "LEVEL 03"
@@ -68,7 +68,7 @@ str49: .asciz "LEVEL 49"
 str50: .asciz "LEVEL 50"
 
 
-; level00: DefineCmp_Level #_level00_pack_end, #str00
+level00: DefineCmp_Level #_level00_pack_end, #str00
 level01: DefineCmp_Level #_level01_pack_end, #str01
 level02: DefineCmp_Level #_level02_pack_end, #str02
 level03: DefineCmp_Level #_level03_pack_end, #str03
@@ -155,8 +155,8 @@ man_level_init::
 
 ; Inicializa el array de niveles con todos los niveles del juego
 man_level_insertar_niveles::
-;    ld hl, #level00
-;    call man_level_create
+   ld hl, #level00
+   call man_level_create
    ld hl, #level01
    call man_level_create
    ld hl, #level02

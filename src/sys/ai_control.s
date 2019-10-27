@@ -12,9 +12,9 @@
 .module sys_ai_control
  
 
-dificultadRango_1 = 20			;; para cambiar la dificultad de los enemigos dependiendo del nivel
-dificultadRango_2 = 40
-dificultadRango_3 = 60
+dificultadRango_1 = 29			;; para cambiar la dificultad de los enemigos dependiendo del nivel
+dificultadRango_2 = 35
+dificultadRango_3 = 35
 dificultad_0 = 0
 dificultad_1 = 1
 dificultad_2 = 2
@@ -613,14 +613,14 @@ sys_ai_patrullar_cambiarGravedad:
 	dec  	a
 	ld  	e_ai_reloj1(ix), a
 	jr  	nz, salto_tempo_patrullar
-	ld  	a, #0x20
+	ld  	a, #0x09
 	ld  	e_ai_reloj1(ix), a
 
 	ld  	a, e_ai_reloj2(ix)
 	dec  	a
 	ld  	e_ai_reloj2(ix), a
 	jr  	nz, salto_tempo_patrullar
-	ld  	a, #0x20
+	ld  	a, #0x09
 	ld  	e_ai_reloj2(ix), a
 	ld	a, e_vy(ix)
 	neg

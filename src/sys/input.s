@@ -17,6 +17,8 @@
 .include "sys/sys_music.h.s"
 .include "man/man_invisibility.h.s"
 
+.include "sys/ai_control.h.s"
+
 ;; //////////////////
 ;; SYS_Input Init
 sys_input_init::
@@ -85,6 +87,7 @@ L_Presed:
       call man_tilemap_load
       call man_tilemap_render
       call man_level_render
+      call setDificultadEnemigos
       ; FIN TEMPORAL
 L_NotPressed:
 

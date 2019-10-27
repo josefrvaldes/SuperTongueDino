@@ -3,6 +3,7 @@
 .include "sys/physics.h.s"
 .include "man/state.h.s"
 .include "sys/sys_music.h.s"
+.include "man/entity.h.s"
 
 ;;
 ;; IX: PUNTERO PRIMERA ENTIDAD
@@ -73,6 +74,17 @@ _hero:
 		ld	a, #1
 		ld	e_dead(ix), a
 		call sys_music_sonar_Explosion ;; jugador con enemigo
+
+		ld    hl, (deathsPlayer)	; sumar muerte y comprobar si se sale de rango
+		ld	a, h
+		cp	#0xFF
+		jr	nz, not_overflow_death
+		ld	a, l
+		cp	#0xFF
+		jr	z, __no_collision  	; esta el contador al maximo
+		not_overflow_death:
+	      inc   hl
+	      ld    (deathsPlayer), hl
 		;-> DESCOMENTAR PARA MORIR EL JUGADOR
 
 		jr	__no_collision

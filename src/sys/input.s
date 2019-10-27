@@ -15,6 +15,7 @@
 .include "man/man_level.h.s"
 .include "man/man_tilemap.h.s"
 .include "sys/sys_music.h.s"
+.include "man/man_invisibility.h.s"
 
 ;; //////////////////
 ;; SYS_Input Init
@@ -161,8 +162,12 @@ A_Pressed:
 	jr	z, A_Holded_OrPressed
 
 	;; Para activar la invisibilidad ponemos a 1 el parametro de la entidad
+	ld  a, (cargadorInvisibilidad)
+    	cp  #1
+    	jr  nz, invisibilidad_yaUsada          ; en caso de haberse usado no se puede volver a pulsar
     	ld  	a,  #1
     	ld  	e_invisi(ix), a
+    	invisibilidad_yaUsada:
 
 	ld	(ent_input_A_pressed), a
 	jr	A_Holded_OrPressed

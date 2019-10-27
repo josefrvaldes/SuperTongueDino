@@ -14,6 +14,7 @@
 
 .module entity_manager
 
+deathsPlayer:: .dw #0
 
 DefineComponentArrayStructure _entity, max_entities, DefineCmp_Entity_default ;; ....
 

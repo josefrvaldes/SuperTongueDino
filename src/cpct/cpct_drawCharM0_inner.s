@@ -88,6 +88,7 @@
 _myDrawCharInner::
    ;; Calculate the memory address where the 8 bytes defining the character appearance 
    ;; ... start (IX = 0x3800 + 8*ASCII value). char0_ROM_address = 0x3800
+   sub #32
    rlca           ;; [1] | A = E = 8*ASCII. 3 RLCA leave A with this
    rlca           ;; [1] |   |hgfedcba| => 3*RLCA => |edcba|hgf|         IXH         IXL
    rlca           ;; [1] | Then we need to move it to IX like this => |00111hgf| |edcba000|

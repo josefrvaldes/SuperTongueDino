@@ -15,7 +15,10 @@
 .globl _planta_sp_1
 .globl _planta_sp_2
 .globl _tierraPlanta_sp
-	
+
+string_frase1: .asciz "DOWN YOU GO!"
+string_frase2: .asciz "MMMMMMMHHH!!"
+
 easterEgg: .db #0
 endAnimation: .db #0
 cont_Animation: .db #0
@@ -44,11 +47,12 @@ man_deadAnimation_init::
 	ld	a, #137
 	ld	(initialPositionY), a  
 
+	
+
 	call man_entity_getArray
 	ld	hl, #_hero_sp_1
 	ld	e_pspr_l(ix), l
 	ld	e_pspr_h(ix), h
-
 
 
 	ld	a, (num_current_level)
@@ -61,7 +65,7 @@ man_deadAnimation_init::
 yes_easterEgg:					;; en caso de ser un nivel concreto se produce el easterEgg
 	call man_deadAnimation_initEGG
 no_easterEgg:
-	 
+	
 	ret
 
 
@@ -160,6 +164,8 @@ ESC_Holded_OrPressed_deadA:
 ;; Destroy: AF, IX
 man_deadAnimation_initEGG:
 	call sys_eren_clearScreen	
+	call dibujar_Frase1
+
 	ld	a, #1
 	ld	(easterEgg), a
 
@@ -249,6 +255,8 @@ animationScene1:	;; Muerde la planta
 
 	ld	a, #2
 	ld	(animationPlantScene), a 
+
+	call dibujar_Frase2
 	ret
 
 
@@ -266,4 +274,38 @@ animationScene2:	;; Se esconde la planta
 	finScene2:	;; Permite el cambio de estado
 	ld	a, #1
 	ld	(endAnimation), a
+
+	ret
+
+
+
+
+dibujar_Frase1:
+	ld    l, #3         ;; D = Background PEN (0)
+	ld    h, #0         ;; E = Foreground PEN (3)
+	call cpct_setDrawCharM0_asm   ;; Set draw char colours
+
+	ld   de, #0xC000 ;; DE = Pointer to start of the screen
+	ld    b, #160                ;; B = y coordinate (24 = 0x18)
+	ld    c, #18                ;; C = x coordinate (16 = 0x10)
+	call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
+
+	ld   IY, #string_frase1   ;; IY = Pointer to the string 
+	call cpct_drawStringM0_asm  ;; Draw the string
+
+	ret
+
+
+dibujar_Frase2:
+	ld    l, #3         ;; D = Background PEN (0)
+	ld    h, #0         ;; E = Foreground PEN (3)
+	call cpct_setDrawCharM0_asm   ;; Set draw char colours
+
+	ld   de, #0xC000 ;; DE = Pointer to start of the screen
+	ld    b, #160                  ;; B = y coordinate (24 = 0x18)
+	ld    c, #18                  ;; C = x coordinate (16 = 0x10)
+	call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
+
+	ld   IY, #string_frase2   ;; IY = Pointer to the string 
+	call cpct_drawStringM0_asm  ;; Draw the string
 	ret

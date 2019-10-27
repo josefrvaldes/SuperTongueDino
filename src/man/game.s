@@ -13,7 +13,7 @@
 .include "sys/ai_control.h.s"
 .include "man/menuIngame.h.s"
 .include "man/man_level.h.s"
-.include "man_invisibility.h.s"
+.include "man/man_invisibility.h.s"
 .include "sys/sys_collision_entity.h.s"
 .include "man/sprite.h.s"
 .include "sys/sys_deleteEntity.h.s"
@@ -75,7 +75,7 @@ man_game_init::
 	call sys_collision_entity_init
     
     
-    	
+    	call man_invisibility_activarInvi
 	ret
 
 

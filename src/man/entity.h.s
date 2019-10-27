@@ -11,3 +11,5 @@
 .globl hero
 .globl ene1
 .globl ene2
+
+.globl deathsPlayer

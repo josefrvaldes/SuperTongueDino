@@ -14,6 +14,7 @@
 .include "man/game.h.s" ; cambiar por man_obstacles
 .include "sys/sys_music.h.s"
 .include "sys/ai_control.h.s"
+.include "man/man_invisibility.h.s"
 
 
 .module sys_entity_physics
@@ -229,11 +230,27 @@ check_diferent_obstacles:
       call man_tilemap_render
       call man_level_render
       call setDificultadEnemigos
+      call man_invisibility_activarInvi
       jr   todo_fondo
 
    morir:
       ld e_dead(ix), #1
-      call sys_music_sonar_Explosion  ;; jugador con pinchos
+      call sys_music_sonar_Explosion  ;; entidad con pinchos
+
+      ld a, e_ai_st(ix)
+      cp #e_ai_st_noAI
+      jr nz, todo_fondo
+      ld    hl, (deathsPlayer)   ; sumar muerte y comprobar si se sale de rango
+      ld a, h
+      cp #0xFF
+      jr nz, not_overflow_death
+      ld a, l
+      cp #0xFF
+      jr z, todo_fondo    ; esta el contador al maximo
+      not_overflow_death:
+         inc   hl
+         ld    (deathsPlayer), hl
+
    todo_fondo:
    ret
 

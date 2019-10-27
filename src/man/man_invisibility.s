@@ -7,6 +7,8 @@
 tempo1: .db 0x0A    
 tempo2: .db 0x0A
 
+cargadorInvisibilidad:: .db #1
+
 ;; CONCLUSIONES: 0x0F = 5 segundos
 ;;         0x20 = 20 segundos
 
@@ -17,6 +19,7 @@ aplicate_invisibility::
     ld  a,  e_invisi(ix)
     dec a
     ret nz                    ;; si no se hace 0 es que no era invisible
+    
 
 
     ld  a, (tempo1)
@@ -44,10 +47,22 @@ aplicate_invisibility::
         ld  a,  #0
         ld  e_invisi(ix), a
 
+        ld  a, #0
+        ld  (cargadorInvisibilidad), a  ; no se puede utilizar la invisibilidad
+
         ld  a, #0x0A
         ld  (tempo1), a
         ld  (tempo2), a
 
 salto_tempo:
+
+  ret
+
+
+
+
+man_invisibility_activarInvi::
+  ld  a, #1
+  ld  (cargadorInvisibilidad), a  ; Se puede utilizar la invisibilidad
 
   ret

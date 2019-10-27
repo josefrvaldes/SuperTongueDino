@@ -2,7 +2,7 @@
 ;; Entity LEVEL, this is the default level entity
 ;;
 max_levels == 51
-final_Level == 35
+final_Level == 51
 
 ;; Defines a new entity component
 .macro DefineCmp_Level _pack_end, _str

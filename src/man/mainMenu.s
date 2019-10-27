@@ -7,6 +7,7 @@
 .include "man/state.h.s"
 .include "man/man_level.h.s"
 .include "sys/sys_music.h.s"
+.include "man/entity.h.s"
 
 .globl _hero_pal
 .globl _menu_principal_pack_end
@@ -32,6 +33,9 @@ man_mainMenu_init::
    ld a, #1
    ld (ent_input_Q_pressed), a   ;; se utiliza para evitar que al iniciar el juego se entre al juego al tener pulsada la tecla y no se vea el menu
 
+
+   ld    hl, #0
+   ld    (deathsPlayer), hl
 
    ld a, #0
    ld (num_current_level), a

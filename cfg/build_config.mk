@@ -52,7 +52,7 @@ PROJNAME   := SuperTongueBoy
 #Z80CODELOC := 0x0974 # empezamos en esta posición para reservar tamaño para el tilemap descomprimido
 #Z80CODELOC := 0x09B4  # sumamos 40
 #Z80CODELOC := 0x1082  # empezamos en esta posición para reservar tamaño para la musica
-Z80CODELOC := 0x1282  # empezamos en esta posición para reservar tamaño para la fuente, que ocupa 512 bytes (200hex)
+Z80CODELOC := 0x1288  # empezamos en esta posición para reservar tamaño para la fuente, que ocupa 512 bytes (200hex)
 ##
 ## Folders 
 ##

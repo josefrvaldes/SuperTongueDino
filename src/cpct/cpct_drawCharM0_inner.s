@@ -101,10 +101,10 @@ _myDrawCharInner::
    ld__ixl_a      ;; [2] and save it to IXL = |edcba|000|
    ;; Now IX = |edcba|000||00111hgf| = 0x3800 + 8*ASCII
 
-   ld bc, #0x1082   ; esto sirve para sumarle a ix la pos de memoria inicial de la fuente, la que está en (build_config - 200hex) (512 bytes)
+   ld bc, #0x1088   ; esto sirve para sumarle a ix la pos de memoria inicial de la fuente, la que está en (build_config - 200hex) (512 bytes)
    add ix, bc
 
-   ld    bc, #my_c_2pxtableM0    ;; [3] BC points to the 2 1-bit pixels to 2 4-bit pixels conversion table
+   ld    bc, #_my_dc_2pxtableM0    ;; [3] BC points to the 2 1-bit pixels to 2 4-bit pixels conversion table
 
    ;; Draw next line from the character to the screen
 nextline:
@@ -155,4 +155,4 @@ boundary_crossed:
 ;; possible combinations with 2 pixels and 2 colours: (00, 01, 10, 11 == BG-BG, BG-FG, FG-BG, FG-FG)
 ;; We reserve here 4 bytes that will be filled in by <cpct_setDrawCharM0>
 ;;
-my_c_2pxtableM0:: .db 0x00, 0x40, 0x80, 0xC0   ;; Default colours BG=0, FG=1
+_my_dc_2pxtableM0:: .db 0x00, 0x40, 0x80, 0xC0   ;; Default colours BG=0, FG=1

@@ -9,14 +9,14 @@
 
 .module level_manager
 
-.globl _myDrawStringM0
+
 
 
 DefineComponentArrayStructure _level, max_levels, DefineCmp_Level_default ;; ....  
 
 
-str00:: .asciz "LEVEL 00"
-str01:: .asciz "LEVEL 01"
+str00: .asciz "LEVEL 00"
+str01: .asciz "LEVEL 01"
 str02: .asciz "LEVEL 02"
 str03: .asciz "LEVEL 03"
 str04: .asciz "LEVEL 04"
@@ -315,8 +315,28 @@ man_level_load_next::
 
 
 man_level_render::
-   ld hl, #0x0211
-   call cpct_setDrawCharM0_asm
+   ld   de, #CPCT_VMEM_START_ASM ;; DE = Pointer to start of the screen
+   ld    b, #84                  ;; B = y coordinate (24 = 0x18)
+   ld    c, #20                   ;; C = x coordinate (16 = 0x10)
+   call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
+   
+   ld d, h     ; pos memoria inicio
+   ld e, l     ; pos memoria inicio
+   
+;    push de
+;    ld h, #HW_WHITE
+;    ld l, #HW_WHITE
+;    call cpct_px2byteM0_asm
+;    pop de
+
+   ld a, #0xC0    ; color
+   ld c, #40   ; ancho en bytes
+   ld b, #24   ; alto en bytes
+   call cpct_drawSolidBox_asm
+
+   ld h, #1
+   ld l, #12
+   call _mySetDrawCharM0
 
    call man_level_get_current
 
@@ -326,8 +346,8 @@ man_level_render::
    ld__iyl_c
 
    ld   de, #CPCT_VMEM_START_ASM ;; DE = Pointer to start of the screen
-   ld    b, #16                  ;; B = y coordinate (24 = 0x18)
-   ld    c, #8                   ;; C = x coordinate (16 = 0x10)
+   ld    b, #92                  ;; B = y coordinate (24 = 0x18)
+   ld    c, #24                   ;; C = x coordinate (16 = 0x10)
    call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
    call _myDrawStringM0
    call man_level_borrar_letras_con_retraso

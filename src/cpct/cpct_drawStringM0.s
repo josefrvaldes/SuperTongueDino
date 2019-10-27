@@ -123,6 +123,7 @@
 ;; Include constants and general values
 ;;
 .include "../../../cpctelera/src/strings/strings.s"
+
 .globl _myDrawCharInner
 ;;
 ;; ASM bindings for <cpct_drawStringM0>

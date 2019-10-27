@@ -46,7 +46,7 @@ sys_music_ponerMusica::
 sys_music_selectSong:
 	dec	a
 	jr	nz, comprobarCancion2	
-	ld	a, #9
+	ld	a, #10
 	ld	(contadorVelocidadMusica), a
 	ld	(velocidadMusica), a 
 	ld	de, #_song_ingame1
@@ -56,7 +56,7 @@ sys_music_selectSong:
 	comprobarCancion2:
 	dec	a
 	jr	nz, comprobarCancion3	
-	ld	a, #12
+	ld	a, #10
 	ld	(contadorVelocidadMusica), a
 	ld	(velocidadMusica), a 
 	ld	de, #_song_ingame2

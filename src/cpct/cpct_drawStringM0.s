@@ -116,19 +116,20 @@
 ;;    L = Length of the string (excluding null-terminator character)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-.globl cpct_drawCharM0_inner_asm
+;.globl cpct_drawCharM0_inner_asm
+
 
 ;;
 ;; Include constants and general values
 ;;
-.include "strings.s"
-
+.include "../../../cpctelera/src/strings/strings.s"
+.globl _myDrawCharInner
 ;;
 ;; ASM bindings for <cpct_drawStringM0>
 ;;
 ;;   3 us, 1 bytes
 ;;
-_myDrawString::
+_myDrawStringM0::
 
    jr    firstChar                  ;; [3] Jump to first char (Saves 1 jr back every iteration)
 

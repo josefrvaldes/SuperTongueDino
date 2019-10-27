@@ -9,6 +9,8 @@
 
 .module level_manager
 
+.globl _myDrawStringM0
+
 
 DefineComponentArrayStructure _level, max_levels, DefineCmp_Level_default ;; ....  
 
@@ -327,7 +329,7 @@ man_level_render::
    ld    b, #16                  ;; B = y coordinate (24 = 0x18)
    ld    c, #8                   ;; C = x coordinate (16 = 0x10)
    call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
-   call cpct_drawStringM0_asm
+   call _myDrawStringM0
    call man_level_borrar_letras_con_retraso
    ret
 ;    ld a, #0xFF

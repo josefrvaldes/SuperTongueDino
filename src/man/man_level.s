@@ -10,60 +10,62 @@
 .module level_manager
 
 
+
+
 DefineComponentArrayStructure _level, max_levels, DefineCmp_Level_default ;; ....  
 
 
-str00: .asciz "Level 01"
-str01: .asciz "Level 02"
-str02: .asciz "Level 03"
-str03: .asciz "Level 03"
-str04: .asciz "Level 04"
-str05: .asciz "Level 05"
-str06: .asciz "Level 06"
-str07: .asciz "Level 07"
-str08: .asciz "Level 08"
-str09: .asciz "Level 09"
-str10: .asciz "Level 10"
-str11: .asciz "Level 11"
-str12: .asciz "Level 12"
-str13: .asciz "Level 13"
-str14: .asciz "Level 14"
-str15: .asciz "Level 15"
-str16: .asciz "Level 16"
-str17: .asciz "Level 17"
-str18: .asciz "Level 18"
-str19: .asciz "Level 19"
-str20: .asciz "Level 20"
-str21: .asciz "Level 21"
-str22: .asciz "Level 22"
-str23: .asciz "Level 23"
-str24: .asciz "Level 24"
-str25: .asciz "Level 25"
-str26: .asciz "Level 26"
-str27: .asciz "Level 27"
-str28: .asciz "Level 28"
-str29: .asciz "Level 29"
-str30: .asciz "Level 30"
-str31: .asciz "Level 31"
-str32: .asciz "Level 32"
-str33: .asciz "Level 33"
-str34: .asciz "Level 34"
-str35: .asciz "Level 35"
-str36: .asciz "Level 36"
-str37: .asciz "Level 37"
-str38: .asciz "Level 38"
-str39: .asciz "Level 39"
-str40: .asciz "Level 40"
-str41: .asciz "Level 41"
-str42: .asciz "Level 42"
-str43: .asciz "Level 43"
-str44: .asciz "Level 44"
-str45: .asciz "Level 45"
-str46: .asciz "Level 46"
-str47: .asciz "Level 47"
-str48: .asciz "Level 48"
-str49: .asciz "Level 49"
-str50: .asciz "Level 50"
+str00: .asciz "LEVEL 00"
+str01: .asciz "LEVEL 01"
+str02: .asciz "LEVEL 02"
+str03: .asciz "LEVEL 03"
+str04: .asciz "LEVEL 04"
+str05: .asciz "LEVEL 05"
+str06: .asciz "LEVEL 06"
+str07: .asciz "LEVEL 07"
+str08: .asciz "LEVEL 08"
+str09: .asciz "LEVEL 09"
+str10: .asciz "LEVEL 10"
+str11: .asciz "LEVEL 11"
+str12: .asciz "LEVEL 12"
+str13: .asciz "LEVEL 13"
+str14: .asciz "LEVEL 14"
+str15: .asciz "LEVEL 15"
+str16: .asciz "LEVEL 16"
+str17: .asciz "LEVEL 17"
+str18: .asciz "LEVEL 18"
+str19: .asciz "LEVEL 19"
+str20: .asciz "LEVEL 20"
+str21: .asciz "LEVEL 21"
+str22: .asciz "LEVEL 22"
+str23: .asciz "LEVEL 23"
+str24: .asciz "LEVEL 24"
+str25: .asciz "LEVEL 25"
+str26: .asciz "LEVEL 26"
+str27: .asciz "LEVEL 27"
+str28: .asciz "LEVEL 28"
+str29: .asciz "LEVEL 29"
+str30: .asciz "LEVEL 30"
+str31: .asciz "LEVEL 31"
+str32: .asciz "LEVEL 32"
+str33: .asciz "LEVEL 33"
+str34: .asciz "LEVEL 34"
+str35: .asciz "LEVEL 35"
+str36: .asciz "LEVEL 36"
+str37: .asciz "LEVEL 37"
+str38: .asciz "LEVEL 38"
+str39: .asciz "LEVEL 39"
+str40: .asciz "LEVEL 40"
+str41: .asciz "LEVEL 41"
+str42: .asciz "LEVEL 42"
+str43: .asciz "LEVEL 43"
+str44: .asciz "LEVEL 44"
+str45: .asciz "LEVEL 45"
+str46: .asciz "LEVEL 46"
+str47: .asciz "LEVEL 47"
+str48: .asciz "LEVEL 48"
+str49: .asciz "LEVEL 49"
+str50: .asciz "LEVEL 50"
 
 
 level00: DefineCmp_Level #_level00_pack_end, #str00
@@ -313,8 +315,28 @@ man_level_load_next::
 
 
 man_level_render::
-   ld hl, #0x2602
-   call cpct_setDrawCharM0_asm
+   ld   de, #CPCT_VMEM_START_ASM ;; DE = Pointer to start of the screen
+   ld    b, #84                  ;; B = y coordinate (24 = 0x18)
+   ld    c, #20                   ;; C = x coordinate (16 = 0x10)
+   call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
+   
+   ld d, h     ; pos memoria inicio
+   ld e, l     ; pos memoria inicio
+   
+;    push de
+;    ld h, #HW_WHITE
+;    ld l, #HW_WHITE
+;    call cpct_px2byteM0_asm
+;    pop de
+
+   ld a, #0xC0    ; color
+   ld c, #40   ; ancho en bytes
+   ld b, #24   ; alto en bytes
+   call cpct_drawSolidBox_asm
+
+   ld h, #1
+   ld l, #12
+   call _mySetDrawCharM0
 
    call man_level_get_current
 
@@ -324,10 +346,10 @@ man_level_render::
    ld__iyl_c
 
    ld   de, #CPCT_VMEM_START_ASM ;; DE = Pointer to start of the screen
-   ld    b, #16                  ;; B = y coordinate (24 = 0x18)
-   ld    c, #8                   ;; C = x coordinate (16 = 0x10)
+   ld    b, #92                  ;; B = y coordinate (24 = 0x18)
+   ld    c, #24                   ;; C = x coordinate (16 = 0x10)
    call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
-   call cpct_drawStringM0_asm
+   call _myDrawStringM0
    call man_level_borrar_letras_con_retraso
    ret
 ;    ld a, #0xFF

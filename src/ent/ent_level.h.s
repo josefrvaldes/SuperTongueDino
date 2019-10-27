@@ -1,7 +1,7 @@
 ;;
 ;; Entity LEVEL, this is the default level entity
 ;;
-max_levels == 50
+max_levels == 51
 final_Level == 35
 
 ;; Defines a new entity component

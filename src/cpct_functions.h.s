@@ -17,6 +17,7 @@
 .globl cpct_setDrawCharM0_asm
 .globl cpct_drawStringM0_asm
 .globl cpct_zx7b_decrunch_s_asm
+.globl cpct_px2byteM0_asm
 
 .globl cpct_etm_setDrawTilemap4x8_ag_asm
 .globl cpct_etm_drawTilemap4x8_ag_asm
@@ -28,3 +29,7 @@
 .globl cpct_akp_stop_asm
 .globl cpct_akp_SFXInit_asm
 .globl cpct_akp_SFXPlay_asm
+
+.globl _myDrawStringM0
+.globl _mySetDrawCharM0
+

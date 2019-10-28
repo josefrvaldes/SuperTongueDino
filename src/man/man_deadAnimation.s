@@ -281,31 +281,31 @@ animationScene2:	;; Se esconde la planta
 
 
 dibujar_Frase1:
-	ld    l, #3         ;; D = Background PEN (0)
-	ld    h, #0         ;; E = Foreground PEN (3)
-	call cpct_setDrawCharM0_asm   ;; Set draw char colours
+	ld 	h, #0		
+	ld 	l, #2		
+	call _mySetDrawCharM0
 
-	ld   de, #0xC000 ;; DE = Pointer to start of the screen
-	ld    b, #160                ;; B = y coordinate (24 = 0x18)
-	ld    c, #18                ;; C = x coordinate (16 = 0x10)
+	ld   	de, #0xC000 		;; DE = Pointer to start of the screen
+	ld    b, #160                	;; B = y coordinate 
+	ld    c, #18                	;; C = x coordinate
 	call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
 
-	ld   IY, #string_frase1   ;; IY = Pointer to the string 
-	call cpct_drawStringM0_asm  ;; Draw the string
+	ld   	iy, #string_frase1   	;; IY = Pointer to the string 
+	call _myDrawStringM0
 
 	ret
 
 
 dibujar_Frase2:
-	ld    l, #3         ;; D = Background PEN (0)
-	ld    h, #0         ;; E = Foreground PEN (3)
-	call cpct_setDrawCharM0_asm   ;; Set draw char colours
+	ld 	h, #0		
+	ld 	l, #2		
+	call _mySetDrawCharM0
 
-	ld   de, #0xC000 ;; DE = Pointer to start of the screen
-	ld    b, #160                  ;; B = y coordinate (24 = 0x18)
-	ld    c, #18                  ;; C = x coordinate (16 = 0x10)
-	call cpct_getScreenPtr_asm    ;; Calculate video memory location and return it in HL
+	ld	de, #0xC000 
+	ld    b, #160                
+	ld    c, #18                  
+	call cpct_getScreenPtr_asm   
 
-	ld   IY, #string_frase2   ;; IY = Pointer to the string 
-	call cpct_drawStringM0_asm  ;; Draw the string
+	ld   	iy, #string_frase2    
+	call _myDrawStringM0
 	ret

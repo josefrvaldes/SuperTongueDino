@@ -33,3 +33,5 @@
 .globl _myDrawStringM0
 .globl _mySetDrawCharM0
 
+.globl cpct_drawCharM0_asm
+

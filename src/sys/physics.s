@@ -15,6 +15,7 @@
 .include "sys/sys_music.h.s"
 .include "sys/ai_control.h.s"
 .include "man/man_invisibility.h.s"
+.include "sys/sys_deathCounter.h.s"
 
 
 .module sys_entity_physics
@@ -240,16 +241,8 @@ check_diferent_obstacles:
       ld a, e_ai_st(ix)
       cp #e_ai_st_noAI
       jr nz, todo_fondo
-      ld    hl, (deathsPlayer)   ; sumar muerte y comprobar si se sale de rango
-      ld a, h
-      cp #0xFF
-      jr nz, not_overflow_death
-      ld a, l
-      cp #0xFF
-      jr z, todo_fondo    ; esta el contador al maximo
-      not_overflow_death:
-         inc   hl
-         ld    (deathsPlayer), hl
+         ;; LLAMAR INCREMENTAR MUERTES
+         call sys_deathCounter
 
    todo_fondo:
    ret

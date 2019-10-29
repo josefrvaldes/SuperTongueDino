@@ -21,6 +21,8 @@
 .include "sys/sys_music.h.s"
 .include "man/man_tilemap.h.s"
 
+.include "sys/sys_deathCounter.h.s"
+
 .module game_manager
 
 
@@ -123,6 +125,8 @@ man_game_update::				;; MEJORAR!!! esto ya que estoy pasando IX al update y se p
 	call man_entity_getArray
 	call sys_delete_entity
 	;cpctm_setBorder_asm HW_WHITE
+
+	call sys_print_death
 
 	ret
 

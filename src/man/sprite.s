@@ -133,7 +133,7 @@ no_more_explosion:
     cp  #e_ai_st_noAI
     jr  nz, __enemy
     ;=========================================================================================================================
-    ;; SOMOS EL HER
+    ;; SOMOS EL HERO
         ld  a, #2
         call man_state_setEstado ;; cambio de estado
 

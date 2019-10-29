@@ -130,23 +130,23 @@ jumping:
 
 
 
-	ld	hl, #Key_M
+	ld	hl, #Key_Esc
 	call cpct_isKeyPressed_asm
-	jr	z, M_NotPressed
-M_Pressed:
-	ld 	a, (ent_input_M_pressed)  ;; se comprueba si estaba pulsada anteriormente
+	jr	z, ESC_NotPressed
+ESC_Pressed:
+	ld 	a, (ent_input_ESC_pressed)  ;; se comprueba si estaba pulsada anteriormente
 	dec	a
-	jr	z, M_Holded_OrPressed
+	jr	z, ESC_Holded_OrPressed
 
 	call abrir_cerrar_menuIngame
 
 	ld	a, #1
-	ld	(ent_input_M_pressed), a
-	jr	M_Holded_OrPressed
-M_NotPressed:
+	ld	(ent_input_ESC_pressed), a
+	jr	ESC_Holded_OrPressed
+ESC_NotPressed:
 	ld	a, #0
-	ld	(ent_input_M_pressed), a
-M_Holded_OrPressed:
+	ld	(ent_input_ESC_pressed), a
+ESC_Holded_OrPressed:
 
 
 
@@ -183,13 +183,25 @@ A_Holded_OrPressed:
 
 
 
-
-ld	hl, #Key_Z
+	ld	hl, #Key_M
 	call cpct_isKeyPressed_asm
-	jr	z, Z_NotPressed
-Z_Presed:
+	jr	z, M_NotPressed
+M_Pressed:
+	ld 	a, (ent_input_M_pressed)  ;; se comprueba si estaba pulsada anteriormente
+	dec	a
+	jr	z, M_Holded_OrPressed
+
 	call sys_music_pausarReanudarMusica
-Z_NotPressed:
+
+	ld  	a,  #1
+	ld	(ent_input_M_pressed), a
+	jr	M_Holded_OrPressed
+M_NotPressed:
+	ld	a, #0
+	ld	(ent_input_M_pressed), a
+M_Holded_OrPressed:
+
+
 
 ;	ld	hl, #Key_W
 ;	call cpct_isKeyPressed_asm

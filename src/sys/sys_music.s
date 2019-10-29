@@ -100,8 +100,9 @@ isr:
 	dec	a
 	jr	z, musicaPausada
 	call cpct_akp_musicPlay_asm
-	musicaPausada:
 	call	detectarSonido_Sfx
+	musicaPausada:
+	
 	
 
 	ld	a, (velocidadMusica)
@@ -126,6 +127,8 @@ sys_music_pausarReanudarMusica::
 	dec	a
 	jr	nz, pausarLaMusica
 	ld	a, #0
+	ld	(sfx_Salto), a
+	ld	(sfx_explosion), a
 	ld	(pausarMusica), a
 	ret
 	pausarLaMusica:

@@ -91,4 +91,25 @@ Q_NotPressed_mainMenu:
 Q_Holded_OrPressed_mainMenu:
 
 
+
+
+   ld hl, #Key_M
+   call cpct_isKeyPressed_asm
+   jr z, M_NotPressed_mainMenu
+M_Pressed_mainMenu:
+   ld    a, (ent_input_M_pressed)  ;; se comprueba si estaba pulsada anteriormente
+   dec   a
+   jr z, M_Holded_OrPressed_mainMenu
+
+   call sys_music_pausarReanudarMusica
+
+   ld    a,  #1
+   ld (ent_input_M_pressed), a
+   jr M_Holded_OrPressed_mainMenu
+M_NotPressed_mainMenu:
+   ld a, #0
+   ld (ent_input_M_pressed), a
+M_Holded_OrPressed_mainMenu:
+
+
    ret

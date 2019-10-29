@@ -7,6 +7,7 @@
 .include "sys/render.h.s"
 .include "sys/sys_music.h.s"
 .include "man/state.h.s"
+.include "sys/sys_deathCounter.h.s"
 
 .globl _menu_ingame_pack_end
 ;//////////// INTI
@@ -26,6 +27,10 @@ menuIngame_init::
 
 
     call sys_music_pausarReanudarMusica
+
+    ;; PINTAR MUERTES
+    call sys_print_death
+
    ret
 
 

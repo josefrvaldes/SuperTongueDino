@@ -68,8 +68,20 @@ sys_death_init::
 sys_print_death::
 
 
-    ld	hl, #0xC000
+    ld	hl, #0xC010
     ld	a, (unidades)
+    add	#48
+    ld	e, a
+    call cpct_drawCharM0_asm
+
+    ld	hl, #0xC008
+    ld	a, (decenas)
+    add	#48
+    ld	e, a
+    call cpct_drawCharM0_asm
+
+    ld	hl, #0xC000
+    ld	a, (centenas)
     add	#48
     ld	e, a
     call cpct_drawCharM0_asm

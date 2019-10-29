@@ -110,7 +110,7 @@ _update_loop:
    cp    #0                            
    jr    nz, continuar_actualizar_pos   ;; lo que implica que pasaremos a la siguiente entidad
 
-   cpctm_setBorder_asm HW_GREEN
+   ;cpctm_setBorder_asm HW_GREEN
 
    push ix
    call man_obstacle_re_rellenar_array
@@ -122,7 +122,7 @@ _update_loop:
    call check_diferent_obstacles
 ;=================================================================================
 
-   cpctm_setBorder_asm HW_RED
+   ;cpctm_setBorder_asm HW_RED
    ;; COLISIONES CON LOS OBJETOS
    call sys_check_collision
 

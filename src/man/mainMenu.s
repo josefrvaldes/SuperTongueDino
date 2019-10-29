@@ -23,7 +23,7 @@ man_mainMenu_init::
    ld hl, #_hero_pal
    ld de, #16
    call cpct_setPalette_asm
-   cpctm_setBorder_asm HW_WHITE
+   ;cpctm_setBorder_asm HW_WHITE
    
    ;call sys_eren_init  ;; va a dibujar el mapa, CORREGIR!!!
    ld hl, #_menu_principal_pack_end

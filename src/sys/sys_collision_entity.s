@@ -67,7 +67,7 @@ _next_iy:
 		jr	nz, _no_hero
 _hero:
 		;call process_dead_hero
-		cpctm_setBorder_asm HW_RED
+		;cpctm_setBorder_asm HW_RED
 		ld    a, e_dead(ix)
 		cp    #0
 		jr	nz, __no_collision
@@ -90,7 +90,7 @@ _hero:
 		jr	__no_collision
 _no_hero:
 		call change_direcction_entity
-		cpctm_setBorder_asm HW_RED
+		;cpctm_setBorder_asm HW_RED
 __no_collision:
 
 	jr	_next_iy

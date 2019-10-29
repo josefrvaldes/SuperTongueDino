@@ -37,7 +37,7 @@ sys_eren_init::
 	ld    hl, #_hero_pal
 	ld    de, #16
 	call cpct_setPalette_asm
-	cpctm_setBorder_asm HW_WHITE
+	;cpctm_setBorder_asm HW_WHITE
 	call sys_eren_load_tilemap
    call sys_eren_drawLevel
    ret

@@ -326,20 +326,20 @@ out_screem_UP:
 	sub  	b
 	jr  	c, __no_collision
 
-    ld  de,   #0xC000
-    ld  a,   #0xFF
-    ld  c,    #0x04
-    ld  b,    #0x08
-        call cpct_drawSolidBox_asm
+   ; ld  de,   #0xC000
+   ; ld  a,   #0xFF
+   ; ld  c,    #0x04
+   ; ld  b,    #0x08
+   ;     call cpct_drawSolidBox_asm
 
     	ld	a, #1
 ret
 __no_collision:
-    ld  de,   #0xC000
-    ld  a,   #0x00
-    ld  c,    #0x04
-    ld  b,    #0x08
-        call cpct_drawSolidBox_asm
+    ;ld  de,   #0xC000
+    ;ld  a,   #0x00
+    ;ld  c,    #0x04
+    ;ld  b,    #0x08
+    ;    call cpct_drawSolidBox_asm
 
     ld	a, #0
   ret
@@ -593,14 +593,14 @@ sys_ai_patrullar:
 	cp	#dificultad_3
 	jr	nz, acabar_patrulla
 
-	ld	d, #3
-	call sys_ai_detectarJugador
-	dec	a
-	jr	nz, patrullar_noAvisar
-	;ld	a, #1						;; descomentar para que las patrullas llamen a perseguir 
-	;ld	(patrullar_llamaPerseguir), a
-	ret
-	patrullar_noAvisar:
+	;ld	d, #3
+	;call sys_ai_detectarJugador
+	;dec	a
+	;jr	nz, patrullar_noAvisar
+	;;ld	a, #1						;; descomentar para que las patrullas llamen a perseguir 
+	;;ld	(patrullar_llamaPerseguir), a
+	;ret
+	;patrullar_noAvisar:
 	ld	a, #0
 	ld	(patrullar_llamaPerseguir), a
 

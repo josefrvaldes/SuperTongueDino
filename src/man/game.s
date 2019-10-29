@@ -102,27 +102,27 @@ man_game_update::				;; MEJORAR!!! esto ya que estoy pasando IX al update y se p
 	call aplicate_invisibility
 
 	;cpctm_setBorder_asm HW_RED
-	cpctm_setBorder_asm HW_YELLOW
+	;cpctm_setBorder_asm HW_YELLOW
 	call man_entity_getArray
 	call sys_ai_control_update
 
-	cpctm_setBorder_asm HW_BLUE
+	;cpctm_setBorder_asm HW_BLUE
 	call man_entity_getArray
 	call aplicate_animation
 
 	;cpctm_setBorder_asm HW_WHITE
-	cpctm_setBorder_asm HW_GREEN
+	;cpctm_setBorder_asm HW_GREEN
 	call man_entity_getArray
 	call sys_physics_update
 
-	cpctm_setBorder_asm HW_ORANGE
+	;cpctm_setBorder_asm HW_ORANGE
 	call man_entity_getArray
 	call sys_collision_entity_update
 
-	cpctm_setBorder_asm HW_BLACK
+	;cpctm_setBorder_asm HW_BLACK
 	call man_entity_getArray
 	call sys_delete_entity
-	cpctm_setBorder_asm HW_WHITE
+	;cpctm_setBorder_asm HW_WHITE
 
 	ret
 

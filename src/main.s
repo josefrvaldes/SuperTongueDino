@@ -46,6 +46,8 @@ _main::
    ;; Disable firmware to prevent it from interfering with string drawing
    call cpct_disableFirmware_asm
 
+   cpctm_setBorder_asm HW_BLUE
+
    call man_state_init
 
    call man_level_init

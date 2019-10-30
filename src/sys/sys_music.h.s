@@ -9,6 +9,10 @@
 
 .globl sys_music_sonar_Salto
 .globl sys_music_sonar_Explosion
+.globl sys_music_sonar_levelComplete
+.globl sys_music_sonar_gameComplete
+
+	
 
 
 

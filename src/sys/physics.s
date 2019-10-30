@@ -226,6 +226,7 @@ check_diferent_obstacles:
       call comprobarFinalJuego
       dec   a
       jr    z, todo_fondo
+      call sys_music_sonar_levelComplete
       call man_level_load_next
       call man_tilemap_load
       call man_tilemap_render

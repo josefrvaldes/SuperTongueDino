@@ -7,9 +7,6 @@
 .include "man/state.h.s"
 
 
-.module level_manager
-
-
 
 
 DefineComponentArrayStructure _level, max_levels, DefineCmp_Level_default ;; ....  

@@ -23,8 +23,6 @@
 
 ;.include "sys/sys_deathCounter.h.s"
 
-.module game_manager
-
 
 bool_mostrar_menu: .db #0
 

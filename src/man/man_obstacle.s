@@ -11,7 +11,6 @@
 .include "sys/sys_calc.h.s"
 .include "man/man_level.h.s"
 
-.module obstacle_manager
 
 obst_array:: DefineComponentArrayStructure _obstacle, max_obstacles, DefineCmp_Obstacle_default ;; ....
 

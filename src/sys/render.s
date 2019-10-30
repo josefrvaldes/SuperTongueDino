@@ -14,8 +14,6 @@
 
 
 
-.module sys_entity_render
-
 .globl _hero_pal
 
 

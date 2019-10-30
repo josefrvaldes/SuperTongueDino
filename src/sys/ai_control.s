@@ -9,7 +9,6 @@
 .include "man/game.h.s"
 .include "man/man_level.h.s"
 
-.module sys_ai_control
  
 
 dificultadRango_1 = 29			;; para cambiar la dificultad de los enemigos dependiendo del nivel

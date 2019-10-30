@@ -18,7 +18,7 @@
 .include "sys/sys_deathCounter.h.s"
 
 
-.module sys_entity_physics
+
 
 ;; Physics system constants
 screen_width  = 80

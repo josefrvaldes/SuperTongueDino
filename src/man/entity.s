@@ -12,7 +12,6 @@
 .globl _enemigo1_sp_0
 .globl _enemigo2_sp_0
 
-.module entity_manager
 
 deathsPlayer:: .dw #0
 

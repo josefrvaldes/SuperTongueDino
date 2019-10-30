@@ -45,8 +45,8 @@ menuIngame_init::
    ld (ent_input_Q_pressed), a   ;; se utiliza para evitar que al abrir el menu se vaya al menu principal al tener pulsada la tecla
 
 
-    call sys_music_pausarReanudarMusica
-
+    ;call sys_music_pausarReanudarMusica
+    call sys_music_pausarReanudarMusica_abirMenuIngame
     ;; PINTAR MUERTES
     call sys_print_death_menuIngame
 
@@ -80,7 +80,7 @@ ESC_Pressed_menuIngame:
    jr z, ESC_Holded_OrPressed_menuIngame
 
    call abrir_cerrar_menuIngame
-	call sys_music_pausarReanudarMusica
+	call sys_music_pausarReanudarMusica_cerrarMenuIngame
 
    ld a, #1
    ld (ent_input_ESC_pressed), a
@@ -107,7 +107,7 @@ Q_Pressed_menuIngame:
    ld a, #0
    call man_state_setEstado
    call man_game_cerrarMenuIngame ;; modificar
-	call sys_music_pausarReanudarMusica
+	call sys_music_pausarReanudarMusica_cerrarMenuIngame
 
    ld a, #1
    ld (ent_input_Q_pressed), a

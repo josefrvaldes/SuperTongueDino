@@ -31,6 +31,8 @@
 .globl sys_music_sonar_levelComplete
 .globl sys_music_sonar_gameComplete
 
+.globl sys_music_pausarReanudarMusica_abirMenuIngame
+.globl sys_music_pausarReanudarMusica_cerrarMenuIngame
 	
 
 

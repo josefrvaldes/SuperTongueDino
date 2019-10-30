@@ -37,6 +37,7 @@ sfx_levelComplete: .db #0
 
 
 pausarMusica: .db #0
+pausarMusica_menuAbierto: .db #0
 ;ArrayCanciones:
 ;	.dw	#_song_ingame
 ;
@@ -175,6 +176,36 @@ sys_music_pausarReanudarMusica::
 	ex	af, af'
 
 	ret
+
+
+
+
+sys_music_pausarReanudarMusica_abirMenuIngame::
+	ld	a, (pausarMusica)
+	cp	#1
+	jr	z, continuar_abirMenuIngame
+	call sys_music_pausarReanudarMusica
+	ret
+
+	continuar_abirMenuIngame:
+	ld	a, #1
+	ld	(pausarMusica_menuAbierto), a
+	ret
+
+
+sys_music_pausarReanudarMusica_cerrarMenuIngame::
+	ld	a, (pausarMusica_menuAbierto)
+	cp	#1
+	jr	z, continuar_cerrarMenuIngame
+	call sys_music_pausarReanudarMusica
+	ret
+
+	continuar_cerrarMenuIngame:
+	ld	a, #0
+	ld	(pausarMusica_menuAbierto), a
+	ret
+
+
 
 
 ; para el interruptor por lo que no se escucha ningun sonido

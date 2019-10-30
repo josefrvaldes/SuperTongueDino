@@ -88,7 +88,7 @@
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-.include "../../../cpctelera/src/strings/strings.s"
+.include "strings/strings.s"
 ;.include "cpct_drawStringM0.s"
 
 ;; Global symbols

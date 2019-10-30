@@ -7,6 +7,7 @@
 .include "sys/render.h.s"
 .include "sys/sys_music.h.s"
 .include "man/state.h.s"
+.include "sys/sys_deathCounter.h.s"
 
 .globl _menu_you_win_pack_end
 ;//////////// INTI
@@ -20,7 +21,9 @@ man_endGame_init::
    ld a, #1
    ld (ent_input_Q_pressed), a   ;; se utiliza para evitar que al abrir el menu se vaya al menu principal al tener pulsada la tecla
 
-   call sys_music_pausarReanudarMusica
+   ;call sys_music_pausarReanudarMusica
+   call sys_print_death_endGame
+   call sys_music_sonar_gameComplete
    ret
 
 
@@ -57,7 +60,7 @@ Q_Pressed_endGame:
 
    ld a, #0
    call man_state_setEstado ; salir menu principal
-   call sys_music_pausarReanudarMusica
+   ;call sys_music_pausarReanudarMusica
 
    ld (ent_input_Q_pressed), a
    jr Q_Holded_OrPressed_endGame
@@ -65,4 +68,27 @@ Q_NotPressed_endGame:
    ld a, #0
    ld (ent_input_Q_pressed), a
 Q_Holded_OrPressed_endGame:
+
+
+
+
+
+
+   ld hl, #Key_M
+   call cpct_isKeyPressed_asm
+   jr z, M_NotPressed_endGame
+M_Pressed_endGame:
+   ld    a, (ent_input_M_pressed)  ;; se comprueba si estaba pulsada anteriormente
+   dec   a
+   jr z, M_Holded_OrPressed_endGame
+
+   call sys_music_pausarReanudarMusica
+
+   ld    a,  #1
+   ld (ent_input_M_pressed), a
+   jr M_Holded_OrPressed_endGame
+M_NotPressed_endGame:
+   ld a, #0
+   ld (ent_input_M_pressed), a
+M_Holded_OrPressed_endGame:
    ret

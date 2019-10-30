@@ -29,7 +29,7 @@ menuIngame_init::
     call sys_music_pausarReanudarMusica
 
     ;; PINTAR MUERTES
-    call sys_print_death
+    call sys_print_death_menuIngame
 
    ret
 

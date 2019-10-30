@@ -13,6 +13,8 @@ velocidadMusica:	.db #12			;; suena 1 vez cada 12 interrupciones
 ; Sonidos sfx
 sfx_Salto: .db #0
 sfx_explosion: .db #0
+sfx_gameComplete: .db #0
+sfx_levelComplete: .db #0
 
 
 pausarMusica: .db #0
@@ -129,6 +131,8 @@ sys_music_pausarReanudarMusica::
 	ld	a, #0
 	ld	(sfx_Salto), a
 	ld	(sfx_explosion), a
+	ld	(sfx_levelComplete), a
+	ld	(sfx_gameComplete), a
 	ld	(pausarMusica), a
 	ret
 	pausarLaMusica:
@@ -187,6 +191,34 @@ sys_music_init_sfx:
 
 
 
+; Destruye: A
+sys_music_sonar_Salto::
+	ld	a, #1
+	ld	(sfx_Salto), a
+	ret
+
+; Destruye: A
+sys_music_sonar_Explosion::
+	ld	a, #1
+	ld	(sfx_explosion), a
+	ret
+
+; Destruye: A
+sys_music_sonar_levelComplete::
+	ld	a, #1
+	ld	(sfx_levelComplete), a
+	ret
+
+; Destruye: A
+sys_music_sonar_gameComplete::
+	ld	a, #1
+	ld	(sfx_gameComplete), a
+	ret
+
+
+
+
+
 ; Destruye: AF, BC, DE, HL
 detectarSonido_Sfx:
 	ld	a, (sfx_Salto)
@@ -240,22 +272,257 @@ detectarSonido_Sfx:
 
 
 	return_salir_sfx:
+	call sonido_levelComplete
+	call sonido_endGame
+
 	ret
 
 
 
 
-; Destruye: A
-sys_music_sonar_Salto::
-	ld	a, #1
-	ld	(sfx_Salto), a
+
+
+;////////////////////////////////////////////////////////////////////////////////////////////
+;////////////////////////////////////////////////////////////////////////////////////////////
+; sonidos al completar un nivel
+sonido_levelComplete:
+	ld	a, (sfx_levelComplete)
+	cp	#0
+	ret	z
+
+	ld	a, (sfx_levelComplete)
+	cp	#1
+	jr	nz, try_levelComplete2_sfx
+
+	ld	l, #06				; sfx_num		 Number of the instrument in the SFX Song (>0), same as the number given to the instrument in Arkos Tracker.
+	ld	h, #10				; volume		 Volume [0-15], 0 = off, 15 = maximum volume.
+	ld	e, #61				; note		 Note to be played with the given instrument [0-143]
+	ld	d, #0					; speed		 Speed (0 = As original, [1-255] = new Speed (1 is fastest))
+	ld	bc, #0				; inverted_pitch	 Inverted Pitch (-0xFFFF -> 0xFFFF).  0 is no pitch.  The higher the pitch, the lower the sound.
+	ld	a, #0x04  ; -> binario 010    ; channel_bitmask	 Bitmask representing channels to use for reproducing the sound (Ch.A = 001 (1), Ch.B = 010 (2), Ch.C = 100 (4))
+	call cpct_akp_SFXPlay_asm
+	ld	a, #2
+	ld	(sfx_levelComplete), a
 	ret
 
-; Destruye: A
-sys_music_sonar_Explosion::
-	ld	a, #1
-	ld	(sfx_explosion), a
+	try_levelComplete2_sfx:
+	ld	a, (sfx_levelComplete)
+	cp	#5
+	jr	nz, try_levelComplete3_sfx
+
+	ld	l, #06			
+	ld	h, #10				
+	ld	e, #61				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #6
+	ld	(sfx_levelComplete), a
 	ret
+
+	try_levelComplete3_sfx:
+	ld	a, (sfx_levelComplete)
+	cp	#9
+	jr	nz, try_levelComplete4_sfx
+
+	ld	l, #06			
+	ld	h, #10					
+	ld	e, #61				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #10
+	ld	(sfx_levelComplete), a
+	ret
+
+	try_levelComplete4_sfx:
+	ld	a, (sfx_levelComplete)
+	cp	#13
+	jr	nz, incrementar_levelComplete
+
+	ld	l, #05				
+	ld	h, #10					
+	ld	e, #69				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #0
+	ld	(sfx_levelComplete), a
+
+	ret
+	incrementar_levelComplete:
+	ld	a, (sfx_levelComplete)
+	inc	a
+	ld	(sfx_levelComplete), a
+	ret
+;////////////////////////////////////////////////////////////////////////////////////////////
+;////////////////////////////////////////////////////////////////////////////////////////////
+
+
+; sonidos al completar el juego
+sonido_endGame:
+	jr sonido_endGame_part1
+
+
+
+sonido_endGame_part1:
+	ld	a, (sfx_gameComplete)
+	cp	#0
+	ret	z
+
+	ld	a, (sfx_gameComplete)
+	cp	#1
+	jr	nz, try_gameComplete2_sfx
+
+	ld	l, #06				
+	ld	h, #11				
+	ld	e, #61				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #2
+	ld	(sfx_gameComplete), a
+	ret
+
+	try_gameComplete2_sfx:
+	ld	a, (sfx_gameComplete)
+	cp	#5
+	jr	nz, try_gameComplete3_sfx
+
+	ld	l, #06			
+	ld	h, #11					
+	ld	e, #62				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #6
+	ld	(sfx_gameComplete), a
+	ret
+
+	try_gameComplete3_sfx:
+	ld	a, (sfx_gameComplete)
+	cp	#9
+	jr	nz, try_gameComplete4_sfx
+
+	ld	l, #06			
+	ld	h, #11					
+	ld	e, #64				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #10
+	ld	(sfx_gameComplete), a
+	ret
+
+	try_gameComplete4_sfx:
+	ld	a, (sfx_gameComplete)
+	cp	#13
+	jr	nz, sonido_endGame_part2
+
+	ld	l, #06				
+	ld	h, #11					
+	ld	e, #61				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #14
+	ld	(sfx_gameComplete), a
+	ret
+
+
+sonido_endGame_part2:
+	ld	a, (sfx_gameComplete)
+	cp	#17
+	jr	nz, try_gameComplete6_sfx
+
+	ld	l, #06			
+	ld	h, #11					
+	ld	e, #61				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #18
+	ld	(sfx_gameComplete), a
+	ret
+
+	try_gameComplete6_sfx:
+	ld	a, (sfx_gameComplete)
+	cp	#21
+	jr	nz, try_gameComplete7_sfx
+
+	ld	l, #06			
+	ld	h, #11					
+	ld	e, #62				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #22
+	ld	(sfx_gameComplete), a
+	ret
+
+	try_gameComplete7_sfx:
+	ld	a, (sfx_gameComplete)
+	cp	#25
+	jr	nz, try_gameComplete8_sfx
+
+	ld	l, #06				
+	ld	h, #11					
+	ld	e, #61				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #26
+	ld	(sfx_gameComplete), a
+	ret
+
+	try_gameComplete8_sfx:
+	ld	a, (sfx_gameComplete)
+	cp	#29
+	jr	nz, try_gameComplete9_sfx
+
+	ld	l, #06			
+	ld	h, #11					
+	ld	e, #62				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #30
+	ld	(sfx_gameComplete), a
+	ret
+
+	try_gameComplete9_sfx:
+	ld	a, (sfx_gameComplete)
+	cp	#33
+	jr	nz, incrementar_gameComplete
+
+	ld	l, #05				
+	ld	h, #11					
+	ld	e, #69				
+	ld	d, #0					
+	ld	bc, #0				
+	ld	a, #0x04  ; -> binario 010    
+	call cpct_akp_SFXPlay_asm
+	ld	a, #0
+	ld	(sfx_gameComplete), a
+	ret
+
+	incrementar_gameComplete:
+	ld	a, (sfx_gameComplete)
+	inc	a
+	ld	(sfx_gameComplete), a
+	ret
+
 
 
 

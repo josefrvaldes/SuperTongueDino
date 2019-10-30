@@ -55,32 +55,81 @@ incrementar_centenas:
  ret 
 
 
-sys_death_init::
 
+sys_death_init::
     xor	a
     ld	(unidades), a
     ld	(decenas), a
     ld	(centenas), a
-
  ret
 
 
-sys_print_death::
 
 
-    ld	hl, #0xC010
+sys_print_death_menuIngame::
+    ld 	h, #1	
+    ld 	l, #12	
+    call cpct_setDrawCharM0_asm
+
+    ld	de, #0xC000
+    ld    b, #65			; Y
+    ld    c, #42              ; X 
+    call cpct_getScreenPtr_asm   
     ld	a, (unidades)
     add	#48
     ld	e, a
     call cpct_drawCharM0_asm
 
-    ld	hl, #0xC008
+    ld	de, #0xC000
+    ld    b, #65			; Y
+    ld    c, #38              ; X 
+    call cpct_getScreenPtr_asm   
     ld	a, (decenas)
     add	#48
     ld	e, a
     call cpct_drawCharM0_asm
 
-    ld	hl, #0xC000
+    ld	de, #0xC000
+    ld    b, #65			; Y
+    ld    c, #34              ; X 
+    call cpct_getScreenPtr_asm   
+    ld	a, (centenas)
+    add	#48
+    ld	e, a
+    call cpct_drawCharM0_asm
+
+ ret
+
+
+
+
+sys_print_death_endGame::
+    ld 	h, #1	
+    ld 	l, #12	
+    call cpct_setDrawCharM0_asm
+
+    ld	de, #0xC000
+    ld    b, #186			; Y
+    ld    c, #42              ; X 
+    call cpct_getScreenPtr_asm   
+    ld	a, (unidades)
+    add	#48
+    ld	e, a
+    call cpct_drawCharM0_asm
+
+    ld	de, #0xC000
+    ld    b, #186			; Y
+    ld    c, #38              ; X 
+    call cpct_getScreenPtr_asm   
+    ld	a, (decenas)
+    add	#48
+    ld	e, a
+    call cpct_drawCharM0_asm
+
+    ld	de, #0xC000
+    ld    b, #186			; Y
+    ld    c, #34              ; X 
+    call cpct_getScreenPtr_asm   
     ld	a, (centenas)
     add	#48
     ld	e, a

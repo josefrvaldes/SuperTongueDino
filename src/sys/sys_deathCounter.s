@@ -1,3 +1,22 @@
+;;----------------------------------LICENSE NOTICE-----------------------------------------------------
+;;    Super Tongue Dino is a challenging platform game
+;;    Copyright (C) 2019  Carlos de la Fuente / Jose Martinez / Jose Francisco Valdes / (@clover_gs)
+;;
+;;    This program is free software: you can redistribute it and/or modify
+;;    it under the terms of the GNU General Public License as published by
+;;    the Free Software Foundation, either version 3 of the License, or
+;;    (at your option) any later version.
+;;
+;;    This program is distributed in the hope that it will be useful,
+;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;    GNU General Public License for more details.
+;;
+;;    You should have received a copy of the GNU General Public License
+;;    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;;------------------------------------------------------------------------------------------------------
+
+
 .include "cpctelera.h.s"
 .include "cpct_functions.h.s"
 
@@ -109,7 +128,7 @@ sys_print_death_endGame::
     call cpct_setDrawCharM0_asm
 
     ld	de, #0xC000
-    ld    b, #186			; Y
+    ld    b, #187			; Y
     ld    c, #42              ; X 
     call cpct_getScreenPtr_asm   
     ld	a, (unidades)
@@ -118,7 +137,7 @@ sys_print_death_endGame::
     call cpct_drawCharM0_asm
 
     ld	de, #0xC000
-    ld    b, #186			; Y
+    ld    b, #187			; Y
     ld    c, #38              ; X 
     call cpct_getScreenPtr_asm   
     ld	a, (decenas)
@@ -127,7 +146,7 @@ sys_print_death_endGame::
     call cpct_drawCharM0_asm
 
     ld	de, #0xC000
-    ld    b, #186			; Y
+    ld    b, #187			; Y
     ld    c, #34              ; X 
     call cpct_getScreenPtr_asm   
     ld	a, (centenas)
